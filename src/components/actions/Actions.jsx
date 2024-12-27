@@ -3,6 +3,7 @@ import Button from "@mui/material/Button";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { Add } from "@mui/icons-material";
 
 const btnStyle = {
   margin: "0 8px",
@@ -12,9 +13,21 @@ const btnStyle = {
   transition: "transform 0.3s, box-shadow 0.3s",
 };
 
-const Actions = ({ onEdit, onDelete, onView }) => {
+const Actions = ({ onEdit, onDelete, onView, onAdd }) => {
   return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <Button
+        variant="contained"
+        color="primary"
+        size="small"
+        startIcon={<Add />}
+        onClick={onAdd}
+        style={btnStyle}
+        onMouseEnter={(e) => e.target.style.transform = "scale(1.05)"}
+        onMouseLeave={(e) => e.target.style.transform = "scale(1)"}
+      >
+        Adicionar
+      </Button>
       <Button
         variant="contained"
         color="primary"
@@ -41,18 +54,6 @@ const Actions = ({ onEdit, onDelete, onView }) => {
         onMouseLeave={(e) => e.target.style.transform = "scale(1)"}
       >
         Excluir
-      </Button>
-      <Button
-        variant="outlined"
-        color="primary"
-        size="small"
-        startIcon={<VisibilityIcon />}
-        onClick={onView}
-        style={btnStyle}
-        onMouseEnter={(e) => e.target.style.transform = "scale(1.05)"}
-        onMouseLeave={(e) => e.target.style.transform = "scale(1)"}
-      >
-        Visualizar
       </Button>
     </div>
   );

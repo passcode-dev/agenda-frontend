@@ -62,7 +62,7 @@ function Table({
     };
 
     return (
-        <div className="text-center flex flex-col items-center justify-center bg-gray-100 p-4">
+        <div className="text-center flex flex-col items-center justify-center">
             {list.length > 0 && (
                 <TableContainer component={Paper} style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", borderRadius: "8px" }}>
                     <MuiTable sx={{ minWidth: 650 }}>
@@ -104,19 +104,19 @@ function Table({
                 </TableContainer>
             )}
             <div style={{ marginTop: "20px" }}>
-                <Button 
-                    variant="contained" 
-                    color="primary" 
-                    onClick={onBack} 
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={onBack}
                     style={{ marginRight: "10px", padding: "6px 16px", borderRadius: "4px" }}
                     disabled={page === 0}
                 >
                     Anterior
                 </Button>
-                <Button 
-                    variant="contained" 
-                    color="primary" 
-                    onClick={onNext} 
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={onNext}
                     style={{ padding: "6px 16px", borderRadius: "4px" }}
                     disabled={page + 1 >= Math.ceil(list.length / pageSize)}
                 >
