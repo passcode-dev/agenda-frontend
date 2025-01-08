@@ -7,24 +7,46 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Back from "@/components/back";
 import { regexEmail, regexUsername, regexPassword } from "@/lib/regex";
+import { Spinner } from "@/components/ui/spinner";
+import { useState } from "react";
+import UsuarioService from "@/lib/service/usuarioService";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 const schema = z.object({
     username: z.string().regex(regexUsername, "Usuário deve ter pelo menos 3 caracteres (apenas letras, números ou _)"),
     email: z.string().regex(regexEmail, "Deve ser um e-mail válido"),
 
-    password: z
+    senha: z
         .string()
         .regex(regexPassword, "Senha deve ter pelo menos 8 caracteres, uma letra maiúscula, uma minúscula e um número"),
 });
 
 export default function Novo() {
-
+    const [loading, setLoading] = useState(false);
+    const router = useRouter();
+    const { toast } = useToast();
     const { register, reset, handleSubmit, formState: { errors } } = useForm({
         resolver: zodResolver(schema),
     });
 
-    const onSubmit = (data) => {
-        console.log(data);
+    const onSubmit = async (data) => {
+        setLoading(true);
+        const usuarioService = new UsuarioService();
+        const cadastrar = await usuarioService.CadastrarUsuario(data);
+        if (cadastrar) {
+            setLoading(false);
+            reset();
+            toast({
+                title: "Usuário cadastrado com sucesso",
+            });
+            return router.push("/admin/usuarios");
+        }
+        setLoading(false);
+        toast({
+            title: "Erro ao cadastrar usuário",
+            status: "error",
+        });
     };
 
     return (
@@ -47,7 +69,9 @@ export default function Novo() {
             <div>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <UsuarioForm register={register} errors={errors} />
-                    <Button type="submit" className="mt-4">Cadastrar</Button>
+                    <Button type="submit" className="mt-4" disabled={loading}>
+                        {loading ? <Spinner className="text-gray-800" /> : "Cadastrar"}
+                    </Button>
                 </form>
             </div>
         </div >
