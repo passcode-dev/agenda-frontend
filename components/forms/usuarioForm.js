@@ -33,9 +33,9 @@ export default function UsuarioForm({ register, errors }) {
                     <Input
                         id="senha"
                         type="password"
-                        {...register("password")}
+                        {...register("senha")}
                     />
-                    {errors.password && (<p className="text-red-500 text-sm">*{errors.password.message}</p>)}
+                    {errors.senha && (<p className="text-red-500 text-sm">*{errors.senha.message}</p>)}
                 </div>
             </div>
         </div>
