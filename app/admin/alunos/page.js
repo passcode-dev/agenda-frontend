@@ -11,6 +11,7 @@ import Table from "@/components/tables/Tables";
 import { PaginationUI } from "@/components/paginationCustom";
 import FilterGroup from "@/components/Filters/FilterGroup";
 import FilterModal from "@/components/Filters/FilterModal";
+import { Value } from "@radix-ui/react-select";
 
 export default function Alunos() {
     const [loading, setLoading] = useState(true);
@@ -126,6 +127,21 @@ export default function Alunos() {
     const router = useRouter();
 
 
+    const filterSchema = [
+        {
+            name: 'Data de Nascimento',
+            Value: <input/>
+        },
+        {
+            name: 'Telefone',
+
+        },
+        {
+            name: 'CEP',
+        }
+    ];
+
+
 
     const columns = [
         { headerName: "Nome", field: "nome" },
@@ -202,6 +218,9 @@ export default function Alunos() {
                             Novo Aluno
                         </Button>
                     </Link>
+                    <FilterModal
+                        filterSchema={filterSchema}
+                    />
                 </div>
             </div>
             <div className="mt-8">
@@ -212,7 +231,9 @@ export default function Alunos() {
                 ) : (
                     alunos.length > 0 ? (
                         <>
-
+                            <FilterGroup
+                                filterSchema={filterSchema}
+                            />
                             <Table
                                 data={paginationData}
                                 columns={columns}
