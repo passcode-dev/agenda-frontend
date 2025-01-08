@@ -1,0 +1,6 @@
+[submodule "agenda-frontend"]
+	path = agenda-frontend
+	url = https://github.com/passcode-dev/agenda-frontend.git
+[submodule "agenda-backend"]
+	path = agenda-backend
+	url = https://github.com/passcode-dev/agenda-backend.git
