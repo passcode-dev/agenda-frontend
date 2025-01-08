@@ -10,14 +10,18 @@ import UsuarioService from '@/lib/service/usuarioService';
 import { Input } from '@/components/ui/input';
 import { SelectUI } from '@/components/selectCustom';
 import { useToast } from '@/hooks/use-toast';
+import { PaginationUI } from '@/components/paginationCustom';
 
 
 export default function Usuarios() {
     const [loading, setLoading] = useState(false);
     const [usuarios, setUsuarios] = useState([]);
     const [selected, setSelected] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
     const filtro = useRef("");
     const { toast } = useToast();
+
     const columns = ["Usuário", "Email", "Ações"];
     const data = [
         {
@@ -32,6 +36,34 @@ export default function Usuarios() {
             usuario: "José",
             email: "w@w.com",
         },
+        {
+            usuario: "José",
+            email: "w@w.com",
+        },
+        {
+            usuario: "José",
+            email: "w@w.com",
+        },
+        {
+            usuario: "José",
+            email: "w@w.com",
+        },
+        {
+            usuario: "José",
+            email: "w@w.com",
+        },
+        {
+            usuario: "José",
+            email: "w@w.com",
+        },
+        {
+            usuario: "José",
+            email: "w@w.com",
+        },
+        {
+            usuario: "José",
+            email: "w@w.com",
+        }
     ];
 
     const fetchUsuarios = async () => {
@@ -68,7 +100,7 @@ export default function Usuarios() {
         console.log(filtro.current.value);
         console.log(selected);
         if (!filtro.current.value && selected == "") {
-            console.log("Fecth all");
+            fetchUsuarios();
         }
 
         if (filtro.current.value && selected == "") {
@@ -83,18 +115,24 @@ export default function Usuarios() {
                 title: "Digite um valor",
                 description: "Digite um valor para pesquisar",
             })
-
-
         }
     }
 
+    const paginationData = data.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    )
+
+    const totalPages = Math.ceil(data.length / itemsPerPage);
+
+
     return (
         <div className="container max-w-4xl justify-center items-center mx-auto p-6">
-            <div className="mb-8">
+            {/* <div className="mb-8">
                 <div className="flex items-center gap-2">
                     <Back icon={<ArrowLeft className="h-4 w-4" />} text="Voltar" href="/admin" />
                 </div>
-            </div>
+            </div> */}
             <div className="mb-8 flex justify-between items-center">
                 <div>
                     <h1 className="mt-4 text-3xl font-bold">
@@ -139,7 +177,21 @@ export default function Usuarios() {
                     </div>
                 ) : (
                     data.length > 0 ? (
-                        <TableUsuarioUI columns={columns} data={data} onEdit={editarUsuario} onDelete={deletarUsuario} />
+                        <>
+                            <TableUsuarioUI
+                                columns={columns}
+                                data={paginationData} 
+                                onEdit={editarUsuario}
+                                onDelete={deletarUsuario}
+                            />
+                            <div className="mt-4 flex justify-end items-center">
+                                <PaginationUI
+                                    currentPage={currentPage}
+                                    onPageChange={setCurrentPage}
+                                    totalPages={totalPages}
+                                />
+                            </div>
+                        </>
                     ) : (
                         <div className="flex justify-center items-center h-64">
                             <p>Nenhum aluno cadastrado.</p>

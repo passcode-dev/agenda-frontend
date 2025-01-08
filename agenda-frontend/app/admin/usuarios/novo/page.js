@@ -9,7 +9,7 @@ import Back from "@/components/back";
 import { regexEmail, regexUsername, regexPassword } from "@/lib/regex";
 
 const schema = z.object({
-    username: z.string().regex(regexUsername, "Username deve ter pelo menos 3 caracteres (apenas letras, números ou _)"),
+    username: z.string().regex(regexUsername, "Usuário deve ter pelo menos 3 caracteres (apenas letras, números ou _)"),
     email: z.string().regex(regexEmail, "Deve ser um e-mail válido"),
 
     password: z
