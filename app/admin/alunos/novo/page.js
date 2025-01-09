@@ -26,6 +26,7 @@ const schema = z.object({
     rg: z
         .string()
         .regex(regexRg, "RG deve estar no formato XX.XXX.XXX-X"),
+    telefone: z.string().optional(),
 });
 
 
@@ -41,21 +42,22 @@ export default function Novo() {
         if (data.nome && data.dataNascimento && data.cpf && data.rg) {
             const alunoService = new AlunoService();
             const cadastrar = await alunoService.cadastrarAluno(data);
+
+
             if (cadastrar) {
                 reset();
                 toast({
                     title: "Aluno cadastrado com sucesso",
                     status: "success",
                 });
-                router.push("/admin/alunos");
-            } else {
-                toast({
-                    title: "Erro ao cadastrar aluno",
-                    description: "Por favor, tente novamente",
-                    status: "error",
-                    variant: "destructive"
-                });
+                return router.push("/admin/alunos");
             }
+            toast({
+                title: "Erro ao cadastrar aluno",
+                description: "Por favor, tente novamente",
+                status: "error",
+                variant: "destructive"
+            });
         }
     };
 
