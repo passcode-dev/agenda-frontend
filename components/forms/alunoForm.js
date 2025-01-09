@@ -48,6 +48,18 @@ export default function AlunoForm({ register, errors }) {
                     {errors.rg && (<p className="text-red-500 text-sm">*{errors.rg.message}</p>)}
                 </div>
             </div>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mt-6">
+                <div>
+                    <Label htmlFor="telefone">Telefone</Label>
+                    <Input
+                        id="telefone"
+                        type="text"
+                        {...register("telefone")}
+                        placeholder="(00) 00000-0000"
+                    />
+                    {errors.telefone && (<p className="text-red-500 text-sm">*{errors.telefone.message}</p>)}
+                </div>
+            </div>
         </div>
     );
 }
