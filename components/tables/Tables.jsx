@@ -31,7 +31,7 @@ function Tables({
                     </TableHeader>
                     <TableBody>
                         {data.map((row, rowIndex) => (
-                            <TableRow key={rowIndex}>
+                            <TableRow key={rowIndex} className="text-center align-middle">
                                 {columns.map((col) => (
                                     <TableCell key={col.field} className="px-4 py-2 align-middle">
                                         {col.renderCell
@@ -59,3 +59,4 @@ function Tables({
 }
 
 export default Tables;
+
