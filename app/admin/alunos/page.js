@@ -11,126 +11,19 @@ import Table from "@/components/tables/Tables";
 import { PaginationUI } from "@/components/paginationCustom";
 import FilterGroup from "@/components/Filters/FilterGroup";
 import FilterModal from "@/components/Filters/FilterModal";
-import { Value } from "@radix-ui/react-select";
 
 export default function Alunos() {
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
-    const [alunos, setAlunos] = useState([
-        {
-            id: 1,
-            nome: "João Silva",
-            email: "joao.silva@example.com",
-            telefone: "123456789",
-            dataNascimento: "2000-01-01",
-        },
-        {
-            id: 2,
-            nome: "Maria Oliveira",
-            email: "maria.oliveira@example.com",
-            telefone: "987654321",
-            dataNascimento: "1995-05-15",
-        },
-        {
-            id: 3,
-            nome: "José Santos",
-            email: "jose.santos@example.com",
-            telefone: "456123789",
-            dataNascimento: "1988-03-20",
-        },
-        {
-            id: 4,
-            nome: "Ana Pereira",
-            email: "ana.pereira@example.com",
-            telefone: "789456123",
-            dataNascimento: "1992-07-10",
-        },
-        {
-            id: 5,
-            nome: "Carlos Lima",
-            email: "carlos.lima@example.com",
-            telefone: "321654987",
-            dataNascimento: "1985-11-05",
-        },
-        {
-            id: 6,
-            nome: "Fernanda Costa",
-            email: "fernanda.costa@example.com",
-            telefone: "654987321",
-            dataNascimento: "1998-09-25",
-        },
-        {
-            id: 7,
-            nome: "Pedro Rocha",
-            email: "pedro.rocha@example.com",
-            telefone: "987321654",
-            dataNascimento: "1980-04-30",
-        },
-        {
-            id: 8,
-            nome: "Mariana Almeida",
-            email: "mariana.almeida@example.com",
-            telefone: "321987654",
-            dataNascimento: "1993-12-12",
-        },
-        {
-            id: 9,
-            nome: "Rafael Gomes",
-            email: "rafael.gomes@example.com",
-            telefone: "654321987",
-            dataNascimento: "1987-06-18",
-        },
-        {
-            id: 10,
-            nome: "Sofia Martins",
-            email: "sofia.martins@example.com",
-            telefone: "987654321",
-            dataNascimento: "1991-08-08",
-        },
-        {
-            id: 11,
-            nome: "Lucas Oliveira",
-            email: "lucas.oliveira@example.com",
-            telefone: "123456789",
-            dataNascimento: "1990-02-14",
-        },
-        {
-            id: 12,
-            nome: "Camila Pereira",
-            email: "camila.pereira@example.com",
-            telefone: "987654321",
-            dataNascimento: "1989-10-03",
-        },
-        {
-            id: 13,
-            nome: "Ricardo Santos",
-            email: "ricardo.santos@example.com",
-            telefone: "456123789",
-            dataNascimento: "1984-06-22",
-        },
-        {
-            id: 14,
-            nome: "Juliana Lima",
-            email: "juliana.lima@example.com",
-            telefone: "789456123",
-            dataNascimento: "1994-04-17",
-        },
-        {
-            id: 15,
-            nome: "Gustavo Costa",
-            email: "gustavo.costa@example.com",
-            telefone: "321654987",
-            dataNascimento: "1983-09-08",
-        }
-    ]);
+    const [alunos, setAlunos] = useState([]);
     const router = useRouter();
 
 
     const filterSchema = [
         {
             name: 'Data de Nascimento',
-            Value: <input/>
+            Value: <input />
         },
         {
             name: 'Telefone',
@@ -144,10 +37,11 @@ export default function Alunos() {
 
 
     const columns = [
-        { headerName: "Nome", field: "nome" },
-        { headerName: "Email", field: "email" },
-        { headerName: "Telefone", field: "telefone" },
-        { headerName: "Data de Nascimento", field: "dataNascimento" },
+        { headerName: "Nome", field: "name" },
+        { headerName: "Telefone", field: "phone_number" },
+        { headerName: "RG", field: "rg" },
+        { headerName: "CPF", field: "cpf" },
+        { headerName: "Data de Nascimento", field: "birth_date", renderCell: ({ row }) => new Date(row.birth_date).toLocaleDateString("pt-BR") },
         {
             headerName: "Ações", field: "acoes", renderCell: (row) => (
                 <div className="flex justify-center gap-3">
@@ -161,6 +55,7 @@ export default function Alunos() {
             )
         }
     ];
+
 
     const fetchAlunos = async () => {
         setLoading(true);
