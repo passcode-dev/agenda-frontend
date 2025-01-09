@@ -1,101 +1,61 @@
+"use client";
+
 import {
     Pagination,
     PaginationContent,
-    PaginationEllipsis,
     PaginationItem,
     PaginationLink,
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
-export function PaginationUI({ currentPage, totalPages, onPageChange }) {
-    const renderPaginationLinks = () => {
-        const links = [];
+export function PaginationUI({ totalPage, onPageChange }) {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const currentPage = Number(searchParams.get("page")) || 1;
 
-        for (let i = 1; i <= totalPages; i++) {
-            links.push(
+    const handlePageChange = (page) => {
+        if (page >= 1 && page <= totalPage) {
+            onPageChange(page);
+            router.push(`?page=${page}`, { scroll: false });
+        }
+    };
+
+    const renderPages = () => {
+        const pages = [];
+        for (let i = 1; i <= totalPage; i++) {
+            pages.push(
                 <PaginationItem key={i}>
                     <PaginationLink
-                        href="#"
+                        onClick={() => handlePageChange(i)}
                         isActive={i === currentPage}
-                        onClick={(e) => {
-                            e.preventDefault();
-                            onPageChange(i);
-                        }}
                     >
                         {i}
                     </PaginationLink>
                 </PaginationItem>
             );
         }
-
-        return links;
+        return pages;
     };
 
     return (
         <Pagination>
-            <PaginationContent>
-                <PaginationItem>
-                    <PaginationPrevious
-                        href="#"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            if (currentPage > 1) onPageChange(currentPage - 1);
-                        }}
-                        disabled={currentPage === 1}
-                    >
-                        Voltar
-                    </PaginationPrevious>
-                </PaginationItem>
-                {currentPage > 3 && (
-                    <>
-                        <PaginationItem>
-                            <PaginationLink
-                                href="#"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    onPageChange(1);
-                                }}
-                            >
-                                1
-                            </PaginationLink>
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationEllipsis />
-                        </PaginationItem>
-                    </>
-                )}
-                {renderPaginationLinks()}
-                {currentPage < totalPages - 2 && (
-                    <>
-                        <PaginationItem>
-                            <PaginationEllipsis />
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationLink
-                                href="#"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    onPageChange(totalPages);
-                                }}
-                            >
-                                {totalPages}
-                            </PaginationLink>
-                        </PaginationItem>
-                    </>
-                )}
-                <PaginationItem>
-                    <PaginationNext
-                        href="#"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            if (currentPage < totalPages) onPageChange(currentPage + 1);
-                        }}
-                        disabled={currentPage === totalPages}
-                    >
-                        Próximo
-                    </PaginationNext>
-                </PaginationItem>
+            <PaginationContent className="flex items-center gap-2">
+                <PaginationPrevious
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                >
+                    Anterior
+                </PaginationPrevious>
+                {renderPages()}
+                <PaginationNext
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPage}
+                >
+                    Próximo
+                </PaginationNext>
             </PaginationContent>
         </Pagination>
     );
