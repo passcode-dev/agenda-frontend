@@ -5,12 +5,13 @@ import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/hooks/use-toast";
 import AuthService from "@/lib/service/authService";
 import { useRouter } from "next/navigation";
 import { regexEmail, regexUsername } from "@/lib/regex";
+import { UserContext } from "./context/userContext";
 
 const schema = z.object({
     emailOrUsername: z.string().refine((value) => {
@@ -31,6 +32,7 @@ export default function LoginPage() {
     });
     const { toast } = useToast();
     const router = useRouter();
+    const { setUser } = useContext(UserContext);
 
     const onSubmit = async (data) => {
         setLoading(true);
@@ -39,6 +41,8 @@ export default function LoginPage() {
             const authService = new AuthService();
             const login = await authService.login(data);
             if (login) {
+                localStorage.setItem("usuario", JSON.stringify(login.data));
+                setUser(login.data);
                 reset();
                 toast({
                     title: "Login efetuado com sucesso",
