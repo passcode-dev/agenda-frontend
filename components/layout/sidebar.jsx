@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
@@ -16,6 +16,7 @@ import { Separator } from "@/components/ui/separator"
 import { ThemeToggle } from "./theme-toggle"
 import { Items } from "./nav-items"
 import { Menu, LogOut } from "lucide-react"
+import { UserContext } from "@/app/context/userContext"
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -25,7 +26,7 @@ export function Sidebar() {
 
   const handleLogout = () => {
     localStorage.removeItem("usuario")
-    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
+    // document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
     router.push('/auth')
   }
 
@@ -60,6 +61,8 @@ function SidebarContent({
   className,
 }) {
   const [NavItems, setNavItems] = useState(Items);
+  const { user } = useContext(UserContext);
+
 
   return (
     <div className={cn("flex h-full flex-col", className)}>
@@ -67,10 +70,10 @@ function SidebarContent({
         <div className="flex items-center gap-3">
           <div>
             <p className="font-medium">
-              Rodrigo
+              {user?.username}
             </p>
             <p className="text-sm text-muted-foreground">
-              exemplo@dominio.com
+              {user?.email}
             </p>
           </div>
         </div>
