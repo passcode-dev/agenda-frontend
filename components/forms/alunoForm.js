@@ -1,27 +1,39 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { useEffect } from "react";
 
-export default function AlunoForm({ register, errors }) {
+export default function AlunoForm({ register, errors, setValue, initialValues }) {
+
+    useEffect(() => {
+        if (initialValues) {
+            setValue("name", initialValues.name);
+            setValue("birth_date", initialValues.birth_date);
+            setValue("cpf", initialValues.cpf);
+            setValue("rg", initialValues.rg);
+            setValue("phone_number", initialValues.phone_number);
+        }
+    }, []);
+
     return (
         <div>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
-                    <Label htmlFor="nome">Nome completo</Label>
+                    <Label htmlFor="name">Nome completo</Label>
                     <Input
-                        id="nome"
+                        id="name"
                         type="text"
-                        {...register("nome")}
+                        {...register("name")}
                         placeholder="João da Silva"
                     />
-                    {errors.nome && (<p className="text-red-500 text-sm">*{errors.nome.message}</p>)}
+                    {errors.name && (<p className="text-red-500 text-sm">*{errors.name.message}</p>)}
                 </div>
 
                 <div>
-                    <Label htmlFor="dataNascimento">Data de Nascimento</Label>
+                    <Label htmlFor="birth_date">Data de Nascimento</Label>
                     <Input
-                        id="dataNascimento"
+                        id="birth_date"
                         type="date"
-                        {...register("dataNascimento")}
+                        {...register("birth_date")}
                     />
                     {errors.dataNascimento && (<p className="text-red-500 text-sm">*{errors.dataNascimento.message}</p>)}
                 </div>
@@ -50,14 +62,14 @@ export default function AlunoForm({ register, errors }) {
             </div>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mt-6">
                 <div>
-                    <Label htmlFor="telefone">Telefone</Label>
+                    <Label htmlFor="phone_number">Telefone</Label>
                     <Input
-                        id="telefone"
+                        id="phone_number"
                         type="text"
-                        {...register("telefone")}
+                        {...register("phone_number")}
                         placeholder="(00) 00000-0000"
                     />
-                    {errors.telefone && (<p className="text-red-500 text-sm">*{errors.telefone.message}</p>)}
+                    {errors.phone_number && (<p className="text-red-500 text-sm">*{errors.phone_number.message}</p>)}
                 </div>
             </div>
         </div>
