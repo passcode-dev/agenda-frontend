@@ -10,40 +10,20 @@ import { regexNome, regexData, regexCpf, regexRg } from "@/lib/regex";
 import AlunoService from "@/lib/service/alunoService";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-
-const schema = z.object({
-    nome: z.string().regex(regexNome, "O nome deve conter pelo menos dois nomes."),
-    dataNascimento: z.string().regex(regexData, "Data de nascimento deve estar no formato YYYY-MM-DD")
-        .refine((dataNascimento) => {
-            const data = new Date(dataNascimento);
-            const dataAtual = new Date();
-            return data < dataAtual;
-        }, { message: "Data de nascimento deve ser anterior a data atual." }),
-
-    cpf: z
-        .string()
-        .regex(regexCpf, "CPF deve estar no formato XXX.XXX.XXX-XX"),
-    rg: z
-        .string()
-        .regex(regexRg, "RG deve estar no formato XX.XXX.XXX-X"),
-    telefone: z.string().optional(),
-});
-
+import { zodAluno } from "@/lib/schemas/zod";
 
 export default function Novo() {
 
-    const { register, reset, handleSubmit, formState: { errors } } = useForm({
-        resolver: zodResolver(schema),
+    const { register, reset, handleSubmit, setValue, formState: { errors } } = useForm({
+        resolver: zodResolver(zodAluno),
     });
     const { toast } = useToast();
     const router = useRouter();
 
     const onSubmit = async (data) => {
-        if (data.nome && data.dataNascimento && data.cpf && data.rg) {
+        if (data.name && data.phone_number && data.birth_date && data.cpf && data.rg) {
             const alunoService = new AlunoService();
             const cadastrar = await alunoService.cadastrarAluno(data);
-
-
             if (cadastrar) {
                 reset();
                 toast({
@@ -59,6 +39,7 @@ export default function Novo() {
                 variant: "destructive"
             });
         }
+        
     };
 
     return (
@@ -80,7 +61,7 @@ export default function Novo() {
             </div>
             <div>
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    <AlunoForm register={register} errors={errors} />
+                    <AlunoForm register={register} errors={errors} setValue={setValue} />
                     <Button type="submit" className="mt-4">Cadastrar</Button>
                 </form>
             </div>
