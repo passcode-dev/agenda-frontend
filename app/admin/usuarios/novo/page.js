@@ -17,7 +17,7 @@ const schema = z.object({
     username: z.string().regex(regexUsername, "Usuário deve ter pelo menos 3 caracteres (apenas letras, números ou _)"),
     email: z.string().regex(regexEmail, "Deve ser um e-mail válido"),
 
-    senha: z
+    password: z
         .string()
         .regex(regexPassword, "Senha deve ter pelo menos 8 caracteres, uma letra maiúscula, uma minúscula e um número"),
 });

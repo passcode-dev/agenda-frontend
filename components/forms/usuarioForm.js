@@ -29,13 +29,13 @@ export default function UsuarioForm({ register, errors }) {
             </div>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mt-6">
                 <div>
-                    <Label htmlFor="senha">Senha</Label>
+                    <Label htmlFor="password">password</Label>
                     <Input
-                        id="senha"
+                        id="password"
                         type="password"
-                        {...register("senha")}
+                        {...register("password")}
                     />
-                    {errors.senha && (<p className="text-red-500 text-sm">*{errors.senha.message}</p>)}
+                    {errors.password && (<p className="text-red-500 text-sm">*{errors.password.message}</p>)}
                 </div>
             </div>
         </div>
