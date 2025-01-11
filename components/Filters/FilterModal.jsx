@@ -77,7 +77,7 @@ const FilterOption = styled.div`
 const FilterIconContainer = styled.div`
     cursor: pointer;
     padding: 8px;
-    border-radius: 50%;
+    border-radius: 5px;
     background-color: #171717;
     display: flex;
     justify-content: center;

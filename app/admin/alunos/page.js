@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
+import { ArrowLeft, Calendar, IdCard, Pencil, Phone, Trash2, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
@@ -24,9 +24,11 @@ export default function Alunos() {
     const currentPage = Number(searchParams.get("page")) || 1
 
     const filterSchema = [
-        { name: "Data de Nascimento", Value: <input /> },
-        { name: "Telefone" },
-        { name: "CEP" },
+        { name: "Nome", parameterName: "name", icon: <UserRound />, },
+        { name: "RG", parameterName: "rg", icon: <IdCard />, },
+        { name: "CPF", parameterName: "cpf", icon: <IdCard />, },
+        { name: "Telefone", parameterName: "phone_number", icon: <Phone />, },
+        { name: "Data de Nascimento", parameterName: "birth_date", icon: <Calendar />, },
     ];
 
     const columns = [
@@ -111,11 +113,11 @@ export default function Alunos() {
                     <h1 className="mt-4 text-3xl font-bold">Alunos</h1>
                     <p className="text-muted-foreground">Lista de alunos cadastrados</p>
                 </div>
-                <div className="flex flex-row">
-                    <Link href="/admin/alunos/novo">
-                        <Button className="px-4 py-2 rounded mt-4">Novo Aluno</Button>
-                    </Link>
+                <div className="flex flex-row justify-center items-center gap-2">
                     <FilterModal filterSchema={filterSchema} />
+                    <Link className="flex items-center justify-center" href="/admin/alunos/novo">
+                        <Button className="px-4">Novo Aluno</Button>
+                    </Link>
                 </div>
             </div>
             <div className="mt-8">
