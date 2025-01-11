@@ -49,7 +49,8 @@ const FilterGroup = ({ filterSchema }) => {
     useEffect(() => {
         const params = [];
         searchParams.forEach((value, key) => {
-            params.push({ key, value });
+            if (key != 'page')
+                params.push({ key, value });
         });
         setFilter(params);
     }, [searchParams]);
@@ -57,7 +58,6 @@ const FilterGroup = ({ filterSchema }) => {
     return (
         <>
             <GlobalStyle />
-            {console.log(filter)}
 
             <div className="flex flex-wrap justify-end gap-x-2 my-3">
                 {filter.map((filterItem, index) => {
