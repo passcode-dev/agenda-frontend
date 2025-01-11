@@ -1,5 +1,6 @@
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import styled from "styled-components";
-
 import { createGlobalStyle } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
@@ -42,21 +43,40 @@ const Icon = styled.i`
 `;
 
 const FilterGroup = ({ filterSchema }) => {
+    const searchParams = useSearchParams();
+    const [filter, setFilter] = useState([]);
+
+    useEffect(() => {
+        const params = [];
+        searchParams.forEach((value, key) => {
+            params.push({ key, value });
+        });
+        setFilter(params);
+    }, [searchParams]);
+
     return (
         <>
             <GlobalStyle />
+            {console.log(filter)}
+
             <div className="flex flex-wrap justify-end gap-x-2 my-3">
-                {filterSchema.map((filter, index) => (
-                    <div key={index}>
-                        <Filter>
-                            <Icon>{filter.icon}</Icon>
-                            <div>
-                                <Name>{filter.name}:</Name>
-                                <Value>{filter.value}</Value>
-                            </div>
-                        </Filter>
-                    </div>
-                ))}
+                {filter.map((filterItem, index) => {
+                    const schema = Array.isArray(filterSchema)
+                        ? filterSchema.find(item => item.parameterName === filterItem.key)
+                        : null;
+
+                    return (
+                        <div key={index}>
+                            <Filter>
+                                {schema?.icon}
+                                <div>
+                                    <Name>{schema?.name}:</Name>
+                                    <Value>{filterItem.value}</Value>
+                                </div>
+                            </Filter>
+                        </div>
+                    );
+                })}
             </div>
         </>
     );

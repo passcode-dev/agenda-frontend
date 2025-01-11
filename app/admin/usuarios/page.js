@@ -1,5 +1,5 @@
 "use client";
-import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
+import { ArrowLeft, Mail, Pencil, Trash2, User } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
@@ -10,6 +10,8 @@ import { SelectUI } from "@/components/selectCustom";
 import { useToast } from "@/hooks/use-toast";
 import { PaginationUI } from "@/components/paginationCustom";
 import Tables from "@/components/tables/Tables";
+import FilterModal from "@/components/Filters/FilterModal";
+import FilterGroup from "@/components/Filters/FilterGroup";
 
 export default function Usuarios() {
     const [loading, setLoading] = useState(false);
@@ -70,6 +72,12 @@ export default function Usuarios() {
     const itemsPerPage = 5;
     const filtro = useRef("");
     const { toast } = useToast();
+
+    const filterSchema = [
+        { name: "Usuário", parameterName: "user", icon: <User /> },
+        { name: "Email", parameterName: "email", icon: <Mail />, },
+
+    ];
 
     const columns = [
         { field: "usuario", headerName: "Usuário" },
@@ -170,33 +178,16 @@ export default function Usuarios() {
                     <h1 className="mt-4 text-3xl font-bold">Usuários</h1>
                     <p className="text-muted-foreground">Lista de usuários cadastrados</p>
                 </div>
-                <div>
-                    <Link href="/admin/usuarios/novo">
-                        <Button className="px-4 py-2 rounded mt-4">Novo Usuário</Button>
+                <div className="flex flex-row justify-center items-center gap-2">
+                    <FilterModal filterSchema={filterSchema} />
+                    <Link className="flex items-center justify-center" href="/admin/usuarios/novo">
+                        <Button className="px-4">Novo Usuário</Button>
                     </Link>
                 </div>
             </div>
+            <FilterGroup filterSchema={filterSchema} />
             <div className="mt-4">
 
-                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 items-end mb-6">
-                    <div>
-                        <Input
-                            type="text"
-                            placeholder="Pesquisar..."
-                            ref={filtro}
-                        />
-                    </div>
-                    <div>
-                        <SelectUI
-                            placeholder="Filtrar por..."
-                            items={["Usuário", "Email"]}
-                            onValueChange={valorSelect}
-                        />
-                    </div>
-                    <div className="flex justify-start sm:justify-end">
-                        <Button onClick={filtroUsuarios}>Pesquisar</Button>
-                    </div>
-                </div>
                 {loading ? (
                     <div className="flex justify-center items-center h-64">
                         <Spinner message="Carregando..." />

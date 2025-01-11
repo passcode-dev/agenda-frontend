@@ -111,7 +111,7 @@ export default function Alunos() {
                     <h1 className="mt-4 text-3xl font-bold">Alunos</h1>
                     <p className="text-muted-foreground">Lista de alunos cadastrados</p>
                 </div>
-                <div>
+                <div className="flex flex-row">
                     <Link href="/admin/alunos/novo">
                         <Button className="px-4 py-2 rounded mt-4">Novo Aluno</Button>
                     </Link>
