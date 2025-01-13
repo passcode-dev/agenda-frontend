@@ -248,7 +248,7 @@ const FilterModal = ({ filterSchema }) => {
                     <Separator />
                     <FilterOption onClick={clearFilters}>
                         <div >
-                            <X />
+                            <X  className='text-black'/>
                         </div>
                         <FilterName>Limpar Filtros</FilterName>
                     </FilterOption>
