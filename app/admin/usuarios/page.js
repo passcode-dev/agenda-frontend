@@ -1,20 +1,22 @@
 "use client";
-import { ArrowLeft, Mail, Pencil, Trash2, User } from "lucide-react";
+import { Mail, Pencil, Trash2, User } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useEffect, useRef, useState } from "react";
 import UsuarioService from "@/lib/service/usuarioService";
-import { Input } from "@/components/ui/input";
-import { SelectUI } from "@/components/selectCustom";
 import { useToast } from "@/hooks/use-toast";
 import { PaginationUI } from "@/components/paginationCustom";
 import Tables from "@/components/tables/Tables";
 import FilterModal from "@/components/Filters/FilterModal";
 import FilterGroup from "@/components/Filters/FilterGroup";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function Usuarios() {
     const [loading, setLoading] = useState(false);
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const currentPage = Number(searchParams.get("page")) || 1;
     const [usuarios, setUsuarios] = useState([
         {
             id: 1,
@@ -67,28 +69,26 @@ export default function Usuarios() {
             email: "usuario10@example.com",
         },
     ]);
-    const [selectedFilter, setSelectedFilter] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5;
-    const filtro = useRef("");
+    const [totalPage, setTotalPage] = useState(3);
     const { toast } = useToast();
 
     const filterSchema = [
-        { name: "Usuário", parameterName: "user", icon: <User /> },
-        { name: "Email", parameterName: "email", icon: <Mail />, },
+        { name: "Usuário", parameterName: "user", icon: <User className="text-black" /> },
+        { name: "Email", parameterName: "email", icon: <Mail className="text-black" />, },
 
     ];
 
     const columns = [
+        { field: "id", headerName: "#" },
         { field: "usuario", headerName: "Usuário" },
         { field: "email", headerName: "Email" },
         {
-            headerName: "Ações", field: "acoes", renderCell: (row) => (
+            headerName: "Ações", field: "acoes", renderCell: (params) => (
                 <div className="flex justify-center gap-3">
-                    <Button size="sm" onClick={() => editarUsuario(row.id)}>
+                    <Button size="sm" onClick={() => editarUsuario(params.row.id)}>
                         <Pencil className="w-4 h-4" />
                     </Button>
-                    <Button size="sm" onClick={() => deletarUsuario(row.id)}>
+                    <Button size="sm" onClick={() => deletarUsuario(params.row.id)}>
                         <Trash2 className="w-4 h-4" />
                     </Button>
                 </div>
@@ -96,7 +96,7 @@ export default function Usuarios() {
         }
     ];
 
-    const fetchUsuarios = async () => {
+    const fetchUsuarios = async (page) => {
         setLoading(true);
         try {
             // const usuarioService = new UsuarioService();
@@ -114,15 +114,15 @@ export default function Usuarios() {
     };
 
     useEffect(() => {
-        fetchUsuarios();
-    }, []);
+        fetchUsuarios(currentPage);
+    }, [currentPage]);
 
     const editarUsuario = (id) => {
-        router.push(`/admin/alunos/editar/${id}`);
+        router.push(`/admin/usuarios/editar/${id}`);
     };
 
     const deletarUsuario = (id) => {
-        const confirm = window.confirm("Deseja realmente deletar este aluno?");
+        const confirm = window.confirm("Deseja realmente deletar este usuário?");
         if (confirm) {
             // Implementar lógica de exclusão aqui
             toast({
@@ -132,44 +132,9 @@ export default function Usuarios() {
         }
     };
 
-    const valorSelect = (value) => {
-        setSelectedFilter(value);
+    const handlePageChange = (page) => {
+        fetchUsuarios(page);
     };
-
-    const filtroUsuarios = async () => {
-        const searchValue = filtro.current.value.trim();
-        if (!searchValue && !selectedFilter) {
-            fetchUsuarios();
-            return;
-        }
-
-        if (!searchValue && selectedFilter) {
-            return toast({
-                title: "Digite um valor",
-                description: "Digite um valor para pesquisar.",
-            });
-        }
-
-        if (searchValue && !selectedFilter) {
-            return toast({
-                title: "Selecione um filtro",
-                description: "Selecione um filtro para pesquisar.",
-            });
-        }
-
-        // Adicione lógica para aplicar o filtro aqui
-        toast({
-            title: "Pesquisa em andamento",
-            description: `Pesquisando por ${selectedFilter}: ${searchValue}`,
-        });
-    };
-
-    const paginationData = usuarios.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    );
-
-    const totalPages = Math.ceil(usuarios.length / itemsPerPage);
 
     return (
         <div className="container max-w-4xl mx-auto p-6">
@@ -197,15 +162,12 @@ export default function Usuarios() {
                         <>
                             <Tables
                                 columns={columns}
-                                data={paginationData}
-                                onEdit={editarUsuario}
-                                onDelete={deletarUsuario}
+                                data={usuarios}
                             />
                             <div className="mt-4 flex justify-end items-center">
                                 <PaginationUI
-                                    currentPage={currentPage}
-                                    onPageChange={setCurrentPage}
-                                    totalPages={totalPages}
+                                    totalPage={totalPage}
+                                    onPageChange={handlePageChange}
                                 />
                             </div>
                         </>
