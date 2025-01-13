@@ -1,7 +1,17 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { useEffect } from "react";
 
-export default function UsuarioForm({ register, errors }) {
+export default function UsuarioForm({ register, errors, setValue, initialValues }) {
+
+    useEffect(() => {
+        if (initialValues) {
+            setValue("username", initialValues.username || "");
+            setValue("email", initialValues.email || "");
+            setValue("password", "");
+        }
+    }, [])
+
     return (
         <div>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
