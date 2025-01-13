@@ -1,33 +1,23 @@
 "use client";
 import { ArrowLeft } from "lucide-react";
-import { z } from "zod";
 import UsuarioForm from "@/components/forms/usuarioForm";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Back from "@/components/back";
-import { regexEmail, regexUsername, regexPassword } from "@/lib/regex";
 import { Spinner } from "@/components/ui/spinner";
 import { useState } from "react";
 import UsuarioService from "@/lib/service/usuarioService";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-
-const schema = z.object({
-    username: z.string().regex(regexUsername, "Usuário deve ter pelo menos 3 caracteres (apenas letras, números ou _)"),
-    email: z.string().regex(regexEmail, "Deve ser um e-mail válido"),
-
-    password: z
-        .string()
-        .regex(regexPassword, "Senha deve ter pelo menos 8 caracteres, uma letra maiúscula, uma minúscula e um número"),
-});
+import { zodUsuario } from "@/lib/schemas/zod";
 
 export default function Novo() {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const { toast } = useToast();
     const { register, reset, handleSubmit, formState: { errors } } = useForm({
-        resolver: zodResolver(schema),
+        resolver: zodResolver(zodUsuario),
     });
 
     const onSubmit = async (data) => {
