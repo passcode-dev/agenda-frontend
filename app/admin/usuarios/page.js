@@ -11,67 +11,18 @@ import Tables from "@/components/tables/Tables";
 import FilterModal from "@/components/Filters/FilterModal";
 import FilterGroup from "@/components/Filters/FilterGroup";
 import { useRouter, useSearchParams } from "next/navigation";
+import { AlertDialogUI } from "@/components/alert";
 
 export default function Usuarios() {
     const [loading, setLoading] = useState(false);
     const searchParams = useSearchParams();
     const router = useRouter();
     const currentPage = Number(searchParams.get("page")) || 1;
-    const [usuarios, setUsuarios] = useState([
-        {
-            id: 1,
-            usuario: "usuario1",
-            email: "usuario1@example.com",
-        },
-        {
-            id: 2,
-            usuario: "usuario2",
-            email: "usuario2@example.com",
-        },
-        {
-            id: 3,
-            usuario: "usuario3",
-            email: "usuario3@example.com",
-        },
-        {
-            id: 4,
-            usuario: "usuario4",
-            email: "usuario4@example.com",
-        },
-        {
-            id: 5,
-            usuario: "usuario5",
-            email: "usuario5@example.com",
-        },
-        {
-            id: 6,
-            usuario: "usuario6",
-            email: "usuario6@example.com",
-        },
-        {
-            id: 7,
-            usuario: "usuario7",
-            email: "usuario7@example.com",
-        },
-        {
-            id: 8,
-            usuario: "usuario8",
-            email: "usuario8@example.com",
-        },
-        {
-            id: 9,
-            usuario: "usuario9",
-            email: "usuario9@example.com",
-        },
-        {
-            id: 10,
-            usuario: "usuario10",
-            email: "usuario10@example.com",
-        },
-    ]);
+    const [usuarios, setUsuarios] = useState([]);
     const [totalPage, setTotalPage] = useState(3);
+    const [showDialog, setShowDialog] = useState(false);
+    const [confirmCallback, setConfirmCallback] = useState(false);
     const { toast } = useToast();
-
     const filterSchema = [
         { name: "Usuário", parameterName: "user", icon: <User className="text-black" /> },
         { name: "Email", parameterName: "email", icon: <Mail className="text-black" />, },
@@ -80,7 +31,7 @@ export default function Usuarios() {
 
     const columns = [
         { field: "id", headerName: "#" },
-        { field: "usuario", headerName: "Usuário" },
+        { field: "username", headerName: "Usuário" },
         { field: "email", headerName: "Email" },
         {
             headerName: "Ações", field: "acoes", renderCell: (params) => (
@@ -99,13 +50,13 @@ export default function Usuarios() {
     const fetchUsuarios = async (page) => {
         setLoading(true);
         try {
-            // const usuarioService = new UsuarioService();
-            // const usuarios = await usuarioService.usuarios();
-            // setUsuarios(usuarios);
+            const usuarioService = new UsuarioService();
+            const usuarios = await usuarioService.usuarios();
+            setUsuarios(usuarios.data);
         } catch (error) {
             toast({
                 title: "Erro ao carregar usuários",
-                description: "Não foi possível carregar a lista de usuários.",
+                description: usuarios.message,
                 variant: "destructive",
             });
         } finally {
@@ -122,14 +73,32 @@ export default function Usuarios() {
     };
 
     const deletarUsuario = (id) => {
-        const confirm = window.confirm("Deseja realmente deletar este usuário?");
-        if (confirm) {
-            // Implementar lógica de exclusão aqui
-            toast({
-                title: "Usuário excluído",
-                description: `O usuário com ID ${id} foi excluído.`,
-            });
-        }
+        setShowDialog(true);
+
+        // setConfirmCallback(() => async () => {
+        //     const usuarioService = new UsuarioService();
+        //     const deletar = await usuarioService.deletarUsuario(id);
+        //     if (deletar.status == "success") {
+        //         setShowDialog(false);
+        //         fetchUsuarios(currentPage);
+        //         return toast({
+        //             title: "Usuário deletado com sucesso",
+        //             description: deletar.message,
+        //             variant: "success",
+        //         });
+
+
+
+        //     }
+
+        //     setShowDialog(false);
+        //     fetchUsuarios(currentPage);
+        //     return toast({
+        //         title: "Erro ao deletar usuário",
+        //         description: deletar.message,
+        //         variant: "destructive",
+        //     });
+        // });
     };
 
     const handlePageChange = (page) => {
@@ -138,6 +107,13 @@ export default function Usuarios() {
 
     return (
         <div className="container max-w-4xl mx-auto p-6">
+            <AlertDialogUI
+                title="Confirmação de exclusão"
+                description="Deseja realmente deletar este usuário?"
+                showDialog={showDialog}
+                setShowDialog={setShowDialog}
+                onConfirm={confirmCallback}
+            />
             <div className="mb-8 flex justify-between items-center">
                 <div>
                     <h1 className="mt-4 text-3xl font-bold">Usuários</h1>
@@ -152,13 +128,12 @@ export default function Usuarios() {
             </div>
             <FilterGroup filterSchema={filterSchema} />
             <div className="mt-4">
-
                 {loading ? (
                     <div className="flex justify-center items-center h-64">
                         <Spinner message="Carregando..." />
                     </div>
                 ) : (
-                    usuarios.length > 0 ? (
+                    usuarios.length >= 0 ? (
                         <>
                             <Tables
                                 columns={columns}

@@ -24,18 +24,21 @@ export default function Novo() {
         setLoading(true);
         const usuarioService = new UsuarioService();
         const cadastrar = await usuarioService.CadastrarUsuario(data);
-        if (cadastrar) {
+        if (cadastrar.status == "success") {
             setLoading(false);
             reset();
             toast({
                 title: "Usuário cadastrado com sucesso",
+                description: cadastrar.message,
             });
             return router.push("/admin/usuarios");
         }
         setLoading(false);
         toast({
             title: "Erro ao cadastrar usuário",
+            description: cadastrar.message,
             status: "error",
+            variant: "destructive",
         });
     };
 
