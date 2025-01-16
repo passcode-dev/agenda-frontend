@@ -21,25 +21,23 @@ export default function Novo() {
     const router = useRouter();
 
     const onSubmit = async (data) => {
-        if (data.name && data.phone_number && data.birth_date && data.cpf && data.rg) {
-            const alunoService = new AlunoService();
-            const cadastrar = await alunoService.cadastrarAluno(data);
-            if (cadastrar) {
-                reset();
-                toast({
-                    title: "Aluno cadastrado com sucesso",
-                    status: "success",
-                });
-                return router.push("/admin/alunos");
-            }
+        const alunoService = new AlunoService();
+        const cadastrar = await alunoService.cadastrarAluno(data);
+        if (cadastrar.status == "success") {
+            reset();
             toast({
-                title: "Erro ao cadastrar aluno",
-                description: "Por favor, tente novamente",
-                status: "error",
-                variant: "destructive"
+                title: "Aluno cadastrado com sucesso",
+                description: cadastrar.message,
+                status: "success",
             });
+            return router.push("/admin/alunos");
         }
-        
+        toast({
+            title: "Erro ao cadastrar aluno",
+            description: cadastrar.message,
+            status: "error",
+            variant: "destructive"
+        });
     };
 
     return (

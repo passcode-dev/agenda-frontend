@@ -9,9 +9,10 @@ import { zodAluno } from "@/lib/schemas/zod";
 import AlunoService from "@/lib/service/alunoService";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Editar({ params }) {
-
+    const [alunos, setAlunos] = useState({});
     const { register, reset, handleSubmit, setValue, formState: { errors } } = useForm({
         resolver: zodResolver(zodAluno),
     });
@@ -22,29 +23,38 @@ export default function Editar({ params }) {
     const onSubmit = async (data) => {
         const alunoService = new AlunoService();
         const editar = await alunoService.editarAluno(params.id, data);
-        if (!editar) {
+        if (editar.status == "success") {
+            toast({
+                title: "Aluno editado com sucesso",
+                description: editar.message,
+                variant: "success"
+            });
+            return router.push('/admin/alunos');
+        }
+        reset();
+        return toast({
+            title: "Erro ao editar aluno",
+            description: editar.message,
+            variant: "destructive"
+        });
+    };
+
+    useEffect(() => {
+        async function fetchAlunos(id) {
+            const alunoService = new AlunoService();
+            const buscar = await alunoService.buscarAluno(id);
+            if (buscar.status == "success") {
+                return setAlunos(buscar.data[0]);
+            }
             return toast({
-                title: "Erro ao editar aluno",
-                description: "Ocorreu um erro ao editar o aluno, tente novamente.",
+                title: "Erro ao buscar aluno",
+                description: buscar.message,
                 variant: "destructive"
             });
         }
-        reset();
-        toast({
-            title: "Aluno editado com sucesso",
-            description: "O aluno foi editado com sucesso.",
-            variant: "success"
-        });
-        router.push("/admin/alunos");
-    };
+        fetchAlunos(params.id);
+    }, [params.id])
 
-    let data = {
-        name: "Rodrigo de Oliveira Froes",
-        rg: "000000000",
-        cpf: "47726987871",
-        birth_date: "2025-01-09",
-        phone_number: "18981805860"
-    }
 
     return (
         <div className="container max-w-4xl justify-center items-center mx-auto p-6">
@@ -65,7 +75,7 @@ export default function Editar({ params }) {
             </div>
             <div>
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    <AlunoForm register={register} errors={errors} setValue={setValue} initialValues={data} />
+                    <AlunoForm register={register} errors={errors} setValue={setValue} initialValues={alunos} />
                     <Button type="submit" className="mt-4">
                         Salvar
                     </Button>

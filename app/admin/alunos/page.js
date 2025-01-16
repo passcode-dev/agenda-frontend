@@ -12,11 +12,14 @@ import FilterGroup from "@/components/Filters/FilterGroup";
 import FilterModal from "@/components/Filters/FilterModal";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter, useSearchParams } from "next/navigation";
+import { AlertDialogUI } from "@/components/alert";
 
 export default function Alunos() {
     const [loading, setLoading] = useState(false);
     const [alunos, setAlunos] = useState([]);
     const [totalPage, setTotalPage] = useState(3);
+    const [showDialog, setShowDialog] = useState(false);
+    const [confirmCallback, setConfirmCallback] = useState(null);
     const router = useRouter();
     const searchParams = useSearchParams();
     const { toast } = useToast();
@@ -76,24 +79,27 @@ export default function Alunos() {
     };
 
     const deletarAluno = async (id) => {
-        const confirm = window.confirm("Deseja realmente deletar este aluno?");
-        if (!confirm) return;
+        setShowDialog(true);
+        setConfirmCallback(() => async () => {
+            const alunoService = new AlunoService();
+            const deletar = await alunoService.deletarAluno(id);
+            if (deletar.status == "success") {
+                setShowDialog(false);
+                fetchAlunos(currentPage);
+                return toast({
+                    title: "Sucesso",
+                    description: deletar.message,
+                });
 
-        const alunoService = new AlunoService();
-        const deletar = await alunoService.deletarAluno(id);
-        if (!deletar) {
+            }
+
+            setShowDialog(false);
+            fetchAlunos(currentPage);
             return toast({
                 title: "Erro",
                 description: "Erro ao deletar aluno, tente novamente.",
                 variant: "destructive",
             });
-        }
-
-        fetchAlunos(currentPage);
-
-        toast({
-            title: "Sucesso",
-            description: "Aluno deletado com sucesso.",
         });
     };
 
@@ -103,6 +109,13 @@ export default function Alunos() {
 
     return (
         <div className="container max-w-4xl justify-center items-center mx-auto p-6">
+            <AlertDialogUI
+                title="Confirmação de exclusão"
+                description="Deseja realmente deletar este aluno?"
+                showDialog={showDialog}
+                setShowDialog={setShowDialog}
+                onConfirm={confirmCallback}
+            />
             <div className="mb-8 flex justify-between items-center">
                 <div>
                     <h1 className="mt-4 text-3xl font-bold">Alunos</h1>
