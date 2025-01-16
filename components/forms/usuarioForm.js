@@ -6,11 +6,11 @@ export default function UsuarioForm({ register, errors, setValue, initialValues 
 
     useEffect(() => {
         if (initialValues) {
-            setValue("username", initialValues.username || "");
-            setValue("email", initialValues.email || "");
+            setValue("username", initialValues.username );
+            setValue("email", initialValues.email);
             setValue("password", "");
         }
-    }, [])
+    }, [initialValues, setValue])
 
     return (
         <div>
@@ -39,7 +39,7 @@ export default function UsuarioForm({ register, errors, setValue, initialValues 
             </div>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mt-6">
                 <div>
-                    <Label htmlFor="password">password</Label>
+                    <Label htmlFor="password">Senha</Label>
                     <Input
                         id="password"
                         type="password"

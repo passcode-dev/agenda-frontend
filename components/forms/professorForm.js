@@ -2,16 +2,18 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useEffect } from "react";
+import { maskCpf } from '@/lib/mask';
 
-export default function ProfessorForm({ register, errors, setValue, initialValues }) {
+export default function ProfessorForm({ register, errors, setValue, initialValues}) {
 
     useEffect(() => {
-        if (initialValues) { 
-            setValue("name", initialValues.name || "");
-            setValue("birth_date", initialValues.birth_date || "");
-            setValue("cpf", initialValues.cpf || "");
+        if (initialValues) {
+            setValue("name", initialValues.name);
+            setValue("birth_date", initialValues.birth_date);
+            setValue("cpf", initialValues.cpf);
         }
     }, [initialValues, setValue]);
+
 
     return (
         <div>
@@ -45,6 +47,7 @@ export default function ProfessorForm({ register, errors, setValue, initialValue
                         type="text"
                         {...register("cpf")}
                         placeholder="000.000.000-00"
+                        onChange={(e) => setValue("cpf", maskCpf(e.target.value))}
                     />
                     {errors.cpf && (<p className="text-red-500 text-sm">*{errors.cpf.message}</p>)}
                 </div>
