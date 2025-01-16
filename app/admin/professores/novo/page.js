@@ -10,9 +10,9 @@ import { useRouter } from "next/navigation";
 import { zodProfessor } from "@/lib/schemas/zod";
 import ProfessorForm from "@/components/forms/professorForm";
 import ProfessoresService from "@/lib/service/professoresService";
+import { useState } from "react";
 
 export default function Novo() {
-
     const { register, reset, handleSubmit, setValue, formState: { errors } } = useForm({
         resolver: zodResolver(zodProfessor),
     });
@@ -23,17 +23,18 @@ export default function Novo() {
         if (data.name && data.birth_date && data.cpf) {
             const professorService = new ProfessoresService();
             const cadastrar = await professorService.cadastrarProfessor(data);
-            if (cadastrar) {
+            if (cadastrar.status == "success") {
                 reset();
                 toast({
                     title: "Professor cadastrado com sucesso",
+                    description: cadastrar.message,
                     status: "success",
                 });
                 return router.push("/admin/professores");
             }
-            toast({
+            return toast({
                 title: "Erro ao cadastrar professor",
-                description: "Por favor, tente novamente",
+                description: cadastrar.message,
                 status: "error",
                 variant: "destructive"
             });
@@ -59,7 +60,7 @@ export default function Novo() {
             </div>
             <div>
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    <ProfessorForm register={register} errors={errors} setValue={setValue} />
+                    <ProfessorForm register={register} errors={errors} setValue={setValue}  />
                     <Button type="submit" className="mt-4">Cadastrar</Button>
                 </form>
             </div>

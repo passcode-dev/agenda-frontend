@@ -9,7 +9,7 @@ import AlunoService from "@/lib/service/alunoService";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import ProfessoresService from "@/lib/service/professoresService";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ProfessorForm from "@/components/forms/professorForm";
 
 export default function Editar({ params }) {
@@ -41,7 +41,7 @@ export default function Editar({ params }) {
 
 
     useEffect(() => {
-        async function fetchProfessor(id){
+        async function fetchProfessor(id) {
             const professorService = new ProfessoresService();
             const buscar = await professorService.buscarProfessor(id);
             if (!buscar) {

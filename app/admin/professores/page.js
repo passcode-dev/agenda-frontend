@@ -13,10 +13,13 @@ import { useSearchParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import Tables from "@/components/tables/Tables";
+import { AlertDialogUI } from "@/components/alert";
 
 export default function Professores() {
     const [loading, setLoading] = useState(false);
     const [professores, setProfessores] = useState([]);
+    const [showDialog, setShowDialog] = useState(false);
+    const [confirmCallback, setConfirmCallback] = useState(null);
     const [totalPage, setTotalPage] = useState(3);
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -73,25 +76,24 @@ export default function Professores() {
     };
 
     const deletarProfessor = async (id) => {
-        const confirm = window.confirm("Deseja realmente deletar este professor?");
-        if (!confirm) return;
-
-        const professorService = new ProfessoresService();
-        const deletar = await professorService.deletarProfessor(id);
-        console.log(deletar)
-        if (!deletar) {
+        setShowDialog(true);
+        setConfirmCallback(() => async () => {
+            const professorService = new ProfessoresService();
+            const deletar = await professorService.deletarProfessor(id);
+            if (deletar.status == "success") {
+                setShowDialog(false);
+                fetchProfessor(currentPage);
+                return toast({
+                    title: "Sucesso",
+                    description: deletar.message,
+                });
+            }
+            setShowDialog(false);
+            fetchProfessor(currentPage);
             return toast({
                 title: "Erro",
-                description: "Erro ao deletar professor, tente novamente.",
-                variant: "destructive",
+                description: deletar.message,
             });
-        }
-
-        fetchProfessor(currentPage);
-
-        toast({
-            title: "Sucesso",
-            description: "Aluno deletado com sucesso.",
         });
     };
 
@@ -101,11 +103,13 @@ export default function Professores() {
 
     return (
         <div className="container max-w-4xl justify-center items-center mx-auto p-6">
-            <div className="mb-8">
-                <div className="flex items-center gap-2">
-                    <Back icon={<ArrowLeft className="h-4 w-4" />} text="Voltar" href="/admin" />
-                </div>
-            </div>
+            <AlertDialogUI
+                title="Confirmação de exclusão"
+                description="Deseja realmente deletar este professor?"
+                showDialog={showDialog}
+                setShowDialog={setShowDialog}
+                onConfirm={confirmCallback}
+            />
             <div className="mb-8 flex justify-between items-center">
                 <div>
                     <h1 className="mt-4 text-3xl font-bold">Professores</h1>
