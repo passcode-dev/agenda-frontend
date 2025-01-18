@@ -1,6 +1,7 @@
+"use client"
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     Select,
     SelectContent,
@@ -11,7 +12,14 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 
-export default function MateriaForm({ register, errors, setValue, professores, setProfessoresMateria, professoresMateria }) {
+export default function MateriaForm({ register, errors, setValue, professores, initialValues, setProfessoresMateria, professoresMateria }) {
+
+    useEffect(() => {
+        if (initialValues) {
+            setValue("name", initialValues.name);
+            setProfessoresMateria(initialValues.Teachers);
+        }
+    }, [initialValues, setValue]);
 
     const handleAdicionarProfessor = (professor) => {
         const professorSelecionado = professores.find(
@@ -57,7 +65,7 @@ export default function MateriaForm({ register, errors, setValue, professores, s
             <div className="flex flex-col flex-wrap gap-2 mt-4">
                 <Label>Professores adicionados</Label>
                 <div className="flex flex-wrap gap-2">
-                    {professoresMateria.length > 0 ? (
+                    {professoresMateria?.length > 0 ? (
                         professoresMateria.map((professor) => (
                             <Badge key={professor.id} className="flex items-center gap-2 justify-between p-2">
                                 <span>{professor.name}</span>
