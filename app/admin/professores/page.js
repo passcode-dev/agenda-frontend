@@ -26,7 +26,6 @@ export default function Professores() {
     const { toast } = useToast();
 
     const currentPage = Number(searchParams.get("page")) || 1
-    console.log(professores);
     const filterSchema = [
         { name: "Data de Nascimento", Value: <input /> },
         { name: "Nome" },
@@ -115,11 +114,11 @@ export default function Professores() {
                     <h1 className="mt-4 text-3xl font-bold">Professores</h1>
                     <p className="text-muted-foreground">Lista de professores cadastrados</p>
                 </div>
-                <div className="flex flex-row">
-                    <Link href="/admin/professores/novo">
-                        <Button className="px-4 py-2 rounded mt-4">Novo Professor</Button>
-                    </Link>
+                <div className="flex flex-row justify-center items-center gap-2">
                     <FilterModal filterSchema={filterSchema} />
+                    <Link className="flex items-center justify-center" href="/admin/professores/novo">
+                        <Button className="px-4 ">Novo Professor</Button>
+                    </Link>
                 </div>
             </div>
             <div className="mt-8">
@@ -141,6 +140,6 @@ export default function Professores() {
                 ) : null
                 }
             </div>
-        </div>
+        </div >
     );
 }

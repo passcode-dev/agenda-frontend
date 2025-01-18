@@ -3,27 +3,31 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AlunoForm from "@/components/forms/alunoForm";
 import Back from "@/components/back";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { zodAluno } from "@/lib/schemas/zod";
 import AlunoService from "@/lib/service/alunoService";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Editar({ params }) {
     const [alunos, setAlunos] = useState({});
     const { register, reset, handleSubmit, setValue, formState: { errors } } = useForm({
         resolver: zodResolver(zodAluno),
     });
-
+    const [loading, setLoading] = useState(false);
     const { toast } = useToast();
     const router = useRouter();
 
     const onSubmit = async (data) => {
+        setLoading(true);
         const alunoService = new AlunoService();
         const editar = await alunoService.editarAluno(params.id, data);
         if (editar.status == "success") {
+            setLoading(false);
+            reset();
             toast({
                 title: "Aluno editado com sucesso",
                 description: editar.message,
@@ -31,7 +35,7 @@ export default function Editar({ params }) {
             });
             return router.push('/admin/alunos');
         }
-        reset();
+        setLoading(false);
         return toast({
             title: "Erro ao editar aluno",
             description: editar.message,
@@ -76,8 +80,8 @@ export default function Editar({ params }) {
             <div>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <AlunoForm register={register} errors={errors} setValue={setValue} initialValues={alunos} />
-                    <Button type="submit" className="mt-4">
-                        Salvar
+                    <Button type="submit" className="mt-4 w-24" disabled={loading}>
+                        {loading ? <Spinner className="text-gray-800" /> : "Editar"}
                     </Button>
                 </form>
             </div>

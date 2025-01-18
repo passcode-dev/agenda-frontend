@@ -2,7 +2,7 @@
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Back from "@/components/back";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { zodProfessor } from "@/lib/schemas/zod";
 import AlunoService from "@/lib/service/alunoService";
@@ -11,32 +11,39 @@ import { useRouter } from "next/navigation";
 import ProfessoresService from "@/lib/service/professoresService";
 import { useEffect, useState } from "react";
 import ProfessorForm from "@/components/forms/professorForm";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Editar({ params }) {
     const { register, reset, handleSubmit, setValue, formState: { errors } } = useForm({
         resolver: zodResolver(zodProfessor),
     });
+    const [loading, setLoading] = useState(false);
     const [professor, setProfessor] = useState({});
     const { toast } = useToast();
     const router = useRouter();
 
     const onSubmit = async (data) => {
+        setLoading(true);
         const professorService = new ProfessoresService();
         const editar = await professorService.editarProfessor(params.id, data);
-        if (!editar) {
-            return toast({
-                title: "Erro ao editar aluno",
-                description: "Ocorreu um erro ao editar o aluno, tente novamente.",
-                variant: "destructive"
+        if (editar.status == "success") {
+            setLoading(false);
+            reset();
+            toast({
+                title: "Aluno editado com sucesso",
+                description: editar.message,
+                variant: "success"
             });
+            return router.push("/admin/alunos");
+
         }
-        reset();
-        toast({
-            title: "Aluno editado com sucesso",
-            description: "O aluno foi editado com sucesso.",
-            variant: "success"
+        setLoading(false);
+        return toast({
+            title: "Erro ao editar aluno",
+            description: editar.message,
+            variant: "destructive"
         });
-        router.push("/admin/alunos");
+
     };
 
 
@@ -44,17 +51,17 @@ export default function Editar({ params }) {
         async function fetchProfessor(id) {
             const professorService = new ProfessoresService();
             const buscar = await professorService.buscarProfessor(id);
-            if (!buscar) {
-                return toast({
-                    title: "Erro ao buscar professor",
-                    description: "Ocorreu um erro ao buscar o professor, tente novamente.",
-                    variant: "destructive"
-                });
+            if (buscar.status == "success") {
+                setProfessor(buscar);
             }
-            setProfessor(buscar);
+            return toast({
+                title: "Erro ao buscar professor",
+                description: buscar.message,
+                variant: "destructive"
+            });
         }
         fetchProfessor(params.id);
-    }, []);
+    }, [params.id]);
 
     return (
         <div className="container max-w-4xl justify-center items-center mx-auto p-6">
@@ -76,8 +83,8 @@ export default function Editar({ params }) {
             <div>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <ProfessorForm register={register} errors={errors} setValue={setValue} initialValues={professor} />
-                    <Button type="submit" className="mt-4">
-                        Salvar
+                    <Button type="submit" className="mt-4 w-24" disabled={loading}>
+                        {loading ? <Spinner className="text-gray-800" /> : "Editar"}
                     </Button>
                 </form>
             </div>

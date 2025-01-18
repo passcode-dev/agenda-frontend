@@ -11,9 +11,11 @@ import UsuarioForm from "@/components/forms/usuarioForm";
 import { optional } from "zod";
 import UsuarioService from "@/lib/service/usuarioService";
 import { useEffect, useState } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Editar({ params }) {
     const [usuario, setUsuario] = useState({});
+    const [loading, setLoading] = useState(false);
     const { register, reset, handleSubmit, setValue, formState: { errors } } = useForm({
         resolver: zodResolver(zodUsuario),
     });
@@ -22,12 +24,25 @@ export default function Editar({ params }) {
     const router = useRouter();
 
     const onSubmit = async (data) => {
-        toast({
-            title: "Usuário editado com sucesso",
-            description: "O usuário foi editado com sucesso.",
-            variant: "success"
+        setLoading(true);
+        const usuarioService = new UsuarioService();
+        const alterar = await usuarioService.alterarUsuario(params.id, data);
+        if (alterar.status == "success") {
+            reset();
+            setLoading(false);
+            router.push("/admin/usuarios");
+            return toast({
+                title: "Usuário editado com sucesso",
+                description: alterar.message,
+                variant: "success"
+            });
+        }
+        setLoading(false);
+        return toast({
+            title: "Erro ao editar usuário",
+            description: alterar.message,
+            variant: "destructive"
         });
-        router.push("/admin/usuarios");
     };
 
     useEffect(() => {
@@ -44,7 +59,7 @@ export default function Editar({ params }) {
             });
         }
         fetchUsuario(params.id);
-    }, []);
+    }, [params.id]);
 
     return (
         <div className="container max-w-4xl justify-center items-center mx-auto p-6">
@@ -66,8 +81,8 @@ export default function Editar({ params }) {
             <div>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <UsuarioForm register={register} errors={errors} setValue={setValue} initialValues={usuario} />
-                    <Button type="submit" className="mt-4">
-                        Salvar
+                    <Button type="submit" className="mt-4 w-24" disabled={loading}>
+                        {loading ? <Spinner className="text-gray-800" /> : "Editar"}
                     </Button>
                 </form>
             </div>

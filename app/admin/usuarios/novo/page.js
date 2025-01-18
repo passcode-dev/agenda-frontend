@@ -34,7 +34,7 @@ export default function Novo() {
             return router.push("/admin/usuarios");
         }
         setLoading(false);
-        toast({
+        return toast({
             title: "Erro ao cadastrar usuário",
             description: cadastrar.message,
             status: "error",
@@ -62,8 +62,8 @@ export default function Novo() {
             <div>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <UsuarioForm register={register} errors={errors} />
-                    <Button type="submit" className="mt-4" disabled={loading}>
-                        {loading ? <Spinner className="text-gray-800" /> : "Cadastrar"}
+                    <Button type="submit" className="mt-4 w-24" disabled={loading}>
+                        {loading ? <Spinner className='' /> : "Cadastrar"}
                     </Button>
                 </form>
             </div>

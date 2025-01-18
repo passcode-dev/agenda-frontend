@@ -11,8 +11,10 @@ import { zodProfessor } from "@/lib/schemas/zod";
 import ProfessorForm from "@/components/forms/professorForm";
 import ProfessoresService from "@/lib/service/professoresService";
 import { useState } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Novo() {
+    const [loading, setLoading] = useState(false);
     const { register, reset, handleSubmit, setValue, formState: { errors } } = useForm({
         resolver: zodResolver(zodProfessor),
     });
@@ -21,6 +23,7 @@ export default function Novo() {
 
     const onSubmit = async (data) => {
         if (data.name && data.birth_date && data.cpf) {
+            setLoading(true);
             const professorService = new ProfessoresService();
             const cadastrar = await professorService.cadastrarProfessor(data);
             if (cadastrar.status == "success") {
@@ -30,8 +33,10 @@ export default function Novo() {
                     description: cadastrar.message,
                     status: "success",
                 });
+                setLoading(false);
                 return router.push("/admin/professores");
             }
+            setLoading(false);
             return toast({
                 title: "Erro ao cadastrar professor",
                 description: cadastrar.message,
@@ -61,7 +66,9 @@ export default function Novo() {
             <div>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <ProfessorForm register={register} errors={errors} setValue={setValue}  />
-                    <Button type="submit" className="mt-4">Cadastrar</Button>
+                    <Button type="submit" className="mt-4 w-24" disabled={loading}>
+                    {loading ? <Spinner  /> : "Cadastrar"}
+                    </Button>
                 </form>
             </div>
         </div >

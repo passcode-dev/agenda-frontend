@@ -11,9 +11,10 @@ import AlunoService from "@/lib/service/alunoService";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { zodAluno } from "@/lib/schemas/zod";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Novo() {
-
+    const [loading, setLoading] = useState(false);
     const { register, reset, handleSubmit, setValue, formState: { errors } } = useForm({
         resolver: zodResolver(zodAluno),
     });
@@ -21,9 +22,11 @@ export default function Novo() {
     const router = useRouter();
 
     const onSubmit = async (data) => {
+        setLoading(true);
         const alunoService = new AlunoService();
         const cadastrar = await alunoService.cadastrarAluno(data);
         if (cadastrar.status == "success") {
+            setLoading(false);
             reset();
             toast({
                 title: "Aluno cadastrado com sucesso",
@@ -32,7 +35,8 @@ export default function Novo() {
             });
             return router.push("/admin/alunos");
         }
-        toast({
+        setLoading(false);
+        return toast({
             title: "Erro ao cadastrar aluno",
             description: cadastrar.message,
             status: "error",
@@ -60,7 +64,9 @@ export default function Novo() {
             <div>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <AlunoForm register={register} errors={errors} setValue={setValue} />
-                    <Button type="submit" className="mt-4">Cadastrar</Button>
+                    <Button type="submit" className="mt-4 w-24" disabled={loading}>
+                    {loading ? <Spinner className="text-gray-800" /> : "Cadastrar"}
+                    </Button>
                 </form>
             </div>
         </div >
