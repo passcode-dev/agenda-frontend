@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import Tables from "@/components/tables/Tables";
 import { AlertDialogUI } from "@/components/alert";
 import MateriaService from "@/lib/service/materiaService";
+import { Badge } from "@/components/ui/badge";
 
 export default function Materias() {
     const [loading, setLoading] = useState(false);
@@ -33,6 +34,19 @@ export default function Materias() {
         { headerName: "#", field: "id" },
         { headerName: "Nome", field: "name" },
         {
+            headerName: "Professores", field: "name", renderCell: (params) => (
+                <div className="flex flex-wrap gap-1 justify-center">
+                    {params.row.Teachers.map((professor, index) => (
+                        <Badge className="p-2"
+                            key={index}
+                        >
+                            {professor.name}
+                        </Badge>
+                    ))}
+                </div>
+            ),
+        },
+        {
             headerName: "Ações",
             field: "acoes",
             renderCell: (params) => (
@@ -52,7 +66,7 @@ export default function Materias() {
         setLoading(true);
         const materiaService = new MateriaService();
         const materias = await materiaService.Materias(page);
-        setMaterias(materias);
+        setMaterias(materias.data);
         setLoading(false);
     };
 
@@ -69,25 +83,25 @@ export default function Materias() {
 
 
     const deletarMateria = async (id) => {
-        // setShowDialog(true);
-        // setConfirmCallback(() => async () => {
-        //     const professorService = new ProfessoresService();
-        //     const deletar = await professorService.deletarProfessor(id);
-        //     if (deletar.status == "success") {
-        //         setShowDialog(false);
-        //         fetchProfessor(currentPage);
-        //         return toast({
-        //             title: "Sucesso",
-        //             description: deletar.message,
-        //         });
-        //     }
-        //     setShowDialog(false);
-        //     fetchProfessor(currentPage);
-        //     return toast({
-        //         title: "Erro",
-        //         description: deletar.message,
-        //     });
-        // });
+        setShowDialog(true);
+        setConfirmCallback(() => async () => {
+            const materiaService = new MateriaService();
+            const deletar = await materiaService.deletarMateria(id);
+            if (deletar.status == "success") {
+                fetchMateria(currentPage);
+                setShowDialog(false);
+                return toast({
+                    title: "Sucesso",
+                    description: deletar.message,
+                });
+            }
+            fetchMateria(currentPage);
+            setShowDialog(false);
+            return toast({
+                title: "Erro",
+                description: deletar.message,
+            });
+        });
     };
 
     const handlePageChange = (page) => {
@@ -98,7 +112,7 @@ export default function Materias() {
         <div className="container max-w-4xl justify-center items-center mx-auto p-6">
             <AlertDialogUI
                 title="Confirmação de exclusão"
-                description="Deseja realmente deletar este professor?"
+                description="Deseja realmente deletar esta matéria ?"
                 showDialog={showDialog}
                 setShowDialog={setShowDialog}
                 onConfirm={confirmCallback}
@@ -123,7 +137,7 @@ export default function Materias() {
                 ) : materias.length >= 0 ? (
                     <>
                         <FilterGroup filterSchema={filterSchema} />
-                        <Tables data={materias} columns={columns} />
+                        <Tables data={materias} columns={columns} isSubjects={true} />
                         <div className="mt-4 flex justify-end items-center">
                             <PaginationUI
                                 totalPage={totalPage}
