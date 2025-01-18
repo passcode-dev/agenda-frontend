@@ -15,12 +15,12 @@ const spinnerVariants = cva('flex-col items-center justify-center', {
   },
 });
 
-const loaderVariants = cva('animate-spin text-primary', {
+const loaderVariants = cva('animate-spin', {
   variants: {
     size: {
-      small: 'size-6',
-      medium: 'size-8',
-      large: 'size-12',
+      small: 'w-6 h-6', // Tamanhos ajustados para Tailwind
+      medium: 'w-8 h-8',
+      large: 'w-12 h-12',
     },
   },
   defaultVariants: {
@@ -28,13 +28,14 @@ const loaderVariants = cva('animate-spin text-primary', {
   },
 });
 
-export function Spinner({ size, show, children, className, message }) {
+export function Spinner({ size, show = true, children, className, message }) {
   return (
     <span className={spinnerVariants({ show })}>
-      <Loader2 className={cn(loaderVariants({ size }), className)} />
-      <p>
-        {message}
-      </p>
+      {/* Aplica a cor primária do tema */}
+      <Loader2
+        className={cn(loaderVariants({ size }), 'text-primary', className)} // Usa text-primary do Tailwind
+      />
+      {message && <p className="text-muted-foreground mt-2">{message}</p>} {/* Cor de texto do tema */}
       {children}
     </span>
   );
