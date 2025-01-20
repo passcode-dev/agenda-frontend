@@ -17,19 +17,13 @@ import { ThemeToggle } from "./theme-toggle"
 import { Items } from "./nav-items"
 import { Menu, LogOut } from "lucide-react"
 import { UserContext } from "@/app/context/userContext"
+import { handleLogout } from "@/lib/functions"
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
 
   const router = useRouter()
-
-  const handleLogout = () => {
-    localStorage.removeItem("usuario")
-    // document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
-    router.push('/auth')
-  }
-
 
   return (
     <>
