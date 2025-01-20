@@ -8,7 +8,6 @@ export default function UsuarioForm({ register, errors, setValue, initialValues 
         if (initialValues) {
             setValue("username", initialValues.username );
             setValue("email", initialValues.email);
-            setValue("password", "");
         }
     }, [initialValues, setValue])
 

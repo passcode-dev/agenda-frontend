@@ -8,6 +8,7 @@ export default function ProfessorForm({ register, errors, setValue, initialValue
 
     useEffect(() => {
         if (initialValues) {
+            console.log(initialValues);
             setValue("name", initialValues.name);
             setValue("birth_date", initialValues.birth_date);
             setValue("cpf", initialValues.cpf);
