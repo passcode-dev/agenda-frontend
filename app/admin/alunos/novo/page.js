@@ -1,17 +1,16 @@
 "use client";
 import { ArrowLeft } from "lucide-react";
-import { z } from "zod";
 import AlunoForm from "@/components/forms/alunoForm";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Back from "@/components/back";
-import { regexNome, regexData, regexCpf, regexRg } from "@/lib/regex";
 import AlunoService from "@/lib/service/alunoService";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { zodAluno } from "@/lib/schemas/zod";
 import { Spinner } from "@/components/ui/spinner";
+import { useState } from "react";
 
 export default function Novo() {
     const [loading, setLoading] = useState(false);

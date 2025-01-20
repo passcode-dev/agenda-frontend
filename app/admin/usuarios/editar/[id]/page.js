@@ -8,12 +8,12 @@ import { zodUsuario } from "@/lib/schemas/zod";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import UsuarioForm from "@/components/forms/usuarioForm";
-import { optional } from "zod";
 import UsuarioService from "@/lib/service/usuarioService";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 
 export default function Editar({ params }) {
+    const { id } = use(params);
     const [usuario, setUsuario] = useState({});
     const [loading, setLoading] = useState(false);
     const { register, reset, handleSubmit, setValue, formState: { errors } } = useForm({
@@ -26,7 +26,7 @@ export default function Editar({ params }) {
     const onSubmit = async (data) => {
         setLoading(true);
         const usuarioService = new UsuarioService();
-        const alterar = await usuarioService.alterarUsuario(params.id, data);
+        const alterar = await usuarioService.alterarUsuario(id, data);
         if (alterar.status == "success") {
             reset();
             setLoading(false);
@@ -58,8 +58,8 @@ export default function Editar({ params }) {
                 variant: "destructive"
             });
         }
-        fetchUsuario(params.id);
-    }, [params.id]);
+        fetchUsuario(id);
+    }, [id]);
 
     return (
         <div className="container max-w-4xl justify-center items-center mx-auto p-6">

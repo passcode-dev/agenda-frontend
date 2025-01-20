@@ -3,7 +3,7 @@ import { Mail, Pencil, Trash2, User } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import UsuarioService from "@/lib/service/usuarioService";
 import { useToast } from "@/hooks/use-toast";
 import { PaginationUI } from "@/components/paginationCustom";
@@ -12,6 +12,8 @@ import FilterModal from "@/components/Filters/FilterModal";
 import FilterGroup from "@/components/Filters/FilterGroup";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AlertDialogUI } from "@/components/alert";
+import { UserContext } from "@/app/context/userContext";
+
 
 export default function Usuarios() {
     const [loading, setLoading] = useState(false);
@@ -22,6 +24,7 @@ export default function Usuarios() {
     const [totalPage, setTotalPage] = useState(3);
     const [showDialog, setShowDialog] = useState(false);
     const [confirmCallback, setConfirmCallback] = useState(false);
+    const { user } = useContext(UserContext);
     const { toast } = useToast();
     const filterSchema = [
         { name: "Usuário", parameterName: "user", icon: <User className="text-black" /> },
@@ -69,10 +72,24 @@ export default function Usuarios() {
     }, [currentPage]);
 
     const editarUsuario = (id) => {
+        if (user.id == id) {
+            return toast({
+                title: "Erro ao editar usuário",
+                description: "Você não pode editar o próprio usuário, vai até a página de perfil para alterar seus dados.",
+                variant: "destructive",
+            });
+        }
         router.push(`/admin/usuarios/editar/${id}`);
     };
 
     const deletarUsuario = (id) => {
+        if (user.id == id) {
+            return toast({
+                title: "Erro ao deletar usuário",
+                description: "Você não pode deletar o próprio usuário, vai até a página de perfil para deletar sua conta.",
+                variant: "destructive",
+            });
+        }
         setShowDialog(true);
 
         // setConfirmCallback(() => async () => {

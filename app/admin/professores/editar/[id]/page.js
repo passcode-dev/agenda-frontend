@@ -9,11 +9,12 @@ import AlunoService from "@/lib/service/alunoService";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import ProfessoresService from "@/lib/service/professoresService";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import ProfessorForm from "@/components/forms/professorForm";
 import { Spinner } from "@/components/ui/spinner";
 
 export default function Editar({ params }) {
+    const { id } = use(params);
     const { register, reset, handleSubmit, setValue, formState: { errors } } = useForm({
         resolver: zodResolver(zodProfessor),
     });
@@ -25,21 +26,21 @@ export default function Editar({ params }) {
     const onSubmit = async (data) => {
         setLoading(true);
         const professorService = new ProfessoresService();
-        const editar = await professorService.editarProfessor(params.id, data);
+        const editar = await professorService.editarProfessor(id, data);
         if (editar.status == "success") {
             setLoading(false);
             reset();
             toast({
-                title: "Aluno editado com sucesso",
+                title: "Professor editado com sucesso",
                 description: editar.message,
                 variant: "success"
             });
-            return router.push("/admin/alunos");
+            return router.push("/admin/professores");
 
         }
         setLoading(false);
         return toast({
-            title: "Erro ao editar aluno",
+            title: "Erro ao editar professor",
             description: editar.message,
             variant: "destructive"
         });
@@ -52,7 +53,7 @@ export default function Editar({ params }) {
             const professorService = new ProfessoresService();
             const buscar = await professorService.buscarProfessor(id);
             if (buscar.status == "success") {
-                setProfessor(buscar);
+                return setProfessor(buscar.data[0]);
             }
             return toast({
                 title: "Erro ao buscar professor",
@@ -60,8 +61,8 @@ export default function Editar({ params }) {
                 variant: "destructive"
             });
         }
-        fetchProfessor(params.id);
-    }, [params.id]);
+        fetchProfessor(id);
+    }, [id]);
 
     return (
         <div className="container max-w-4xl justify-center items-center mx-auto p-6">
