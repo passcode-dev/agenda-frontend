@@ -77,11 +77,11 @@ export default function AlunoForm({ register, errors, setValue, initialValues })
                     {errors.phone_number && (<p className="text-red-500 text-sm">*{errors.phone_number.message}</p>)}
                 </div>
                 <div>
-                    <Label htmlFor="inital_date">Data de Início</Label>
+                    <Label htmlFor="entry_date">Data de Início</Label>
                     <Input
-                        id="inital_date"
+                        id="entry_date"
                         type="date"
-                        {...register("inital_date")}
+                        {...register("entry_date")}
                     />
                     {errors.inital_date && (<p className="text-red-500 text-sm">*{errors.inital_date.message}</p>)}
                 </div>
