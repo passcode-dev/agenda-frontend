@@ -40,12 +40,7 @@ export default function Alunos() {
         { headerName: "Telefone", field: "phone_number" },
         { headerName: "RG", field: "rg" },
         { headerName: "CPF", field: "cpf" },
-        {
-            headerName: "Data de Nascimento",
-            field: "birth_date",
-            renderCell: ({ row }) =>
-                new Date(row.birth_date).toLocaleDateString("pt-BR"),
-        },
+        { headerName: "Data de Nascimento", field: "birth_date", },
         {
             headerName: "Ações",
             field: "acoes",
@@ -66,7 +61,8 @@ export default function Alunos() {
         setLoading(true);
         const alunoService = new AlunoService();
         const alunos = await alunoService.alunos(page);
-        setAlunos(alunos);
+        console.log(alunos.data);
+        setAlunos(alunos.data == null ? [] : alunos.data);
         setLoading(false);
     };
 

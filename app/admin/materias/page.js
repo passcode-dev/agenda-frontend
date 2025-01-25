@@ -35,7 +35,7 @@ export default function Materias() {
         { headerName: "Nome", field: "name" },
         {
             headerName: "Professores", field: "name", renderCell: (params) => (
-                <div className="flex flex-wrap gap-1 justify-center">
+                <div className="flex flex-wrap  gap-1 justify-center">
                     {params.row.Teachers.map((professor, index) => (
                         <Badge className="p-2"
                             key={index}

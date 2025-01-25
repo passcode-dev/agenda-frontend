@@ -63,7 +63,7 @@ export default function Novo() {
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <UsuarioForm register={register} errors={errors} />
                     <Button type="submit" className="mt-4 w-24" disabled={loading}>
-                        {loading ? <Spinner className='' /> : "Cadastrar"}
+                        {loading ? <Spinner className='text-gray-800' /> : "Cadastrar"}
                     </Button>
                 </form>
             </div>

@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 
 export default function MateriaForm({ register, errors, setValue, professores, initialValues, setProfessoresMateria, professoresMateria }) {
+    const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
         if (initialValues) {
@@ -31,7 +32,15 @@ export default function MateriaForm({ register, errors, setValue, professores, i
         ) {
             setProfessoresMateria((prev) => [...prev, professorSelecionado]);
         }
-    }
+        setSearchTerm(""); 
+    };
+
+   
+    const filteredProfessores = searchTerm
+        ? professores.filter(professor =>
+            professor.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        : professores;
 
     return (
         <div>
@@ -46,18 +55,27 @@ export default function MateriaForm({ register, errors, setValue, professores, i
                 </div>
                 <div>
                     <Label>Professores</Label>
-                    <Select
-                        onValueChange={(value) => handleAdicionarProfessor(value)}
-                    >
+                    <Select onValueChange={handleAdicionarProfessor}>
                         <SelectTrigger>
-                            <SelectValue placeholder="Selecione um professor" />
+                            <SelectValue placeholder="Selecione um professor..." />
                         </SelectTrigger>
                         <SelectContent>
-                            {professores.map((professor) => (
-                                <SelectItem key={professor.id} value={professor.id}>
-                                    {professor.name}
-                                </SelectItem>
-                            ))}
+                            <Input
+                                type="text"
+                                placeholder="Buscar professor..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="p-2"
+                            />
+                            {filteredProfessores.length > 0 ? (
+                                filteredProfessores.map((professor) => (
+                                    <SelectItem key={professor.id} value={professor.id}>
+                                        {professor.name}
+                                    </SelectItem>
+                                ))
+                            ) : (
+                                <p className="p-2 text-gray-500">Nenhum professor encontrado.</p>
+                            )}
                         </SelectContent>
                     </Select>
                 </div>

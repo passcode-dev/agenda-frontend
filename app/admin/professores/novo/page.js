@@ -39,7 +39,7 @@ export default function Novo() {
             setLoading(false);
             return toast({
                 title: "Erro ao cadastrar professor",
-                description: cadastrar.message,
+                description: cadastrar.data.details,
                 status: "error",
                 variant: "destructive"
             });
@@ -67,7 +67,7 @@ export default function Novo() {
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <ProfessorForm register={register} errors={errors} setValue={setValue}  />
                     <Button type="submit" className="mt-4 w-24" disabled={loading}>
-                    {loading ? <Spinner  /> : "Cadastrar"}
+                    {loading ? <Spinner className="text-gray-800"  /> : "Cadastrar"}
                     </Button>
                 </form>
             </div>

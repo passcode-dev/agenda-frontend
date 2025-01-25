@@ -50,7 +50,7 @@ export default function Editar({ params }) {
         setLoading(false);
         return toast({
             title: "Erro",
-            description: editar.message,
+            description: buscar.data.details,
             variant: "destructive",
         });
     };
@@ -58,7 +58,7 @@ export default function Editar({ params }) {
     const fetchProfessor = async (page = 1) => {
         const professorService = new ProfessoresService();
         const professores = await professorService.Professores(page);
-        setProfessores(professores);
+        setProfessores(professores.data);
     };
 
     useEffect(() => {
@@ -70,7 +70,7 @@ export default function Editar({ params }) {
             } else {
                 toast({
                     title: "Erro ao buscar matéria",
-                    description: buscar.message,
+                    description: buscar.data.details,
                     variant: "destructive",
                 });
             }

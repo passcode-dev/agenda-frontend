@@ -21,6 +21,7 @@ export default function Novo() {
     const router = useRouter();
 
     const onSubmit = async (data) => {
+        console.log(data);
         setLoading(true);
         const alunoService = new AlunoService();
         const cadastrar = await alunoService.cadastrarAluno(data);

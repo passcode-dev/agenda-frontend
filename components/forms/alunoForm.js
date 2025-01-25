@@ -20,25 +20,28 @@ export default function AlunoForm({ register, errors, setValue, initialValues })
         <div>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
-                    <Label htmlFor="name">Nome completo</Label>
+                    <Label htmlFor="name">Nome</Label>
                     <Input
                         id="name"
                         type="text"
                         {...register("name")}
-                        placeholder="João da Silva"
+                        placeholder="João"
                     />
                     {errors.name && (<p className="text-red-500 text-sm">*{errors.name.message}</p>)}
                 </div>
 
                 <div>
-                    <Label htmlFor="birth_date">Data de Nascimento</Label>
+                    <Label htmlFor="sobrenome">Sobrenome</Label>
                     <Input
-                        id="birth_date"
-                        type="date"
-                        {...register("birth_date")}
+                        id="sobrenome"
+                        type="text"
+                        {...register("last_name")}
+                        placeholder="Silva"
                     />
-                    {errors.birth_date && (<p className="text-red-500 text-sm">*{errors.birth_date.message}</p>)}
+                    {errors.last_name && (<p className="text-red-500 text-sm">*{errors.last_name.message}</p>)}
                 </div>
+
+
             </div>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mt-6">
                 <div>
@@ -66,16 +69,29 @@ export default function AlunoForm({ register, errors, setValue, initialValues })
             </div>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mt-6">
                 <div>
+                    <Label htmlFor="birth_date">Data de Nascimento</Label>
+                    <Input
+                        id="birth_date"
+                        type="date"
+                        {...register("birth_date")}
+                    />
+                    {errors.birth_date && (<p className="text-red-500 text-sm">*{errors.birth_date.message}</p>)}
+                </div>
+                <div>
                     <Label htmlFor="phone_number">Telefone</Label>
                     <Input
                         id="phone_number"
                         type="text"
                         {...register("phone_number")}
-                        placeholder="(00) 00000-0000"
+                        placeholder="+55 (00) 00000-0000"
                         onChange={(e) => setValue("phone_number", maskPhone(e.target.value))}
                     />
                     {errors.phone_number && (<p className="text-red-500 text-sm">*{errors.phone_number.message}</p>)}
                 </div>
+
+            </div>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mt-6">
+
                 <div>
                     <Label htmlFor="entry_date">Data de Início</Label>
                     <Input

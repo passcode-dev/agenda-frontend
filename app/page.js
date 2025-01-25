@@ -81,7 +81,6 @@ export default function LoginPage() {
                                 id="email"
                                 type="text"
                                 {...register("emailOrUsername")}
-                                className="bg-gray-800 border-gray-700 text-white"
                                 placeholder="exemplo@dominio.com ou username"
                             />
                             {errors.emailOrUsername && (<p className="text-red-500 text-sm">*{errors.emailOrUsername.message}</p>)}
@@ -93,7 +92,6 @@ export default function LoginPage() {
                                 id="password"
                                 type="password"
                                 {...register("password")}
-                                className="bg-gray-800 border-gray-700 text-white"
                             />
                             {errors.password && (<p className="text-red-500 text-sm">*{errors.password.message}</p>)}
                         </div>

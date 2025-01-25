@@ -90,32 +90,30 @@ export default function Usuarios() {
                 variant: "destructive",
             });
         }
+
+        setConfirmCallback(() => async () => {
+            const usuarioService = new UsuarioService();
+            const deletar = await usuarioService.deletarUsuario(id);
+            if (deletar.status == "success") {
+                setShowDialog(false);
+                fetchUsuarios(currentPage);
+                return toast({
+                    title: "Usuário deletado com sucesso",
+                    description: deletar.message,
+                    variant: "success",
+                });
+
+            }
+
+            setShowDialog(false);
+            fetchUsuarios(currentPage);
+            return toast({
+                title: "Erro ao deletar usuário",
+                description: deletar.message,
+                variant: "destructive",
+            });
+        });
         setShowDialog(true);
-
-        // setConfirmCallback(() => async () => {
-        //     const usuarioService = new UsuarioService();
-        //     const deletar = await usuarioService.deletarUsuario(id);
-        //     if (deletar.status == "success") {
-        //         setShowDialog(false);
-        //         fetchUsuarios(currentPage);
-        //         return toast({
-        //             title: "Usuário deletado com sucesso",
-        //             description: deletar.message,
-        //             variant: "success",
-        //         });
-
-
-
-        //     }
-
-        //     setShowDialog(false);
-        //     fetchUsuarios(currentPage);
-        //     return toast({
-        //         title: "Erro ao deletar usuário",
-        //         description: deletar.message,
-        //         variant: "destructive",
-        //     });
-        // });
     };
 
     const handlePageChange = (page) => {

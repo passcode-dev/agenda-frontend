@@ -38,9 +38,12 @@ export default function Professores() {
         { headerName: "CPF", field: "cpf" },
         {
             headerName: "Data de Nascimento",
-            field: "birth_date",
-            renderCell: ({ row }) =>
-                new Date(row.birth_date).toLocaleDateString("pt-BR"),
+            field: "BirthDate",
+            renderCell: (params) => {
+                const date = new Date(params.row.BirthDate);
+                return date.toLocaleDateString("pt-BR");
+            },
+
         },
         {
             headerName: "Ações",
@@ -62,7 +65,7 @@ export default function Professores() {
         setLoading(true);
         const professorService = new ProfessoresService();
         const professores = await professorService.Professores(page);
-        setProfessores(professores);
+        setProfessores(professores.data);
         setLoading(false);
     };
 
