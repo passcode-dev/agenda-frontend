@@ -45,7 +45,7 @@ export default function AlunoForm({ register, errors, setValue, initialValues })
             </div>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mt-6">
                 <div>
-                    <Label htmlFor="cpf">CPF (Opcional)</Label>
+                    <Label htmlFor="cpf">CPF</Label>
                     <Input
                         id="cpf"
                         type="text"
@@ -56,7 +56,7 @@ export default function AlunoForm({ register, errors, setValue, initialValues })
                     {errors.cpf && (<p className="text-red-500 text-sm">*{errors.cpf.message}</p>)}
                 </div>
                 <div>
-                    <Label htmlFor="rg">RG (Opcional)</Label>
+                    <Label htmlFor="rg">RG</Label>
                     <Input
                         id="rg"
                         type="text"
@@ -99,7 +99,16 @@ export default function AlunoForm({ register, errors, setValue, initialValues })
                         type="date"
                         {...register("entry_date")}
                     />
-                    {errors.inital_date && (<p className="text-red-500 text-sm">*{errors.inital_date.message}</p>)}
+                    {errors.entry_date && (<p className="text-red-500 text-sm">*{errors.entry_date.message}</p>)}
+                </div>
+                <div>
+                    <Label htmlFor="exit_date">Data de Saída</Label>
+                    <Input
+                        id="exit_date"
+                        type="date"
+                        {...register("exit_date")}
+                    />
+                    {errors.exit_date && (<p className="text-red-500 text-sm">*{errors.exit_date.message}</p>)}
                 </div>
             </div>
         </div>

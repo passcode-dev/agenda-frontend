@@ -1,11 +1,10 @@
 "use client";
 import Link from "next/link";
-import { ArrowLeft, Calendar, IdCard, Pencil, Phone, Trash2, UserRound } from "lucide-react";
+import { Calendar, IdCard, Pencil, Phone, Trash2, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import AlunoService from "@/lib/service/alunoService";
-import Back from "@/components/back";
 import Table from "@/components/tables/Tables";
 import { PaginationUI } from "@/components/paginationCustom";
 import FilterGroup from "@/components/Filters/FilterGroup";
@@ -41,6 +40,8 @@ export default function Alunos() {
         { headerName: "RG", field: "rg" },
         { headerName: "CPF", field: "cpf" },
         { headerName: "Data de Nascimento", field: "birth_date", },
+        { headerName: "Data de Entrada", field: "entry_date", },
+        { headerName: "Data de Saída", field: "exit_date", },
         {
             headerName: "Ações",
             field: "acoes",

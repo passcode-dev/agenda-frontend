@@ -97,7 +97,7 @@ function SidebarContent({
       </ScrollArea>
 
       <div className="mt-auto p-4 border-t">
-        <Separator className="my-2" />
+        {/* <Separator className="my-2" /> */}
         <Button
           variant="link"
           className="w-full justify-start"

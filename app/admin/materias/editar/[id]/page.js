@@ -50,7 +50,7 @@ export default function Editar({ params }) {
         setLoading(false);
         return toast({
             title: "Erro",
-            description: buscar.data.details,
+            description: editar.data.details,
             variant: "destructive",
         });
     };

@@ -38,7 +38,7 @@ export default function Editar({ params }) {
         setLoading(false);
         return toast({
             title: "Erro ao editar aluno",
-            description: editar.message,
+            description: editar.data.details,
             variant: "destructive"
         });
     };
