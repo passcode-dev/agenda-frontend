@@ -1,6 +1,5 @@
 "use client";
 import { League_Spartan } from "next/font/google";
-import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
@@ -19,15 +18,8 @@ export default function RootLayout({ children }) {
             league.className
           )}
         >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-            <Toaster />
-          </ThemeProvider>
+          {children}
+          <Toaster />
         </body>
       </html>
     </UserProvider>

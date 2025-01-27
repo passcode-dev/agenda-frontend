@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/sheet"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
-import { ThemeToggle } from "./theme-toggle"
 import { Items } from "./nav-items"
 import { Menu, LogOut } from "lucide-react"
 import { UserContext } from "@/app/context/userContext"
@@ -98,7 +97,6 @@ function SidebarContent({
       </ScrollArea>
 
       <div className="mt-auto p-4 border-t">
-        <ThemeToggle />
         <Separator className="my-2" />
         <Button
           variant="link"
