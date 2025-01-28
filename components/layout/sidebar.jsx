@@ -1,120 +1,238 @@
-"use client"
+import { useContext, useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Items } from "./nav-items";
+import { LogOut, Menu, X } from "lucide-react";
+import { UserContext } from "@/app/context/userContext";
+import styled from "styled-components";
 
-import { useContext, useEffect, useState } from "react"
-import { useRouter, usePathname } from "next/navigation"
-import Link from "next/link"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Separator } from "@/components/ui/separator"
-import { Items } from "./nav-items"
-import { Menu, LogOut } from "lucide-react"
-import { UserContext } from "@/app/context/userContext"
-import { handleLogout } from "@/lib/functions"
+const LinkStyled = styled.a`
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 20px 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  color: ${(props) => (props.isActive ? "#2563eb" : "#4b5563")};
+  background-color: ${(props) => (props.isActive ? "#e0f2fe" : "transparent")};
+
+  &:hover {
+    background-color: ${(props) =>
+    props.isActive ? "#dbeafe" : "#f3f4f6"};
+    color: ${(props) => (props.isActive ? "#1d4ed8" : "#1f2937")};
+  }
+`;
+
+const AsideBar = styled.aside`
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  background-color: #ffffff;
+  transition: width 0.3s ease, opacity 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+
+  ${(props) =>
+    props.isOpen
+      ? `width: 280px; opacity: 1;`
+      : `width: 64px; opacity: 0.95;`}
+`;
+
+const LabelSection = styled.span`
+  white-space: nowrap;
+  overflow: hidden;
+  opacity: ${(props) => (props.isOpen ? 1 : 0)};
+  transform: ${(props) => (props.isOpen ? "translateX(0)" : "translateX(-20px)")};
+  transition: opacity 0.3s ease, transform 0.3s ease;
+`;
+
+const UserInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+  padding-left: 16px;
+  padding-top: 24px;
+  padding-bottom: 16px;
+  height: 60px;
+  width: 100%;
+  
+`;
+
+const UserSection = styled.div`
+  opacity: ${(props) => (props.isOpen ? 1 : 0)};
+  transform: ${(props) => (props.isOpen ? "translateX(0)" : "translateX(-20px)")};
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  
+`;
+
+const Avatar = styled.div`
+  background-color: #e5e7eb;
+  color: #374151;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  min-width: 40px;
+  min-height: 40px;
+`;
+
+const LogoutButton = styled(Button)`
+  gap: 24px;
+  width: 100%;
+  justify-content: start;
+  color: #4b5563;
+  height: 60px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    background-color: #f3f4f6;
+    color: #1f2937;
+  }
+  
+`;
+
+const LogOutSpan = styled.span`
+  opacity: ${(props) => (props.isOpen ? 1 : 0)};
+  transform: ${(props) => (props.isOpen ? "translateX(0)" : "translateX(-20px)")};
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: 1rem;
+  font-weight: 600;
+`;
+
+const LogOutIcon = styled(LogOut)`
+  width: 24px !important;
+  height: 24px !important;
+`;
 
 export function Sidebar() {
-  const [isOpen, setIsOpen] = useState(false)
-  const pathname = usePathname()
+  const [isOpen, setIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const pathname = usePathname();
+  const [NavItems, setNavItems] = useState(Items);
+  const { user } = useContext(UserContext);
+  const sidebarRef = useRef(null);
 
-  const router = useRouter()
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 1024);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isMobile && isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isMobile, isOpen]);
+
+  const handleMouseEnter = () => setIsOpen(true);
+  const handleMouseLeave = () => !isMobile && setIsOpen(false);
 
   return (
     <>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="fixed top-4 left-4 z-40 lg:hidden"
-        onClick={() => setIsOpen(true)}
-      >
-        <Menu className="h-6 w-6" />
-      </Button>
+      {isMobile && !isOpen && (
+        <Menu
+          onClick={() => setIsOpen(true)}
+          className="cursor-pointer text-gray-600 absolute top-4 left-4"
+          size={24}
+          aria-label="Open Sidebar"
+        />
+      )}
 
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent side="left" className="w-[300px] p-0">
-          <MobileSidebar pathname={pathname} onLogout={handleLogout} />
-        </SheetContent>
-      </Sheet>
-
-      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-64 border-r bg-background lg:block">
-        <DesktopSidebar pathname={pathname} onLogout={handleLogout} />
-      </aside>
-    </>
-  )
-}
-
-function SidebarContent({
-  pathname,
-  onLogout,
-  className,
-}) {
-  const [NavItems, setNavItems] = useState(Items);
-  const { user } = useContext(UserContext);
-
-
-  return (
-    <div className={cn("flex h-full flex-col", className)}>
-      <div className="p-4 border-b">
-        <div className="flex items-center gap-3">
-          <div>
-            <p className="font-medium">
-              {user?.username}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {user?.email}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <ScrollArea className="flex-1 p-4">
-        <nav className="grid gap-1">
-          {NavItems.map((item, index) => (
-            <Link
-              key={index}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
-                pathname === item.href ? "bg-accent" : "transparent",
-                item.variant === "default" ? "text-primary" : "text-muted-foreground"
-              )}
-            >
-              <item.icon className="h-4 w-4" />
-              <span>{item.title}</span>
-              {item.label && (
-                <span className="ml-auto bg-primary/10 text-primary px-2 py-0.5 rounded-md text-xs">
-                  {item.label}
-                </span>
-              )}
-            </Link>
-          ))}
-        </nav>
-      </ScrollArea>
-
-      <div className="mt-auto p-4 border-t">
-        <Separator className="my-2" />
-        <Button
-          variant="link"
-          className="w-full justify-start"
-          onClick={onLogout}
+      {(!isMobile || isOpen) && (
+        <AsideBar
+          ref={sidebarRef}
+          isOpen={isOpen}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          aria-expanded={isOpen}
         >
-          <LogOut className="mr-2 h-4 w-4" />
-          Logout
-        </Button>
-      </div>
-    </div>
-  )
-}
+          <div className="flex flex-col h-full">
+            {isMobile && (
+              <div className="flex justify-end p-4">
+                <X
+                  onClick={() => setIsOpen(false)}
+                  className="cursor-pointer text-gray-600"
+                  size={24}
+                  aria-label="Close Sidebar"
+                />
+              </div>
+            )}
 
-function MobileSidebar({ pathname, onLogout }) {
-  return <SidebarContent pathname={pathname} onLogout={onLogout} />
-}
+            <UserInfo isOpen={isOpen}>
+              <Avatar>
+                {user?.username?.[0]?.toUpperCase() || "U"}
+              </Avatar>
+              <UserSection isOpen={isOpen}>
 
-function DesktopSidebar({ pathname, onLogout }) {
-  return <SidebarContent pathname={pathname} onLogout={onLogout} />
+                <p className="font-semibold text-lg text-gray-800 capitalize">{user?.username}</p>
+                <p className="font-semibold text-sm text-gray-500">{user?.email}</p>
+              </UserSection>
+            </UserInfo>
+
+            <Separator className="my-2" />
+
+            <nav className="flex flex-col px-2">
+              {NavItems.map((item, index) => {
+                const isActive = pathname === item.href;
+                return (
+                  <LinkStyled
+                    key={index}
+                    href={item.href}
+                    isActive={isActive}
+                    isOpen={isOpen}
+                    aria-current={isActive ? "page" : undefined}
+                  >
+                    <span>
+                      <item.icon size="24px" />
+                    </span>
+                    <LabelSection isOpen={isOpen}>
+                      {item.title}
+                    </LabelSection>
+                  </LinkStyled>
+                );
+              })}
+            </nav>
+
+            <div className="mt-auto border-t px-2 py-2">
+              <LogoutButton isOpen={isOpen} variant="link">
+                <LogOutIcon isOpen={isOpen} />
+                <LogOutSpan isOpen={isOpen}>Logout</LogOutSpan>
+              </LogoutButton>
+            </div>
+          </div>
+        </AsideBar >
+      )
+      }
+    </>
+  );
 }
