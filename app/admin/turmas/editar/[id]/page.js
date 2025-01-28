@@ -13,6 +13,9 @@ import { use } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import MateriaForm from "@/components/forms/materiaForm";
+import AlunoService from "@/lib/service/alunoService";
+import TurmaService from "@/lib/service/turmaService";
+import TurmaForm from "@/components/forms/turmaForm";
 
 export default function Editar({ params }) {
     const { id } = use(params);
@@ -20,10 +23,10 @@ export default function Editar({ params }) {
     const { register, reset, handleSubmit, setValue, formState: { errors } } = useForm({
         resolver: zodResolver(zodMateria),
     });
-    const [professores, setProfessores] = useState([]);
-    const [professoresMateria, setProfessoresMateria] = useState([]);
+    const [alunos, setAlunos] = useState([]);
+    const [alunosMateria, setAlunosMateria] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [materias, setMaterias] = useState({});
+    const [turma, setTurma] = useState({});
     const { toast } = useToast();
     const router = useRouter();
 
@@ -31,12 +34,12 @@ export default function Editar({ params }) {
         setLoading(true);
         let obj = {
             name: data.name,
-            teachers: professoresMateria.length > 0 ? professoresMateria.map((professor) => {
-                return { id: professor.id }
-            }) : materias.Teachers,
+            students: alunosMateria.length > 0 ? alunosMateria.map((aluno) => {
+                return { id: aluno.id }
+            }) : alunos.Students,
         }
-        const materiaService = new MateriaService();
-        const editar = await materiaService.editarMateria(id, obj);
+        const turmaService = new TurmaService();
+        const editar = await turmaService.editarTurma(id, obj);
         if (editar.status == "success") {
             setLoading(false);
             reset();
@@ -45,7 +48,7 @@ export default function Editar({ params }) {
                 description: editar.message,
                 variant: "success",
             });
-            return router.push("/admin/materias");
+            return router.push("/admin/turmas");
         }
         setLoading(false);
         return toast({
@@ -55,57 +58,57 @@ export default function Editar({ params }) {
         });
     };
 
-    const fetchProfessor = async (page = 1) => {
-        const professorService = new ProfessoresService();
-        const professores = await professorService.Professores(page);
-        setProfessores(professores.data);
+    const fetchAlunos = async (page = 1) => {
+        const alunoService = new AlunoService();
+        const alunos = await alunoService.alunos(page);
+        setProfessores(alunos.data);
     };
 
     useEffect(() => {
-        async function fetchMateria(id) {
-            const materiaService = new MateriaService();
-            const buscar = await materiaService.buscarMateria(id);
+        async function fetchTurmas(id) {
+            const turmaService = new TurmaService();
+            const buscar = await turmaService.buscarTurma(id);
             if (buscar.status === "success") {
-                setMaterias(buscar.data);
+                setTurma(buscar.data);
             } else {
                 toast({
-                    title: "Erro ao buscar matéria",
+                    title: "Erro ao buscar turma",
                     description: buscar.data.details,
                     variant: "destructive",
                 });
             }
         }
-        fetchProfessor();
-        fetchMateria(id);
+        fetchAlunos();
+        fetchTurmas(id);
     }, [id]);
 
     return (
         <div className="container max-w-4xl justify-center items-center mx-auto p-6">
             <div className="mb-8">
                 <div className="flex items-center gap-2">
-                    <Back icon={<ArrowLeft className="h-4 w-4" />} text="Voltar" href="/admin/materias" />
+                    <Back icon={<ArrowLeft className="h-4 w-4" />} text="Voltar" href="/admin/turmas" />
                 </div>
             </div>
             <div className="mb-8 flex justify-between items-center">
                 <div>
                     <h1 className="mt-4 text-3xl font-bold">
-                        Editar Matéria
+                        Editar Turma
                     </h1>
                     <p className="text-muted-foreground">
-                        Preencha os campos abaixo para editar uma matéria.
+                        Preencha os campos abaixo para editar uma Turma.
                     </p>
                 </div>
             </div>
             <div>
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    <MateriaForm
+                    <TurmaForm
                         register={register}
                         errors={errors}
                         setValue={setValue}
-                        professores={professores}
-                        initialValues={materias}
-                        setProfessoresMateria={setProfessoresMateria}
-                        professoresMateria={professoresMateria}
+                        alunos={alunos}
+                        initialValues={turma}
+                        setAlunosMateria={setAlunosMateria}
+                        alunosMateria={alunosMateria}
                     />
                     <Button type="submit" className="mt-4 w-24" disabled={loading}>
                         {loading ? <Spinner className="text-gray-800" /> : "Editar"}
