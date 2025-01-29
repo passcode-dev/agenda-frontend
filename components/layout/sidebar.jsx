@@ -9,6 +9,7 @@ import { LogOut, Menu, X } from "lucide-react";
 import { UserContext } from "@/app/context/userContext";
 import styled from "styled-components";
 
+// LinkStyled agora usa $isActive
 const LinkStyled = styled.a`
   display: flex;
   align-items: center;
@@ -18,17 +19,18 @@ const LinkStyled = styled.a`
   font-weight: 600;
   border-radius: 0.5rem;
   transition: all 0.3s ease;
-  color: ${(props) => (props.isActive ? "#2563eb" : "#4b5563")};
-  background-color: ${(props) => (props.isActive ? "#e0f2fe" : "transparent")};
+  color: ${({ $isActive }) => ($isActive ? "#2563eb" : "#4b5563")};
+  background-color: ${({ $isActive }) => ($isActive ? "#e0f2fe" : "transparent")};
 
   &:hover {
-    background-color: ${(props) =>
-    props.isActive ? "#dbeafe" : "#f3f4f6"};
-    color: ${(props) => (props.isActive ? "#1d4ed8" : "#1f2937")};
+    background-color: ${({ $isActive }) =>
+    $isActive ? "#dbeafe" : "#f3f4f6"};
+    color: ${({ $isActive }) => ($isActive ? "#1d4ed8" : "#1f2937")};
   }
 `;
 
-const AsideBar = styled.aside`
+// Usando $isOpen em vez de isOpen
+const AsideBar = styled(({ $isOpen, ...props }) => <aside {...props} />)`
   position: fixed;
   top: 0;
   left: 0;
@@ -40,8 +42,8 @@ const AsideBar = styled.aside`
   display: flex;
   flex-direction: column;
 
-  ${(props) =>
-    props.isOpen
+  ${({ $isOpen }) =>
+    $isOpen
       ? `width: 280px; opacity: 1;`
       : `width: 64px; opacity: 0.95;`}
 `;
@@ -49,8 +51,8 @@ const AsideBar = styled.aside`
 const LabelSection = styled.span`
   white-space: nowrap;
   overflow: hidden;
-  opacity: ${(props) => (props.isOpen ? 1 : 0)};
-  transform: ${(props) => (props.isOpen ? "translateX(0)" : "translateX(-20px)")};
+  opacity: ${({ $isOpen }) => ($isOpen ? 1 : 0)};
+  transform: ${({ $isOpen }) => ($isOpen ? "translateX(0)" : "translateX(-20px)")};
   transition: opacity 0.3s ease, transform 0.3s ease;
 `;
 
@@ -64,14 +66,12 @@ const UserInfo = styled.div`
   padding-bottom: 16px;
   height: 60px;
   width: 100%;
-  
 `;
 
 const UserSection = styled.div`
-  opacity: ${(props) => (props.isOpen ? 1 : 0)};
-  transform: ${(props) => (props.isOpen ? "translateX(0)" : "translateX(-20px)")};
+  opacity: ${({ $isOpen }) => ($isOpen ? 1 : 0)};
+  transform: ${({ $isOpen }) => ($isOpen ? "translateX(0)" : "translateX(-20px)")};
   transition: opacity 0.3s ease, transform 0.3s ease;
-  
 `;
 
 const Avatar = styled.div`
@@ -99,12 +99,11 @@ const LogoutButton = styled(Button)`
     background-color: #f3f4f6;
     color: #1f2937;
   }
-  
 `;
 
 const LogOutSpan = styled.span`
-  opacity: ${(props) => (props.isOpen ? 1 : 0)};
-  transform: ${(props) => (props.isOpen ? "translateX(0)" : "translateX(-20px)")};
+  opacity: ${({ $isOpen }) => ($isOpen ? 1 : 0)};
+  transform: ${({ $isOpen }) => ($isOpen ? "translateX(0)" : "translateX(-20px)")};
   transition: opacity 0.3s ease, transform 0.3s ease;
   white-space: nowrap;
   overflow: hidden;
@@ -171,7 +170,7 @@ export function Sidebar() {
       {(!isMobile || isOpen) && (
         <AsideBar
           ref={sidebarRef}
-          isOpen={isOpen}
+          $isOpen={isOpen}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           aria-expanded={isOpen}
@@ -188,12 +187,11 @@ export function Sidebar() {
               </div>
             )}
 
-            <UserInfo isOpen={isOpen}>
+            <UserInfo $isOpen={isOpen}>
               <Avatar>
                 {user?.username?.[0]?.toUpperCase() || "U"}
               </Avatar>
-              <UserSection isOpen={isOpen}>
-
+              <UserSection $isOpen={isOpen}>
                 <p className="font-semibold text-lg text-gray-800 capitalize">{user?.username}</p>
                 <p className="font-semibold text-sm text-gray-500">{user?.email}</p>
               </UserSection>
@@ -208,14 +206,13 @@ export function Sidebar() {
                   <LinkStyled
                     key={index}
                     href={item.href}
-                    isActive={isActive}
-                    isOpen={isOpen}
+                    $isActive={isActive}
                     aria-current={isActive ? "page" : undefined}
                   >
                     <span>
                       <item.icon size="24px" />
                     </span>
-                    <LabelSection isOpen={isOpen}>
+                    <LabelSection $isOpen={isOpen}>
                       {item.title}
                     </LabelSection>
                   </LinkStyled>
@@ -224,15 +221,14 @@ export function Sidebar() {
             </nav>
 
             <div className="mt-auto border-t px-2 py-2">
-              <LogoutButton isOpen={isOpen} variant="link">
-                <LogOutIcon isOpen={isOpen} />
-                <LogOutSpan isOpen={isOpen}>Logout</LogOutSpan>
+              <LogoutButton $isOpen={isOpen} variant="link">
+                <LogOutIcon $isOpen={isOpen} />
+                <LogOutSpan $isOpen={isOpen}>Logout</LogOutSpan>
               </LogoutButton>
             </div>
           </div>
-        </AsideBar >
-      )
-      }
+        </AsideBar>
+      )}
     </>
   );
 }
