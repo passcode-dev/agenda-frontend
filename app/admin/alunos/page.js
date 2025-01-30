@@ -12,6 +12,8 @@ import FilterModal from "@/components/Filters/FilterModal";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AlertDialogUI } from "@/components/alert";
+import InputDate from "@/components/ui/inputDate";
+
 
 export default function Alunos() {
     const [loading, setLoading] = useState(false);
@@ -30,7 +32,7 @@ export default function Alunos() {
         { name: "RG", parameterName: "rg", icon: <IdCard />, },
         { name: "CPF", parameterName: "cpf", icon: <IdCard />, },
         { name: "Telefone", parameterName: "phone_number", icon: <Phone />, },
-        { name: "Data de Nascimento", parameterName: "birth_date", icon: <Calendar />, },
+        { name: "Data de Nascimento", parameterName: "birth_date", icon: <Calendar />, renderCell:true },
     ];
 
     const columns = [
@@ -46,7 +48,7 @@ export default function Alunos() {
             headerName: "Ações",
             field: "acoes",
             renderCell: (params) => (
-                <div className="flex justify-center gap-3">
+                <div className="flex justify-center gap-3 ">
                     <Button size="sm" onClick={() => editarAluno(params.row.id)}>
                         <Pencil className="w-4 h-4" />
                     </Button>

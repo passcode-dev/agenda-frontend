@@ -3,7 +3,7 @@ import FilterGroup from "@/components/Filters/FilterGroup";
 import FilterModal from "@/components/Filters/FilterModal";
 import { PaginationUI } from "@/components/paginationCustom";
 import { Spinner } from "@/components/ui/spinner";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -27,7 +27,7 @@ export default function Turmas() {
 
     const currentPage = Number(searchParams.get("page")) || 1
     const filterSchema = [
-        { name: "Nome" },
+        { name: "Nome", parameterName: "name", icon: <UserRound />,},
     ];
 
     const columns = [
@@ -63,12 +63,18 @@ export default function Turmas() {
     ];
 
     const fetchTurmas = async (page) => {
-        setLoading(true);
+    setLoading(true);
+    try {
         const turmaService = new TurmaService();
-        const turmas = await turmaService.Turmas(page);
-        setTurmas(turmas.data);
-        setLoading(false);
-    };
+        const response = await turmaService.Turmas(page);
+        setTurmas(response?.data || []);
+    } catch (error) {
+        console.error("Erro ao buscar turmas:", error);
+        setTurmas([]); 
+    }
+    setLoading(false);
+};
+
 
     useEffect(() => {
         fetchTurmas(currentPage);

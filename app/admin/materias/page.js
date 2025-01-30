@@ -3,7 +3,7 @@ import FilterGroup from "@/components/Filters/FilterGroup";
 import FilterModal from "@/components/Filters/FilterModal";
 import { PaginationUI } from "@/components/paginationCustom";
 import { Spinner } from "@/components/ui/spinner";
-import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
+import { ArrowLeft, Pencil, Trash2, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -27,7 +27,7 @@ export default function Materias() {
 
     const currentPage = Number(searchParams.get("page")) || 1
     const filterSchema = [
-        { name: "Nome" },
+        { name: "Nome", parameterName:"name", icon: <UserRound/> },
     ];
 
     const columns = [
@@ -125,7 +125,7 @@ export default function Materias() {
                 <div className="flex flex-row justify-center items-center gap-2">
                     <FilterModal filterSchema={filterSchema} />
                     <Link className="flex items-center justify-center" href="/admin/materias/novo">
-                        <Button className="px-4 ">Novo Matéria</Button>
+                        <Button className="px-4 ">Nova Matéria</Button>
                     </Link>
                 </div>
             </div>
