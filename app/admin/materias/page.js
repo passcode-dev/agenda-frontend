@@ -66,7 +66,8 @@ export default function Materias() {
         setLoading(true);
         const materiaService = new MateriaService();
         const materias = await materiaService.Materias(page);
-        setMaterias(materias.data);
+        setMaterias(materias.data.subjects);
+        setTotalPage(Math.ceil(materias.data.total_records / 10));
         setLoading(false);
     };
 

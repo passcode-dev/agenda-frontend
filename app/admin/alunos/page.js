@@ -16,7 +16,7 @@ import { AlertDialogUI } from "@/components/alert";
 export default function Alunos() {
     const [loading, setLoading] = useState(false);
     const [alunos, setAlunos] = useState([]);
-    const [totalPage, setTotalPage] = useState(3);
+    const [totalPage, setTotalPage] = useState(0);
     const [showDialog, setShowDialog] = useState(false);
     const [confirmCallback, setConfirmCallback] = useState(null);
     const router = useRouter();
@@ -62,8 +62,8 @@ export default function Alunos() {
         setLoading(true);
         const alunoService = new AlunoService();
         const alunos = await alunoService.alunos(page);
-        console.log(alunos.data);
-        setAlunos(alunos.data == null ? [] : alunos.data);
+        setAlunos(alunos.data.students);
+        setTotalPage(Math.ceil(alunos.data.total_records / 10));
         setLoading(false);
     };
 

@@ -50,14 +50,14 @@ export default function Novo() {
         });
     }
 
-    const fetchProfessor = async (page = 1) => {
+    const fetchAlunos = async () => {
         const alunoService = new AlunoService();
-        const alunos = await alunoService.alunos(page);
-        setAlunos(alunos.data);
+        const alunos = await alunoService.alunos();
+        setAlunos(alunos.data.students);
     };
 
     useEffect(() => {
-        fetchProfessor();
+        fetchAlunos();
     }, []);
 
     return (

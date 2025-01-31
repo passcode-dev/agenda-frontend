@@ -61,7 +61,7 @@ export default function Editar({ params }) {
     const fetchAlunos = async (page = 1) => {
         const alunoService = new AlunoService();
         const alunos = await alunoService.alunos(page);
-        setProfessores(alunos.data);
+        setAlunos(alunos.data.students);
     };
 
     useEffect(() => {

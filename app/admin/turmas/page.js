@@ -20,7 +20,7 @@ export default function Turmas() {
     const [turmas, setTurmas] = useState([]);
     const [showDialog, setShowDialog] = useState(false);
     const [confirmCallback, setConfirmCallback] = useState(null);
-    const [totalPage, setTotalPage] = useState(3);
+    const [totalPage, setTotalPage] = useState(0);
     const router = useRouter();
     const searchParams = useSearchParams();
     const { toast } = useToast();
@@ -66,7 +66,8 @@ export default function Turmas() {
         setLoading(true);
         const turmaService = new TurmaService();
         const turmas = await turmaService.Turmas(page);
-        setTurmas(turmas.data);
+        setTurmas(turmas.data.classes);
+        setTotalPage(Math.ceil(turmas.data.total_records / 10));
         setLoading(false);
     };
 

@@ -54,7 +54,7 @@ export default function Novo() {
     const fetchProfessor = async (page = 1) => {
         const professorService = new ProfessoresService();
         const professores = await professorService.Professores(page);
-        setProfessores(professores.data);
+        setProfessores(professores.data.teachers);
     };
 
     useEffect(() => {

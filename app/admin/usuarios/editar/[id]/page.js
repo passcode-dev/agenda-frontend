@@ -50,7 +50,7 @@ export default function Editar({ params }) {
             const professorService = new UsuarioService();
             const buscar = await professorService.buscarUsuario(id);
             if (buscar.status == "success") {
-                return setUsuario(buscar.data[0]);
+                return setUsuario(buscar.data.users[0]);
             }
             return toast({
                 title: "Erro ao buscar usuário",

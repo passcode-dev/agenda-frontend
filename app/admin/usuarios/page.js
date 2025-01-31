@@ -55,7 +55,8 @@ export default function Usuarios() {
         try {
             const usuarioService = new UsuarioService();
             const usuarios = await usuarioService.usuarios();
-            setUsuarios(usuarios.data);
+            setUsuarios(usuarios.data.users);
+            setTotalPage(Math.ceil(usuarios.data.total_records / 10));
         } catch (error) {
             toast({
                 title: "Erro ao carregar usuários",
@@ -161,11 +162,7 @@ export default function Usuarios() {
                                 />
                             </div>
                         </>
-                    ) : (
-                        <div className="flex justify-center items-center h-64">
-                            <p>Nenhum usuário cadastrado.</p>
-                        </div>
-                    )
+                    ) : null
                 )}
             </div>
         </div>

@@ -36,7 +36,7 @@ export default function Novo() {
         setLoading(false);
         return toast({
             title: "Erro ao cadastrar usuário",
-            description: cadastrar.message,
+            description: cadastrar.data.details,
             status: "error",
             variant: "destructive",
         });
