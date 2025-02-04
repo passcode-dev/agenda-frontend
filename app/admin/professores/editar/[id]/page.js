@@ -31,7 +31,7 @@ export default function Editar({ params }) {
             setLoading(false);
             reset();
             toast({
-                title: "Professor editado com sucesso",
+                title: "Sucesso",
                 description: editar.message,
                 variant: "success"
             });
@@ -40,7 +40,7 @@ export default function Editar({ params }) {
         }
         setLoading(false);
         return toast({
-            title: "Erro ao editar professor",
+            title: "Erro",
             description: editar.data.details,
             variant: "destructive"
         });
@@ -56,7 +56,7 @@ export default function Editar({ params }) {
                 return setProfessor(buscar.data.teachers[0]);
             }
             return toast({
-                title: "Erro ao buscar professor",
+                title: "Erro",
                 description: buscar.data.details,
                 variant: "destructive"
             });

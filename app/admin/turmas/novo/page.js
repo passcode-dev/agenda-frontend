@@ -36,7 +36,7 @@ export default function Novo() {
         if (turma.status === "success") {
             setLoading(false);
             toast({
-                title: "Turma cadastrada com sucesso!",
+                title: "Sucesso",
                 description: turma.message,
                 status: "success",
             });
@@ -44,8 +44,8 @@ export default function Novo() {
         };
         setLoading(false);
        return toast({
-            title: "Erro ao cadastrar turma!",
-            description: turma.message,
+            title: "Erro",
+            description: turma.data.details,
             status: "error",
         });
     }

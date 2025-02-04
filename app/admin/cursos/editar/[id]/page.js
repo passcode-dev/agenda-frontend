@@ -72,7 +72,7 @@ export default function Editar({ params }) {
                 setCursos(buscar.data);
             } else {
                 toast({
-                    title: "Erro ao buscar turmas",
+                    title: "Erro",
                     description: buscar.data.details,
                     variant: "destructive",
                 });

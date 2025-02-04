@@ -72,7 +72,7 @@ export default function Editar({ params }) {
                 setTurma(buscar.data);
             } else {
                 toast({
-                    title: "Erro ao buscar turma",
+                    title: "Erro",
                     description: buscar.data.details,
                     variant: "destructive",
                 });

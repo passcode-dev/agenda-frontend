@@ -96,7 +96,7 @@ export default function Cursos() {
             setShowDialog(false);
             return toast({
                 title: "Erro",
-                description: deletar.message,
+                description: deletar.data.details,
             });
         });
     };

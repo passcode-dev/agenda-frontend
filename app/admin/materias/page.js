@@ -100,7 +100,7 @@ export default function Materias() {
             setShowDialog(false);
             return toast({
                 title: "Erro",
-                description: deletar.message,
+                description: deletar.data.details,
             });
         });
     };
@@ -113,7 +113,7 @@ export default function Materias() {
         <div className="container max-w-4xl justify-center items-center mx-auto p-6">
             <AlertDialogUI
                 title="Confirmação de exclusão"
-                description="Deseja realmente deletar esta matéria ?"
+                description="Deseja realmente deletar esta matéria?"
                 showDialog={showDialog}
                 setShowDialog={setShowDialog}
                 onConfirm={confirmCallback}

@@ -94,7 +94,7 @@ export default function Alunos() {
             fetchAlunos(currentPage);
             return toast({
                 title: "Erro",
-                description: "Erro ao deletar aluno, tente novamente.",
+                description: deletar.data.details,
                 variant: "destructive",
             });
         });

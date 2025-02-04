@@ -109,7 +109,7 @@ export default function Turmas() {
         <div className="container max-w-4xl justify-center items-center mx-auto p-6">
             <AlertDialogUI
                 title="Confirmação de exclusão"
-                description="Deseja realmente deletar esta turma ?"
+                description="Deseja realmente deletar esta turma?"
                 showDialog={showDialog}
                 setShowDialog={setShowDialog}
                 onConfirm={confirmCallback}

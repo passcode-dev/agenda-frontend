@@ -37,7 +37,7 @@ export default function Novo() {
         if (materia.status === "success") {
             setLoading(false);
             toast({
-                title: "Matéria cadastrada com sucesso!",
+                title: "Sucesso",
                 description: materia.message,
                 status: "success",
             });
@@ -45,8 +45,8 @@ export default function Novo() {
         };
         setLoading(false);
        return toast({
-            title: "Erro ao cadastrar matéria!",
-            description: materia.message,
+            title: "Erro",
+            description: materia.data.details,
             status: "error",
         });
     }

@@ -69,7 +69,7 @@ export default function Editar({ params }) {
                 setMaterias(buscar.data);
             } else {
                 toast({
-                    title: "Erro ao buscar matéria",
+                    title: "Erro",
                     description: buscar.data.details,
                     variant: "destructive",
                 });

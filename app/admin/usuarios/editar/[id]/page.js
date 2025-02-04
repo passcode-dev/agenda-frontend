@@ -32,15 +32,15 @@ export default function Editar({ params }) {
             setLoading(false);
             router.push("/admin/usuarios");
             return toast({
-                title: "Usuário editado com sucesso",
+                title: "Sucesso",
                 description: alterar.message,
                 variant: "success"
             });
         }
         setLoading(false);
         return toast({
-            title: "Erro ao editar usuário",
-            description: alterar.message,
+            title: "Erro",
+            description: alterar.data.details,
             variant: "destructive"
         });
     };
@@ -53,8 +53,8 @@ export default function Editar({ params }) {
                 return setUsuario(buscar.data.users[0]);
             }
             return toast({
-                title: "Erro ao buscar usuário",
-                description: buscar.message,
+                title: "Erro",
+                description: buscar.data.details,
                 variant: "destructive"
             });
         }

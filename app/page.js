@@ -45,7 +45,7 @@ export default function LoginPage() {
                 setUser(login.data);
                 reset();
                 toast({
-                    title: "Login efetuado com sucesso",
+                    title: "Sucesso",
                     description: "Você será redirecionado para a página inicial",
                     status: "success",
                 });

@@ -95,7 +95,7 @@ export default function Professores() {
             fetchProfessor(currentPage);
             return toast({
                 title: "Erro",
-                description: deletar.message,
+                description: deletar.data.details,
             });
         });
     };

@@ -29,7 +29,7 @@ export default function Novo() {
             if (cadastrar.status == "success") {
                 reset();
                 toast({
-                    title: "Professor cadastrado com sucesso",
+                    title: "Sucesso",
                     description: cadastrar.message,
                     status: "success",
                 });
@@ -38,7 +38,7 @@ export default function Novo() {
             }
             setLoading(false);
             return toast({
-                title: "Erro ao cadastrar professor",
+                title: "Erro",
                 description: cadastrar.data.details,
                 status: "error",
                 variant: "destructive"

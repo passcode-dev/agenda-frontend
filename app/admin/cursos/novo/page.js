@@ -36,7 +36,7 @@ export default function Novo() {
         if (cursos.status === "success") {
             setLoading(false);
             toast({
-                title: "Curso cadastrada com sucesso!",
+                title: "Sucesso",
                 description: cursos.message,
                 status: "success",
             });
@@ -44,7 +44,7 @@ export default function Novo() {
         };
         setLoading(false);
         return toast({
-            title: "Erro ao cadastrar o curso!",
+            title: "Erro",
             description: cursos.data.details,
             status: "error",
         });
