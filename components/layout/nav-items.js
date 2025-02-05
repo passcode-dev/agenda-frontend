@@ -32,12 +32,6 @@ export const Items = [
     href: "/admin/classes"
   },
   {
-    title: "Início",
-    icon: Home,
-    variant: "default",
-    href: "/admin"
-  },
-  {
     title: "Matérias",
     icon: Book,
     variant: "default",
