@@ -55,11 +55,12 @@ export default function Usuarios() {
         try {
             const usuarioService = new UsuarioService();
             const usuarios = await usuarioService.usuarios();
-            setUsuarios(usuarios.data);
+            setUsuarios(usuarios.data.users);
+            setTotalPage(Math.ceil(usuarios.data.total_records / 10));
         } catch (error) {
             toast({
-                title: "Erro ao carregar usuários",
-                description: usuarios.message,
+                title: "Erro",
+                description: usuarios.data.details,
                 variant: "destructive",
             });
         } finally {
@@ -74,7 +75,7 @@ export default function Usuarios() {
     const editarUsuario = (id) => {
         if (user.id == id) {
             return toast({
-                title: "Erro ao editar usuário",
+                title: "Erro",
                 description: "Você não pode editar o próprio usuário, vai até a página de perfil para alterar seus dados.",
                 variant: "destructive",
             });
@@ -85,7 +86,7 @@ export default function Usuarios() {
     const deletarUsuario = (id) => {
         if (user.id == id) {
             return toast({
-                title: "Erro ao deletar usuário",
+                title: "Erro",
                 description: "Você não pode deletar o próprio usuário, vai até a página de perfil para deletar sua conta.",
                 variant: "destructive",
             });
@@ -98,7 +99,7 @@ export default function Usuarios() {
                 setShowDialog(false);
                 fetchUsuarios(currentPage);
                 return toast({
-                    title: "Usuário deletado com sucesso",
+                    title: "Sucesso",
                     description: deletar.message,
                     variant: "success",
                 });
@@ -108,8 +109,8 @@ export default function Usuarios() {
             setShowDialog(false);
             fetchUsuarios(currentPage);
             return toast({
-                title: "Erro ao deletar usuário",
-                description: deletar.message,
+                title: "Erro",
+                description: deletar.data.details,
                 variant: "destructive",
             });
         });
@@ -161,11 +162,7 @@ export default function Usuarios() {
                                 />
                             </div>
                         </>
-                    ) : (
-                        <div className="flex justify-center items-center h-64">
-                            <p>Nenhum usuário cadastrado.</p>
-                        </div>
-                    )
+                    ) : null
                 )}
             </div>
         </div>

@@ -28,15 +28,15 @@ export default function Novo() {
             setLoading(false);
             reset();
             toast({
-                title: "Usuário cadastrado com sucesso",
+                title: "Sucesso",
                 description: cadastrar.message,
             });
             return router.push("/admin/usuarios");
         }
         setLoading(false);
         return toast({
-            title: "Erro ao cadastrar usuário",
-            description: cadastrar.message,
+            title: "Erro",
+            description: cadastrar.data.details,
             status: "error",
             variant: "destructive",
         });

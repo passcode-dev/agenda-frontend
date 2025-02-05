@@ -29,7 +29,7 @@ export default function Editar({ params }) {
             setLoading(false);
             reset();
             toast({
-                title: "Aluno editado com sucesso",
+                title: "Sucesso",
                 description: editar.message,
                 variant: "success"
             });
@@ -37,7 +37,7 @@ export default function Editar({ params }) {
         }
         setLoading(false);
         return toast({
-            title: "Erro ao editar aluno",
+            title: "Erro",
             description: editar.data.details,
             variant: "destructive"
         });

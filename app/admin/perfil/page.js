@@ -38,8 +38,8 @@ export default function Perfil() {
         }
         setLoading(false);
         return toast({
-            title: "Erro ao editar usuário",
-            description: alterar.message,
+            title: "Erro",
+            description: alterar.data.details,
             variant: "destructive"
         });
     };
