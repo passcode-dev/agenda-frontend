@@ -31,20 +31,20 @@ const LinkStyled = styled.a`
 
 // Usando $isOpen em vez de isOpen
 const AsideBar = styled(({ $isOpen, ...props }) => <aside {...props} />)`
-  position: fixed;
+  position: sticky;
   top: 0;
   left: 0;
   height: 100vh;
   background-color: #ffffff;
   transition: width 0.3s ease, opacity 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  z-index: 9999;
+  z-index: 10;
   display: flex;
   flex-direction: column;
 
   ${({ $isOpen }) =>
     $isOpen
-      ? `width: 280px; opacity: 1;`
+      ? `width: 330px; opacity: 1;`
       : `width: 64px; opacity: 0.95;`}
 `;
 

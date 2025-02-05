@@ -2,6 +2,12 @@ import { Home, UserCog, Layers, BookMarked, Users, GraduationCapIcon, CalendarRa
 
 export const Items = [
   {
+    title: "Início",
+    icon: Home,
+    variant: "default",
+    href: "/admin"
+  },
+  {
     title: "Agenda",
     icon: CalendarRange,
     variant: "default",
@@ -18,12 +24,6 @@ export const Items = [
     icon: BookMarked,
     variant: "default",
     href: "/admin/cursos"
-  },
-  {
-    title: "Início",
-    icon: Home,
-    variant: "default",
-    href: "/admin"
   },
   {
     title: "Matérias",
