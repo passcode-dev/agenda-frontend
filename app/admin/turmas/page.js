@@ -3,7 +3,7 @@ import FilterGroup from "@/components/Filters/FilterGroup";
 import FilterModal from "@/components/Filters/FilterModal";
 import { PaginationUI } from "@/components/paginationCustom";
 import { Spinner } from "@/components/ui/spinner";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -27,7 +27,7 @@ export default function Turmas() {
 
     const currentPage = Number(searchParams.get("page")) || 1
     const filterSchema = [
-        { name: "Nome" },
+        { name: "Nome", parameterName: "name", icon: <UserRound />, }
     ];
 
     const columns = [
@@ -64,12 +64,22 @@ export default function Turmas() {
 
     const fetchTurmas = async (page) => {
         setLoading(true);
-        const turmaService = new TurmaService();
-        const turmas = await turmaService.Turmas(page);
-        setTurmas(turmas.data.classes);
-        setTotalPage(Math.ceil(turmas.data.total_records / 10));
-        setLoading(false);
-    };
+        try {
+            const turmaService = new TurmaService();
+            const turmas = await turmaService.Turmas(page);
+            setTurmas(turmas.data.classes);
+            setTotalPage(Math.ceil(turmas.data.total_records / 10));
+            setLoading(false);
+        }
+        catch (error) {
+            setLoading(false);
+            return toast({
+                title: "Erro",
+                description: error.message,
+            });
+        }
+    }
+
 
     useEffect(() => {
         fetchTurmas(currentPage);

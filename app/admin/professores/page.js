@@ -5,7 +5,7 @@ import FilterModal from "@/components/Filters/FilterModal";
 import { PaginationUI } from "@/components/paginationCustom";
 import { Spinner } from "@/components/ui/spinner";
 import ProfessoresService from "@/lib/service/professoresService";
-import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
+import { ArrowLeft, Pencil, Trash2, UserRound, IdCard, Calendar } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -27,10 +27,15 @@ export default function Professores() {
 
     const currentPage = Number(searchParams.get("page")) || 1
     const filterSchema = [
-        { name: "Data de Nascimento", Value: <input /> },
-        { name: "Nome" },
-        { name: "CPF" },
+        { name: "Data de Nascimento", parameterName: "birth_date", icon: <Calendar />,},
+        { name: "Nome", parameterName:"name", icon: <UserRound/> },
+        { name: "CPF", parameterName: "cpf", icon: <IdCard />, },
     ];
+
+    const filterSchema2 = [
+        { name: "Nome", parameterName:"name", icon: <UserRound/> },
+    ];
+
 
     const columns = [
         { headerName: "#", field: "id" },

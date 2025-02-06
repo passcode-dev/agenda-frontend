@@ -3,6 +3,13 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Separator } from '../ui/separator';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DateField } from "@mui/x-date-pickers/DateField";
+import dayjs from "dayjs";
+import "dayjs/locale/pt-br";
+
 
 const fadeInAndSlideDown = keyframes`
     from {
@@ -143,25 +150,20 @@ const Icon = styled.i`
     color: #007bff;
 `;
 
+
+
 const GenericModal = ({ isOpen, onClose, filterName, onSubmit, selectedFilter, searchParams, router }) => {
-    const [inputValue, setInputValue] = useState('');
+    const [inputValue, setInputValue] = useState("");
 
     if (!isOpen) return null;
-
-    const handleInputChange = (e) => {
-        setInputValue(e.target.value);
-    };
 
     const handleSubmit = () => {
         const params = new URLSearchParams(searchParams.toString());
         params.set(selectedFilter.parameterName, inputValue);
-        const newParams = new URLSearchParams(window.location.search);
-        newParams.set(selectedFilter.parameterName, inputValue);
-        router.push(`${window.location.pathname}?${newParams.toString()}`);
-        onSubmit(inputValue);
+        router.push(`${window.location.pathname}?${params.toString()}`);
+        onSubmit(inputValue, selectedFilter);
         onClose();
     };
-
 
     return (
         <>
@@ -172,24 +174,37 @@ const GenericModal = ({ isOpen, onClose, filterName, onSubmit, selectedFilter, s
                     <Separator />
                 </div>
                 <div className='flex flex-col justify-center h-full'>
-                    {selectedFilter?.renderCell
-                        ? selectedFilter?.renderCell({ value: inputValue, onChange: handleInputChange })
-                        : (
-                            <Input
-                                type="text"
-                                defaultValue={searchParams.get(selectedFilter.parameterName)}
-                                onChange={handleInputChange}
-                                placeholder={`Digite o valor para ${filterName}`}
-                            />
-                        )
-                    }
-
+                    {selectedFilter?.renderCell === true ? (
+                        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
+                            <DemoContainer components={["DateField"]}>
+                                <DateField
+                                    defaultValue={inputValue ? dayjs(inputValue, "DD-MM-YYYY") : null}
+                                    onChange={(e) => {
+                                        const formattedDate = e ? e.format("DD-MM-YYYY") : "";
+                                        setInputValue(formattedDate);
+                                    }}
+                                    className="w-full"
+                                    label="Digite a data"
+                                    format="DD/MM/YYYY"
+                                />
+                            </DemoContainer>
+                        </LocalizationProvider>
+                    ) : selectedFilter?.type === "date" ? (
+                        <InputDate value={inputValue} setInputValue={setInputValue} />
+                    ) : (
+                        <Input
+                            type="text"
+                            value={inputValue}
+                            onChange={(e) => setInputValue(e.target.value)}
+                            placeholder={`Digite o valor para ${filterName}`}
+                        />
+                    )}
                     <Button onClick={handleSubmit}>Salvar</Button>
                 </div>
             </GenericModalContent>
         </>
     );
-};
+}
 
 const FilterModal = ({ filterSchema }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -248,7 +263,7 @@ const FilterModal = ({ filterSchema }) => {
                     <Separator />
                     <FilterOption onClick={clearFilters}>
                         <div >
-                            <X  className='text-black'/>
+                            <X className='text-black' />
                         </div>
                         <FilterName>Limpar Filtros</FilterName>
                     </FilterOption>
