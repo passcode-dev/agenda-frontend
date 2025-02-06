@@ -12,7 +12,7 @@ import FilterModal from "@/components/Filters/FilterModal";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AlertDialogUI } from "@/components/alert";
-import InputDate from "@/components/ui/inputDate";
+
 
 
 export default function Alunos() {
@@ -132,7 +132,7 @@ export default function Alunos() {
                     <div className="flex justify-center items-center h-64">
                         <Spinner message="Carregando..." />
                     </div>
-                ) : alunos.length >= 0 ? (
+                ) : alunos?.length >= 0 ? (
                     <>
                         <FilterGroup filterSchema={filterSchema} />
                         <Table data={alunos} columns={columns} />
