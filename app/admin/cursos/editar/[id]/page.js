@@ -13,9 +13,9 @@ import { use } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import MateriaForm from "@/components/forms/materiaForm";
-import AlunoService from "@/lib/service/alunoService";
+import CursoService from "@/lib/service/cursoService";
+import GenericSelectForm from "@/components/forms/genericoForm";
 import TurmaService from "@/lib/service/turmaService";
-import TurmaForm from "@/components/forms/turmaForm";
 
 export default function Editar({ params }) {
     const { id } = use(params);
@@ -23,10 +23,10 @@ export default function Editar({ params }) {
     const { register, reset, handleSubmit, setValue, formState: { errors } } = useForm({
         resolver: zodResolver(zodMateria),
     });
-    const [alunos, setAlunos] = useState([]);
-    const [alunosMateria, setAlunosMateria] = useState([]);
+    const [turmas, setTurmas] = useState([]);
+    const [cursosTurma, setCursosTurma] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [turma, setTurma] = useState({});
+    const [cursos, setCursos] = useState({});
     const { toast } = useToast();
     const router = useRouter();
 
@@ -34,12 +34,12 @@ export default function Editar({ params }) {
         setLoading(true);
         let obj = {
             name: data.name,
-            students: alunosMateria.length > 0 ? alunosMateria.map((aluno) => {
-                return { id: aluno.id }
-            }) : alunos.Students,
+            classes: cursosTurma.length > 0 ? cursosTurma.map((turma) => {
+                return { id: turma.id }
+            }) : cursos.Classes,
         }
-        const turmaService = new TurmaService();
-        const editar = await turmaService.editarTurma(id, obj);
+        const cursoService = new CursoService();
+        const editar = await cursoService.editarCurso(id, obj);
         if (editar.status == "success") {
             setLoading(false);
             reset();
@@ -48,7 +48,7 @@ export default function Editar({ params }) {
                 description: editar.message,
                 variant: "success",
             });
-            return router.push("/admin/turmas");
+            return router.push("/admin/cursos");
         }
         setLoading(false);
         return toast({
@@ -58,18 +58,18 @@ export default function Editar({ params }) {
         });
     };
 
-    const fetchAlunos = async (page = 1) => {
-        const alunoService = new AlunoService();
-        const alunos = await alunoService.alunos(page);
-        setAlunos(alunos.data.students);
+    const fetchTurmas = async (page = 1) => {
+        const turmaService = new TurmaService();
+        const turmas = await turmaService.Turmas(page);
+        setTurmas(turmas.data.classes);
     };
 
     useEffect(() => {
-        async function fetchTurmas(id) {
-            const turmaService = new TurmaService();
-            const buscar = await turmaService.buscarTurma(id);
+        async function fetchCursos(id) {
+            const cursoService = new CursoService();
+            const buscar = await cursoService.buscarCurso(id);
             if (buscar.status === "success") {
-                setTurma(buscar.data);
+                setCursos(buscar.data);
             } else {
                 toast({
                     title: "Erro",
@@ -78,37 +78,43 @@ export default function Editar({ params }) {
                 });
             }
         }
-        fetchAlunos();
-        fetchTurmas(id);
+        fetchTurmas();
+        fetchCursos(id);
     }, [id]);
 
     return (
         <div className="container max-w-4xl justify-center items-center mx-auto p-6">
             <div className="mb-8">
                 <div className="flex items-center gap-2">
-                    <Back icon={<ArrowLeft className="h-4 w-4" />} text="Voltar" href="/admin/turmas" />
+                    <Back icon={<ArrowLeft className="h-4 w-4" />} text="Voltar" href="/admin/cursos" />
                 </div>
             </div>
             <div className="mb-8 flex justify-between items-center">
                 <div>
                     <h1 className="mt-4 text-3xl font-bold">
-                        Editar Turma
+                        Editar Curso
                     </h1>
                     <p className="text-muted-foreground">
-                        Preencha os campos abaixo para editar uma Turma.
+                        Preencha os campos abaixo para editar um curso.
                     </p>
                 </div>
             </div>
             <div>
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    <TurmaForm
+                    <GenericSelectForm
                         register={register}
                         errors={errors}
                         setValue={setValue}
-                        alunos={alunos}
-                        initialValues={turma}
-                        setAlunosMateria={setAlunosMateria}
-                        alunosMateria={alunosMateria}
+                        initialValues={cursos}
+                        items={turmas}
+                        setSelectedItems={setCursosTurma}
+                        selectedItems={cursosTurma}
+                        label="Curso"
+                        placeholder="Selecione uma turma..."
+                        itemName="Classes"
+                        searchPlaceholder="Buscar turma..."
+                        noItemsMessage="Nenhum turma encontrada."
+                        labelSelect="Turmas"
                     />
                     <Button type="submit" className="mt-4 w-24" disabled={loading}>
                         {loading ? <Spinner className="text-gray-800" /> : "Editar"}

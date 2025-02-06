@@ -3,7 +3,7 @@ import FilterGroup from "@/components/Filters/FilterGroup";
 import FilterModal from "@/components/Filters/FilterModal";
 import { PaginationUI } from "@/components/paginationCustom";
 import { Spinner } from "@/components/ui/spinner";
-import { Pencil, Trash2, UserRound } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -12,10 +12,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import Tables from "@/components/tables/Tables";
 import { AlertDialogUI } from "@/components/alert";
+import CursoService from "@/lib/service/cursoService";
 import { Badge } from "@/components/ui/badge";
-import TurmaService from "@/lib/service/turmaService";
 
-export default function Turmas() {
+export default function Cursos() {
     const [loading, setLoading] = useState(false);
     const [turmas, setTurmas] = useState([]);
     const [showDialog, setShowDialog] = useState(false);
@@ -27,20 +27,20 @@ export default function Turmas() {
 
     const currentPage = Number(searchParams.get("page")) || 1
     const filterSchema = [
-        { name: "Nome", parameterName: "name", icon: <UserRound />, }
+        { name: "Nome" },
     ];
 
     const columns = [
         { headerName: "#", field: "id" },
-        { headerName: "Turma", field: "name" },
+        { headerName: "Curso", field: "name" },
         {
-            headerName: "Alunos", field: "name", renderCell: (params) => (
+            headerName: "Turma", field: "name", renderCell: (params) => (
                 <div className="flex flex-wrap  gap-1 justify-center">
-                    {params.row.Students.map((aluno, index) => (
+                    {params.row.Classes.map((turma, index) => (
                         <Badge className="p-2"
                             key={index}
                         >
-                            {aluno.name}
+                            {turma.name}
                         </Badge>
                     ))}
                 </div>
@@ -54,7 +54,7 @@ export default function Turmas() {
                     <Button size="sm" onClick={() => editarMateria(params.row.id)}>
                         <Pencil className="w-4 h-4" />
                     </Button>
-                    <Button size="sm" onClick={() => deletarTurma(params.row.id)}>
+                    <Button size="sm" onClick={() => deletarCurso(params.row.id)}>
                         <Trash2 className="w-4 h-4" />
                     </Button>
                 </div>
@@ -62,80 +62,68 @@ export default function Turmas() {
         },
     ];
 
-    const fetchTurmas = async (page) => {
+    const fetchCursos = async (page) => {
         setLoading(true);
-        try {
-            const turmaService = new TurmaService();
-            const turmas = await turmaService.Turmas(page);
-            setTurmas(turmas.data.classes);
-            setTotalPage(Math.ceil(turmas.data.total_records / 10));
-            setLoading(false);
-        }
-        catch (error) {
-            setLoading(false);
-            return toast({
-                title: "Erro",
-                description: error.message,
-            });
-        }
-    }
-
+        const cursoService = new CursoService();
+        const cursos = await cursoService.Cursos(page);
+        setTurmas(cursos.data.courses);
+        setTotalPage(Math.ceil(cursos.data.total_records / 10));
+        setLoading(false);
+    };
 
     useEffect(() => {
-        fetchTurmas(currentPage);
+        fetchCursos(currentPage);
     }, [currentPage]);
 
     const editarMateria = (id) => {
-        router.push(`/admin/turmas/editar/${id}`);
+        router.push(`/admin/cursos/editar/${id}`);
     };
 
-    const deletarTurma = async (id) => {
+    const deletarCurso = async (id) => {
         setShowDialog(true);
         setConfirmCallback(() => async () => {
-            const turmaService = new TurmaService();
-            const deletar = await turmaService.deletarTurma(id);
+            const cursoService = new CursoService();
+            const deletar = await cursoService.deletarCurso(id);
             if (deletar.status == "success") {
-                fetchTurmas(currentPage);
+                fetchCursos(currentPage);
                 setShowDialog(false);
                 return toast({
                     title: "Sucesso",
                     description: deletar.message,
                 });
             }
-            fetchTurmas(currentPage);
+            fetchCursos(currentPage);
             setShowDialog(false);
             return toast({
                 title: "Erro",
-                description: deletar.message,
+                description: deletar.data.details,
             });
         });
     };
 
     const handlePageChange = (page) => {
-        fetchTurmas(page);
+        fetchCursos(page);
     };
 
     return (
         <div className="container max-w-4xl justify-center items-center mx-auto p-6">
             <AlertDialogUI
                 title="Confirmação de exclusão"
-                description="Deseja realmente deletar esta turma?"
+                description="Deseja realmente deletar esse curso ?"
                 showDialog={showDialog}
                 setShowDialog={setShowDialog}
                 onConfirm={confirmCallback}
             />
-            <div className="container max-w-4xl mx-auto p-6">
-                <div className="mb-8 flex justify-between items-center">
-                    <div>
-                        <h1 className="mt-4 text-3xl font-bold">Turmas</h1>
-                        <p className="text-muted-foreground">Lista de turmas cadastrados</p>
-                    </div>
-                    <div className="flex flex-row justify-center items-center gap-2">
-                        <FilterModal filterSchema={filterSchema} />
-                        <Link className="flex items-center justify-center" href="/admin/turmas/novo">
-                            <Button className="px-4">Nova Turma</Button>
-                        </Link>
-                    </div>
+            <div className="mb-8 flex justify-between items-center">
+                <div>
+                    <h1 className="mt-4 text-3xl font-bold">Cursos</h1>
+                    <p className="text-muted-foreground">Lista de cursos cadastrados</p>
+                </div>
+                <div className="flex flex-row justify-center items-center gap-2">
+                    <FilterModal filterSchema={filterSchema} />
+                    <Link className="flex items-center justify-center" href="/admin/cursos/novo">
+                        <Button className="px-4">Novo Curso</Button>
+                    </Link>
                 </div>
             </div>
             <div className="mt-8">
@@ -157,6 +145,6 @@ export default function Turmas() {
                 ) : null
                 }
             </div>
-        </div >
+        </div>
     );
 }

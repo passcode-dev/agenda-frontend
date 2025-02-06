@@ -20,7 +20,7 @@ export default function Professores() {
     const [professores, setProfessores] = useState([]);
     const [showDialog, setShowDialog] = useState(false);
     const [confirmCallback, setConfirmCallback] = useState(null);
-    const [totalPage, setTotalPage] = useState(3);
+    const [totalPage, setTotalPage] = useState(0);
     const router = useRouter();
     const searchParams = useSearchParams();
     const { toast } = useToast();
@@ -70,7 +70,8 @@ export default function Professores() {
         setLoading(true);
         const professorService = new ProfessoresService();
         const professores = await professorService.Professores(page);
-        setProfessores(professores.data);
+        setTotalPage(Math.ceil(professores.data.total_records / 10));
+        setProfessores(professores.data.teachers);
         setLoading(false);
     };
 
@@ -99,7 +100,7 @@ export default function Professores() {
             fetchProfessor(currentPage);
             return toast({
                 title: "Erro",
-                description: deletar.message,
+                description: deletar.data.details,
             });
         });
     };

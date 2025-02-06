@@ -66,7 +66,8 @@ export default function Materias() {
         setLoading(true);
         const materiaService = new MateriaService();
         const materias = await materiaService.Materias(page);
-        setMaterias(materias.data);
+        setMaterias(materias.data.subjects);
+        setTotalPage(Math.ceil(materias.data.total_records / 10));
         setLoading(false);
     };
 
@@ -99,7 +100,7 @@ export default function Materias() {
             setShowDialog(false);
             return toast({
                 title: "Erro",
-                description: deletar.message,
+                description: deletar.data.details,
             });
         });
     };
@@ -112,7 +113,7 @@ export default function Materias() {
         <div className="container max-w-4xl justify-center items-center mx-auto p-6">
             <AlertDialogUI
                 title="Confirmação de exclusão"
-                description="Deseja realmente deletar esta matéria ?"
+                description="Deseja realmente deletar esta matéria?"
                 showDialog={showDialog}
                 setShowDialog={setShowDialog}
                 onConfirm={confirmCallback}

@@ -1,6 +1,12 @@
-import { Home, UserCog, Layers, BookMarked, Users, GraduationCapIcon, CalendarRange, Book, Cog } from 'lucide-react';
+import { Home, UserCog, Layers, BookMarked, Users, GraduationCapIcon, CalendarRange, Book } from 'lucide-react';
 
 export const Items = [
+  {
+    title: "Início",
+    icon: Home,
+    variant: "default",
+    href: "/admin"
+  },
   {
     title: "Agenda",
     icon: CalendarRange,
@@ -20,10 +26,10 @@ export const Items = [
     href: "/admin/cursos"
   },
   {
-    title: "Início",
-    icon: Home,
+    title: "Classes",
+    icon: Layers,
     variant: "default",
-    href: "/admin"
+    href: "/admin/classes"
   },
   {
     title: "Matérias",

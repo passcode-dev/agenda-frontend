@@ -6,81 +6,93 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Back from "@/components/back";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { zodMateria } from "@/lib/schemas/zod";
-import ProfessoresService from "@/lib/service/professoresService";
+import { zodCurso } from "@/lib/schemas/zod";
 import { useEffect, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
-import MateriaForm from "@/components/forms/materiaForm";
-import { Teachers } from "next/font/google";
-import MateriaService from "@/lib/service/materiaService";
+import TurmaService from "@/lib/service/turmaService";
+import GenericSelectForm from "@/components/forms/genericoForm";
+import CursoService from "@/lib/service/cursoService";
 
 export default function Novo() {
     const [loading, setLoading] = useState(false);
-    const [professoresMateria, setProfessoresMateria] = useState([]);
+    const [turmaCurso, setTurmaCurso] = useState([]);
     const { register, reset, handleSubmit, setValue, formState: { errors } } = useForm({
-        resolver: zodResolver(zodMateria),
+        resolver: zodResolver(zodCurso),
     });
     const { toast } = useToast();
     const router = useRouter();
-    const [professores, setProfessores] = useState([]);
+    const [turmas, setTurmas] = useState([]);
 
     const onSubmit = async (data) => {
         setLoading(true);
         let obj = {
             ...data,
-            teachers: professoresMateria.map((professor) => {
-                return { id: professor.id }
+            classes: turmaCurso.map((turma) => {
+                return { id: turma.id }
             }),
         }
-        const materiaService = new MateriaService();
-        const materia = await materiaService.cadastrarMateria(obj);
-        if (materia.status === "success") {
+        const cursoService = new CursoService();
+        const cursos = await cursoService.cadastrarCurso(obj);
+        if (cursos.status === "success") {
             setLoading(false);
             toast({
                 title: "Sucesso",
-                description: materia.message,
+                description: cursos.message,
                 status: "success",
             });
-            return router.push("/admin/materias");
+            return router.push("/admin/cursos");
         };
         setLoading(false);
-       return toast({
+        return toast({
             title: "Erro",
-            description: materia.data.details,
+            description: cursos.data.details,
             status: "error",
         });
     }
 
-    const fetchProfessor = async (page = 1) => {
-        const professorService = new ProfessoresService();
-        const professores = await professorService.Professores(page);
-        setProfessores(professores.data.teachers);
+    const fetchTurmas = async (page) => {
+        const turmaService = new TurmaService();
+        const turmas = await turmaService.Turmas(page);
+        setTurmas(turmas.data.classes);
     };
 
     useEffect(() => {
-        fetchProfessor();
+        fetchTurmas();
     }, []);
 
     return (
         <div className="container max-w-4xl justify-center items-center mx-auto p-6">
             <div className="mb-8">
                 <div className="flex items-center gap-2">
-                    <Back icon={<ArrowLeft className="h-4 w-4" />} text="Voltar" href="/admin/materias" />
+                    <Back icon={<ArrowLeft className="h-4 w-4" />} text="Voltar" href="/admin/cursos" />
                 </div>
             </div>
             <div className="mb-8 flex justify-between items-center">
                 <div>
                     <h1 className="mt-4 text-3xl font-bold">
-                        Nova Matéria
+                        Novo Curso
                     </h1>
                     <p className="text-muted-foreground">
-                        Cadastre uma nova matéria
+                        Cadastre uma novo curso
                     </p>
                 </div>
             </div>
             <div>
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    <MateriaForm register={register} errors={errors} setValue={setValue} professores={professores} setProfessoresMateria={setProfessoresMateria} professoresMateria={professoresMateria} />
+                    <GenericSelectForm
+                        register={register}
+                        errors={errors}
+                        setValue={setValue}
+                        items={turmas}
+                        setSelectedItems={setTurmaCurso}
+                        selectedItems={turmaCurso}
+                        label="Curso"
+                        placeholder="Selecione uma turma..."
+                        itemName="Classes"
+                        searchPlaceholder="Buscar turma..."
+                        noItemsMessage="Nenhum turma encontrada."
+                        labelSelect="Turmas"
+                    />
                     <Button type="submit" className="mt-4 w-24" disabled={loading}>
                         {loading ? <Spinner className="text-gray-800" /> : "Cadastrar"}
                     </Button>
