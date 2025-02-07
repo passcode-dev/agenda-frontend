@@ -3,13 +3,10 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Separator } from '../ui/separator';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateField } from "@mui/x-date-pickers/DateField";
-import dayjs from "dayjs";
 import "dayjs/locale/pt-br";
-
 
 const fadeInAndSlideDown = keyframes`
     from {
@@ -97,7 +94,7 @@ const FilterIconContainer = styled.div`
 `;
 
 const ModalContainer = styled.div`
-    position: fixed;
+    position: absolute;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -127,7 +124,7 @@ const FilterName = styled.span`
 `;
 
 const GenericModalContent = styled.div`
-    position: absolute;
+    position: fixed;
     top: 150px;
     left: 0;
     right: 0;
@@ -149,8 +146,6 @@ const Icon = styled.i`
     margin-right: 8px;
     color: #007bff;
 `;
-
-
 
 const GenericModal = ({ isOpen, onClose, filterName, onSubmit, selectedFilter, searchParams, router }) => {
     const [inputValue, setInputValue] = useState("");
@@ -174,24 +169,10 @@ const GenericModal = ({ isOpen, onClose, filterName, onSubmit, selectedFilter, s
                     <Separator />
                 </div>
                 <div className='flex flex-col justify-center h-full'>
-                    {selectedFilter?.renderCell === true ? (
-                        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
-                            <DemoContainer components={["DateField"]}>
-                                <DateField
-                                    defaultValue={inputValue ? dayjs(inputValue, "DD-MM-YYYY") : null}
-                                    onChange={(e) => {
-                                        const formattedDate = e ? e.format("DD-MM-YYYY") : "";
-                                        setInputValue(formattedDate);
-                                    }}
-                                    className="w-full"
-                                    label="Digite a data"
-                                    format="DD/MM/YYYY"
-                                />
-                            </DemoContainer>
-                        </LocalizationProvider>
-                    ) : selectedFilter?.type === "date" ? (
-                        <InputDate value={inputValue} setInputValue={setInputValue} />
-                    ) : (
+                    {selectedFilter?.renderCell ? (
+                        selectedFilter.renderCell(inputValue, setInputValue)
+                    )
+                         : (
                         <Input
                             type="text"
                             value={inputValue}
@@ -226,6 +207,7 @@ const FilterModal = ({ filterSchema }) => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
+
     const openModal = () => {
         setIsModalOpen(!isModalOpen);
     };
@@ -248,10 +230,12 @@ const FilterModal = ({ filterSchema }) => {
     const handleFilterSubmit = (value) => {
         console.log(`Valor para ${selectedFilter?.name}:`, value);
     };
+
     const clearFilters = useCallback(() => {
         router.push(window.location.pathname);
         setIsModalOpen(false);
     }, [router]);
+
     return (
         <div>
             <FilterIconContainer onClick={openModal}>
@@ -262,7 +246,7 @@ const FilterModal = ({ filterSchema }) => {
                     <ModalHeader>Filtros</ModalHeader>
                     <Separator />
                     <FilterOption onClick={clearFilters}>
-                        <div >
+                        <div>
                             <X className='text-black' />
                         </div>
                         <FilterName>Limpar Filtros</FilterName>
@@ -271,9 +255,7 @@ const FilterModal = ({ filterSchema }) => {
                     {filterSchema.map((filter, index) => (
                         <React.Fragment key={index}>
                             <FilterOption onClick={() => openGenericModal(filter)}>
-                                <div >
-                                    {filter.icon}
-                                </div>
+                                <div>{filter.icon}</div>
                                 <FilterName>{filter.name}</FilterName>
                             </FilterOption>
                             {index < filterSchema.length - 1 && <Separator />}

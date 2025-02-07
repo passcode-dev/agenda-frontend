@@ -8,10 +8,14 @@ import AlunoService from "@/lib/service/alunoService";
 import Table from "@/components/tables/Tables";
 import { PaginationUI } from "@/components/paginationCustom";
 import FilterGroup from "@/components/Filters/FilterGroup";
-import FilterModal from "@/components/Filters/FilterModal";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AlertDialogUI } from "@/components/alert";
+import { DateField, LocalizationProvider } from "@mui/x-date-pickers";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
+import FilterModal from "@/components/Filters/FilterModal";
 
 
 
@@ -28,11 +32,34 @@ export default function Alunos() {
     const currentPage = Number(searchParams.get("page")) || 1
 
     const filterSchema = [
-        { name: "Nome", parameterName: "name", icon: <UserRound />, },
-        { name: "RG", parameterName: "rg", icon: <IdCard />, },
-        { name: "CPF", parameterName: "cpf", icon: <IdCard />, },
-        { name: "Telefone", parameterName: "phone_number", icon: <Phone />, },
-        { name: "Data de Nascimento", parameterName: "birth_date", icon: <Calendar />, renderCell:true },
+        { name: "Nome", parameterName: "name", icon: <UserRound /> },
+        { name: "RG", parameterName: "rg", icon: <IdCard /> },
+        { name: "CPF", parameterName: "cpf", icon: <IdCard /> },
+        { name: "Telefone", parameterName: "phone_number", icon: <Phone /> },
+        {
+            parameterName: 'Data de Nascimento',
+            name: 'birth_date',
+            type: 'text',  // Tipo de filtro
+            renderCell: (value, setValue) => {
+                // Aqui, 'value' seria o valor do filtro atual, passado a partir de seu estado.
+                return (
+                    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
+                        <DemoContainer components={["DateField"]}>
+                            <DateField
+                                value={value ? dayjs(value, "DD-MM-YYYY") : null} // Use o valor passado para 'renderCell'
+                                onChange={(e) => {
+                                    const formattedDate = e ? e.format("DD-MM-YYYY") : ""; // Formata a data
+                                    setValue(formattedDate); // Atualiza o valor do filtro
+                                }}
+                                className="w-full"
+                                label="Digite a data"
+                                format="DD/MM/YYYY" // Formato da exibição da data
+                            />
+                        </DemoContainer>
+                    </LocalizationProvider>
+                );
+            }
+        },
     ];
 
     const columns = [
@@ -146,6 +173,6 @@ export default function Alunos() {
                 ) : null
                 }
             </div>
-        </div>
+        </div >
     );
 }

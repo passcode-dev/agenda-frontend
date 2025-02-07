@@ -133,7 +133,7 @@ export default function Agenda() {
     return (
         <div className="flex flex-col items-center p-6 bg-white shadow-lg rounded-xl w-full transition-all duration-300">
             <div className="flex w-full border-gray-300">
-                <div className="flex flex-col mt-16 border-gray-300">
+                <div className="flex flex-col mt-32 border-gray-300">
                     {Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, "0")}:00`).map((hour, index) => (
                         <div key={index} className="flex items-start justify-center h-16 w-20 text-sm text-gray-500">
                             {hour}
