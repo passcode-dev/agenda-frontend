@@ -37,11 +37,7 @@ const StyledProCard = styled(ProCard)`
     border-radius: 16px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    transition: all 0.3s;
-    &:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    }
+
 `;
 
 const columns = [
