@@ -47,7 +47,7 @@ const AutoCompleteComponent = ({ value, setValue }) => {
 
             if (Array.isArray(results)) {
                 setOptions(results.map(item => ({
-                    value: `${item.id} - ${item.name}`,
+                    value: `${item.name}`,
                     key: item.id
                 })));
             } else {
