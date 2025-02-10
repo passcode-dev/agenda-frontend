@@ -90,9 +90,9 @@ export default function Alunos() {
     const fetchAlunos = async (page) => {
         setLoading(true);
         const alunoService = new AlunoService();
-        const alunos = await alunoService.alunos(page);
-        setAlunos(alunos.data.students);
-        setTotalPage(Math.ceil(alunos.data.total_records / 10));
+        const alunos = await alunoService.alunos(searchParams);
+        setAlunos(alunos.data?.students);
+        setTotalPage(Math.ceil(alunos.data?.total_records / 10));
         setLoading(false);
     };
 
@@ -132,6 +132,15 @@ export default function Alunos() {
     const handlePageChange = (page) => {
         fetchAlunos(page);
     };
+    useEffect(() => {
+        fetchAlunos(currentPage);
+    }, [currentPage, searchParams]);
+
+    useEffect(() => {
+        const params = new URLSearchParams();
+        params.set("page", currentPage);
+        router.push(`${window.location.pathname}?${params.toString()}`)
+    }, []);
 
     return (
         <div className="container max-w-4xl justify-center items-center mx-auto p-6">

@@ -25,15 +25,16 @@ export default function Professores() {
     const searchParams = useSearchParams();
     const { toast } = useToast();
 
+
     const currentPage = Number(searchParams.get("page")) || 1
     const filterSchema = [
-        { name: "Data de Nascimento", parameterName: "birth_date", icon: <Calendar />,},
-        { name: "Nome", parameterName:"name", icon: <UserRound/> },
+        { name: "Data de Nascimento", parameterName: "birth_date", icon: <Calendar />, },
+        { name: "Nome", parameterName: "name", icon: <UserRound /> },
         { name: "CPF", parameterName: "cpf", icon: <IdCard />, },
     ];
 
     const filterSchema2 = [
-        { name: "Nome", parameterName:"name", icon: <UserRound/> },
+        { name: "Nome", parameterName: "name", icon: <UserRound /> },
     ];
 
 
@@ -69,7 +70,7 @@ export default function Professores() {
     const fetchProfessor = async (page) => {
         setLoading(true);
         const professorService = new ProfessoresService();
-        const professores = await professorService.Professores(page);
+        const professores = await professorService.Professores(searchParams);
         setTotalPage(Math.ceil(professores.data.total_records / 10));
         setProfessores(professores.data.teachers);
         setLoading(false);
@@ -106,8 +107,18 @@ export default function Professores() {
     };
 
     const handlePageChange = (page) => {
-        fetchProfessor(page);
+        fetchProfessor(page); // Chama a função para buscar os dados da nova página
     };
+
+    useEffect(() => {
+        fetchProfessor(currentPage); // Chama a função de busca com o `currentPage` da URL
+    }, [currentPage, searchParams]); // O useEffect será chamado sempre que `currentPage` mudar
+
+    useEffect(() => {
+        const params = new URLSearchParams();
+        params.set("page", currentPage);
+        router.push(`${window.location.pathname}?${params.toString()}`)
+    }, []);
 
     return (
         <div className="container max-w-4xl justify-center items-center mx-auto p-6">
