@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { AutoComplete } from "antd"; // Ou outro pacote que você esteja usando
+import { AutoComplete } from "antd";
 import styled from "styled-components";
+import { useToast } from "@/hooks/use-toast";
 
 const AutoCompleteCustom = styled(AutoComplete)`
     font-size: 14px !important;
@@ -8,53 +9,72 @@ const AutoCompleteCustom = styled(AutoComplete)`
     height: 42px;
 `
 
-
 const AutoCompleteComponent = ({ value, setValue }) => {
-    const [options, setOptions] = useState([]); // Para armazenar as opções filtradas
+    const [options, setOptions] = useState([]);
+    const { toast } = useToast();
 
-    // Mock de dados para a pesquisa
-    const mockData = [
-        { id: 1, name: "Maçã" },
-        { id: 2, name: "Banana" },
-        { id: 3, name: "Laranja" },
-        { id: 4, name: "Morango" },
-        { id: 5, name: "Uva" },
-        { id: 6, name: "Pera" },
-        { id: 7, name: "Abacaxi" },
-    ];
 
-    // Função para simular a busca na API
-    const fetchOptionsFromApi = (searchText) => {
-        // Filtro simples para pesquisar nas opções pelo nome
-        return mockData.filter((item) =>
-            item.name.toLowerCase().includes(searchText.toLowerCase())
-        );
+    const fetchOptionsFromApi = async (searchText) => {
+        try {
+            const response = await fetch(`/api/teachers?name=${searchText}`);
+            if (!response.ok) {
+                throw new Error("Erro ao buscar os dados da API");
+            }
+            const data = await response.json();
+
+
+            if (data?.data?.teachers && Array.isArray(data.data.teachers)) {
+                return data.data.teachers;
+            } else {
+                console.error("A resposta da API não contém um array de professores:", data);
+                return [];
+            }
+        } catch (error) {
+            toast({
+                title: "Erro",
+                description: "Ocorreu um erro ao buscar os dados.",
+                variant: "destructive",
+                autoClose: 3000,
+            });
+            return [];
+        }
     };
 
-    // Função chamada durante a pesquisa
-    const onSearch = (text) => {
-        const results = fetchOptionsFromApi(text);
-        setOptions(results);
+    const onSearch = async (text) => {
+        if (text) {
+            const results = await fetchOptionsFromApi(text);
+
+
+            if (Array.isArray(results)) {
+                setOptions(results.map(item => ({
+                    value: `${item.id} - ${item.name}`,
+                    key: item.id
+                })));
+            } else {
+                setOptions([]);
+            }
+        } else {
+            setOptions([]);
+        }
     };
 
 
-    // Função chamada quando o valor é alterado (ao digitar)
+
     const onChange = (value) => {
-        setValue(value); // Atualiza o estado do valor no componente pai
+        setValue(value);
     };
 
     return (
         <AutoCompleteCustom
-            options={options.map((option) => ({ value: option.name }))}
+            options={options}
             style={{ width: 200 }}
             onSelect={(value) => setValue(value)}
             onSearch={onSearch}
             onChange={onChange}
             value={value}
             placeholder="Digite para buscar"
-            getPopupContainer={(triggerNode) => triggerNode.parentElement} // Define onde renderizar o dropdown
+            getPopupContainer={(triggerNode) => triggerNode.parentElement}
         />
-
     );
 };
 
