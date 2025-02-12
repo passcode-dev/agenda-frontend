@@ -1,12 +1,17 @@
-const { createContext, useState } = require("react");
+"use client";
+import { createContext, useState, useEffect } from "react";
 
 export const UserContext = createContext(null);
 
 export const UserProvider = ({ children }) => {
-  const storedUser = localStorage.getItem("usuario");
-  const initialUser = storedUser ? JSON.parse(storedUser) : null;
-
-  const [user, setUser] = useState(initialUser);
+  
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    const storedUser = localStorage.getItem("usuario");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
