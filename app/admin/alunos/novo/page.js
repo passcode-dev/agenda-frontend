@@ -37,7 +37,7 @@ export default function Novo() {
         setLoading(false);
         return toast({
             title: "Erro",
-            description: cadastrar.data.details,
+            description: cadastrar?.data?.details,
             status: "error",
             variant: "destructive"
         });

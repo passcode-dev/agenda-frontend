@@ -1,7 +1,8 @@
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import styled from "styled-components";
 import { createGlobalStyle } from "styled-components";
+import CloseIcon from '@mui/icons-material/Close';
 
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
@@ -20,6 +21,8 @@ const Filter = styled.a`
     border: 1px solid #e0e0e0;
     border-radius: 6px;
     transition: all 0.3s ease;
+    margin: 5px;
+    padding: 10px;
     
     &:hover {
         border-color: #007bff;
@@ -30,6 +33,7 @@ const Name = styled.span`
     font-weight: bold;
     margin-right: 6px;
     color: #333;
+    padding: 5px;
 `;
 
 const Value = styled.span`
@@ -42,18 +46,37 @@ const Icon = styled.i`
     color: #007bff;
 `;
 
+const RemoveButton = styled.div`
+    cursor: pointer;
+    padding: 10x;
+    transition: all 0.3s ease;
+    margin-left: 10px;
+
+    &:hover {
+        color: rgb(97, 97, 97);
+    }
+`;
+
 const FilterGroup = ({ filterSchema }) => {
     const searchParams = useSearchParams();
+    const router = useRouter(); 
     const [filter, setFilter] = useState([]);
 
     useEffect(() => {
         const params = [];
         searchParams.forEach((value, key) => {
-            if (key != 'page')
-                params.push({ key, value });
+            if (key !== 'page') params.push({ key, value });
         });
         setFilter(params);
     }, [searchParams]);
+
+
+
+    const removeFilter = (keyToRemove) => {
+        const newParams = new URLSearchParams(searchParams.toString());
+        newParams.delete(keyToRemove);
+        router.push(`?${newParams.toString()}`);
+    };
 
     return (
         <>
@@ -73,6 +96,7 @@ const FilterGroup = ({ filterSchema }) => {
                                     <Name>{schema?.name}:</Name>
                                     <Value>{filterItem.value}</Value>
                                 </div>
+                                <RemoveButton onClick={() => removeFilter(filterItem.key)}><CloseIcon/></RemoveButton>
                             </Filter>
                         </div>
                     );

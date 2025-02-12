@@ -3,6 +3,10 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Separator } from '../ui/separator';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DateField } from "@mui/x-date-pickers/DateField";
+import "dayjs/locale/pt-br";
 
 const fadeInAndSlideDown = keyframes`
     from {
@@ -90,7 +94,7 @@ const FilterIconContainer = styled.div`
 `;
 
 const ModalContainer = styled.div`
-    position: fixed;
+    position: absolute;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -120,7 +124,7 @@ const FilterName = styled.span`
 `;
 
 const GenericModalContent = styled.div`
-    position: absolute;
+    position: fixed;
     top: 150px;
     left: 0;
     right: 0;
@@ -144,24 +148,17 @@ const Icon = styled.i`
 `;
 
 const GenericModal = ({ isOpen, onClose, filterName, onSubmit, selectedFilter, searchParams, router }) => {
-    const [inputValue, setInputValue] = useState('');
+    const [inputValue, setInputValue] = useState("");
 
     if (!isOpen) return null;
-
-    const handleInputChange = (e) => {
-        setInputValue(e.target.value);
-    };
 
     const handleSubmit = () => {
         const params = new URLSearchParams(searchParams.toString());
         params.set(selectedFilter.parameterName, inputValue);
-        const newParams = new URLSearchParams(window.location.search);
-        newParams.set(selectedFilter.parameterName, inputValue);
-        router.push(`${window.location.pathname}?${newParams.toString()}`);
-        onSubmit(inputValue);
+        router.push(`${window.location.pathname}?${params.toString()}`);
+        onSubmit(inputValue, selectedFilter);
         onClose();
     };
-
 
     return (
         <>
@@ -172,24 +169,23 @@ const GenericModal = ({ isOpen, onClose, filterName, onSubmit, selectedFilter, s
                     <Separator />
                 </div>
                 <div className='flex flex-col justify-center h-full'>
-                    {selectedFilter?.renderCell
-                        ? selectedFilter?.renderCell({ value: inputValue, onChange: handleInputChange })
-                        : (
-                            <Input
-                                type="text"
-                                defaultValue={searchParams.get(selectedFilter.parameterName)}
-                                onChange={handleInputChange}
-                                placeholder={`Digite o valor para ${filterName}`}
-                            />
-                        )
-                    }
-
+                    {selectedFilter?.renderCell ? (
+                        selectedFilter.renderCell(inputValue, setInputValue)
+                    )
+                         : (
+                        <Input
+                            type="text"
+                            value={inputValue}
+                            onChange={(e) => setInputValue(e.target.value)}
+                            placeholder={`Digite o valor para ${filterName}`}
+                        />
+                    )}
                     <Button onClick={handleSubmit}>Salvar</Button>
                 </div>
             </GenericModalContent>
         </>
     );
-};
+}
 
 const FilterModal = ({ filterSchema }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -211,6 +207,7 @@ const FilterModal = ({ filterSchema }) => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
+
     const openModal = () => {
         setIsModalOpen(!isModalOpen);
     };
@@ -233,10 +230,12 @@ const FilterModal = ({ filterSchema }) => {
     const handleFilterSubmit = (value) => {
         console.log(`Valor para ${selectedFilter?.name}:`, value);
     };
+
     const clearFilters = useCallback(() => {
         router.push(window.location.pathname);
         setIsModalOpen(false);
     }, [router]);
+
     return (
         <div>
             <FilterIconContainer onClick={openModal}>
@@ -247,8 +246,8 @@ const FilterModal = ({ filterSchema }) => {
                     <ModalHeader>Filtros</ModalHeader>
                     <Separator />
                     <FilterOption onClick={clearFilters}>
-                        <div >
-                            <X  className='text-black'/>
+                        <div>
+                            <X className='text-black' />
                         </div>
                         <FilterName>Limpar Filtros</FilterName>
                     </FilterOption>
@@ -256,9 +255,7 @@ const FilterModal = ({ filterSchema }) => {
                     {filterSchema.map((filter, index) => (
                         <React.Fragment key={index}>
                             <FilterOption onClick={() => openGenericModal(filter)}>
-                                <div >
-                                    {filter.icon}
-                                </div>
+                                <div>{filter.icon}</div>
                                 <FilterName>{filter.name}</FilterName>
                             </FilterOption>
                             {index < filterSchema.length - 1 && <Separator />}
