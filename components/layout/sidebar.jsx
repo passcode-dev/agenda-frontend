@@ -8,6 +8,7 @@ import { Items } from "./nav-items";
 import { LogOut, Menu, X } from "lucide-react";
 import { UserContext } from "@/app/context/userContext";
 import styled from "styled-components";
+import { handleLogout } from "@/lib/functions";
 
 // LinkStyled agora usa $isActive
 const LinkStyled = styled.a`
@@ -223,7 +224,7 @@ export function Sidebar() {
             <div className="mt-auto border-t px-2 py-2">
               <LogoutButton $isOpen={isOpen} variant="link">
                 <LogOutIcon $isOpen={isOpen} />
-                <LogOutSpan $isOpen={isOpen}>Logout</LogOutSpan>
+                <LogOutSpan $isOpen={isOpen} onClick={handleLogout}>Logout</LogOutSpan>
               </LogoutButton>
             </div>
           </div>
