@@ -4,8 +4,8 @@ import { createContext, useState, useEffect } from "react";
 export const UserContext = createContext(null);
 
 export const UserProvider = ({ children }) => {
-  
-  const [user, setUser] = useState(null);
+
+  const [user, setUser] = useState({});
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     if (storedUser) {
