@@ -18,10 +18,12 @@ export function PaginationUI({ totalPage, onPageChange }) {
 
     const handlePageChange = (page) => {
         if (page >= 1 && page <= totalPage) {
-            onPageChange(page);
-            router.push(`?page=${page}`, { scroll: false });
+            const params = new URLSearchParams(searchParams.toString());
+            params.set("page", page); 
+            router.push(`?${params.toString()}`, { scroll: false });
         }
     };
+
 
     const renderPages = () => {
         const pages = [];
