@@ -46,7 +46,7 @@ export default function Perfil() {
 
     useEffect(() => {
         setUsuario(user);
-    }, []);
+    }, [user]);
 
     return (
         <div className="container max-w-4xl justify-center items-center mx-auto p-6">

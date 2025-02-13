@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Back from "@/components/back";
 import { useToast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { zodMateria } from "@/lib/schemas/zod";
 import { useEffect, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
@@ -21,6 +21,8 @@ export default function Novo() {
     });
     const { toast } = useToast();
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const currentPage = Number(searchParams.get("page")) || 1
     const [alunos, setAlunos] = useState([]);
 
     const onSubmit = async (data) => {
@@ -43,22 +45,22 @@ export default function Novo() {
             return router.push("/admin/turmas");
         };
         setLoading(false);
-       return toast({
+        return toast({
             title: "Erro",
             description: turma.data.details,
             status: "error",
         });
     }
 
-    const fetchAlunos = async () => {
+    const fetchAlunos = async (page) => {
         const alunoService = new AlunoService();
-        const alunos = await alunoService.alunos();
+        const alunos = await alunoService.alunos(page);
         setAlunos(alunos.data.students);
     };
 
     useEffect(() => {
-        fetchAlunos();
-    }, []);
+        fetchAlunos(currentPage);
+    }, [currentPage]);
 
     return (
         <div className="container max-w-4xl justify-center items-center mx-auto p-6">
