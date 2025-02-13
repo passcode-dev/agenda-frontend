@@ -27,7 +27,7 @@ export default function Usuarios() {
     const { user } = useContext(UserContext);
     const { toast } = useToast();
     const filterSchema = [
-        { name: "Usuário", parameterName: "user", icon: <User className="text-black" /> },
+        { name: "Usuário", parameterName: "username", icon: <User className="text-black" /> },
         { name: "Email", parameterName: "email", icon: <Mail className="text-black" />, },
 
     ];
@@ -51,26 +51,34 @@ export default function Usuarios() {
     ];
 
     const fetchUsuarios = async (page) => {
-        setLoading(true);
         try {
             const usuarioService = new UsuarioService();
-            const usuarios = await usuarioService.usuarios();
-            setUsuarios(usuarios.data.users);
-            setTotalPage(Math.ceil(usuarios.data.total_records / 10));
+            const usuarios = await usuarioService.usuarios(page);
+            setUsuarios(usuarios?.data.users ? usuarios?.data.users : []);
+
+            const totalRecords = Number(usuarios?.data?.total_records);
+            setTotalPage(Math.ceil(totalRecords / 10) || 1);
+            setLoading(false);
         } catch (error) {
             toast({
                 title: "Erro",
                 description: usuarios.data.details,
                 variant: "destructive",
             });
-        } finally {
             setLoading(false);
         }
+
     };
 
     useEffect(() => {
-        fetchUsuarios(currentPage);
+        fetchUsuarios(searchParams);
     }, [currentPage]);
+
+    useEffect(() => {
+        const params = new URLSearchParams();
+        params.set("page", currentPage);
+        router.push(`${window.location.pathname}?${params.toString()}`)
+    }, []);
 
     const editarUsuario = (id) => {
         if (user.id == id) {
@@ -97,7 +105,7 @@ export default function Usuarios() {
             const deletar = await usuarioService.deletarUsuario(id);
             if (deletar.status == "success") {
                 setShowDialog(false);
-                fetchUsuarios(currentPage);
+                fetchUsuarios(searchParams);
                 return toast({
                     title: "Sucesso",
                     description: deletar.message,
@@ -107,7 +115,7 @@ export default function Usuarios() {
             }
 
             setShowDialog(false);
-            fetchUsuarios(currentPage);
+            fetchUsuarios(searchParams);
             return toast({
                 title: "Erro",
                 description: deletar.data.details,
@@ -117,8 +125,8 @@ export default function Usuarios() {
         setShowDialog(true);
     };
 
-    const handlePageChange = (page) => {
-        fetchUsuarios(page);
+    const handlePageChange = () => {
+        fetchUsuarios(searchParams);
     };
 
     return (
