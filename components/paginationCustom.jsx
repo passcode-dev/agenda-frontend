@@ -18,7 +18,6 @@ export function PaginationUI() {
         const paramUrl= new URLSearchParams(searchParams.toString())
         paramUrl.set("page",page);
         router.push(`?${paramUrl.toString()}`, { scroll: false });
-        
     };
 
     return (

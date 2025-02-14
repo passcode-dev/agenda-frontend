@@ -68,13 +68,15 @@ export default function Turmas() {
             const turmaService = new TurmaService();
             const turmas = await turmaService.Turmas(page);
             setTurmas(turmas.data.classes);
-            setTotalPage(Math.ceil(turmas.data.total_records / 10));
+
+            const totalRecords = Number(turmas.data.total_records);
+            setTotalPage(Math.ceil(totalRecords / 10) || 1);
             setLoading(false);
         }
         catch (error) {
             setLoading(false);
             return toast({
-                title: "Erro",
+                title: "Errooo",
                 description: error.message,
             });
         }
@@ -82,8 +84,14 @@ export default function Turmas() {
 
 
     useEffect(() => {
-        fetchTurmas(currentPage);
+        fetchTurmas(searchParams);
     }, [currentPage]);
+
+    useEffect(() => {
+        const params = new URLSearchParams();
+        params.set("page", currentPage);
+        router.push(`${window.location.pathname}?${params.toString()}`)
+    }, []);
 
     const editarMateria = (id) => {
         router.push(`/admin/turmas/editar/${id}`);
@@ -111,8 +119,8 @@ export default function Turmas() {
         });
     };
 
-    const handlePageChange = (page) => {
-        fetchTurmas(page);
+    const handlePageChange = () => {
+        fetchTurmas(searchParams);
     };
 
     return (
