@@ -1,5 +1,5 @@
 "use client";
-import { Mail, Pencil, Trash2, User } from "lucide-react";
+import { Mail, Pencil, Trash2, User, LibraryBig } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
