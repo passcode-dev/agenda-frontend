@@ -1,116 +1,79 @@
-"use client";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { useEffect } from "react";
-import { maskCpf, maskPhone, maskRg } from "@/lib/mask";
+import React from "react";
+import { maskCpf, maskPhone, maskRg } from "@/lib/mask"; // Importando as máscaras
+import InputWithMask from "../ui/inputWithMask";
+import DatePickerField from "../ui/datePickerField";
+import dayjs from "dayjs";
 
-export default function AlunoForm({ register, errors, setValue, initialValues }) {
-    useEffect(() => {
-        if (initialValues) {
-            setValue("name", initialValues.name);
-            setValue("birth_date", initialValues.birth_date);
-            setValue("cpf", maskCpf(initialValues.cpf));
-            setValue("rg", maskRg(initialValues.rg));
-            setValue("phone_number", maskPhone(initialValues.phone_number));
-            setValue("inital_date", initialValues.inital_date);
-        }
-    }, [initialValues, setValue]);
+const AlunoForm = ({ aluno, setAlunoData }) => {
+  const handleChange = (name, value) => {
+    setAlunoData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
 
-    return (
-        <div>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                <div>
-                    <Label htmlFor="name">Nome</Label>
-                    <Input
-                        id="name"
-                        type="text"
-                        {...register("name")}
-                        placeholder="João"
-                    />
-                    {errors.name && (<p className="text-red-500 text-sm">*{errors.name.message}</p>)}
-                </div>
+  return (
+    <form className="space-y-4">
+      <InputWithMask
+        label="Nome"
+        value={aluno.name}
+        name="name"
+        onChange={handleChange}
+      />
+      
+      <InputWithMask
+        label="Último nome"
+        value={aluno.last_name}
+        name="last_name"  
+        onChange={handleChange}
+      />
 
-                <div>
-                    <Label htmlFor="sobrenome">Sobrenome</Label>
-                    <Input
-                        id="sobrenome"
-                        type="text"
-                        {...register("last_name")}
-                        placeholder="Silva"
-                    />
-                    {errors.last_name && (<p className="text-red-500 text-sm">*{errors.last_name.message}</p>)}
-                </div>
+      <InputWithMask
+        label="Telefone"
+        value={aluno.phone_number}
+        name="phone_number"
+        onChange={handleChange}
+        mask={maskPhone} // Aplica a máscara para telefone
+      />
 
+      <InputWithMask
+        label="RG"
+        value={aluno.rg}
+        name="rg"
+        onChange={handleChange}
+        mask={maskRg} // Aplica a máscara para RG
+      />
 
-            </div>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mt-6">
-                <div>
-                    <Label htmlFor="cpf">CPF</Label>
-                    <Input
-                        id="cpf"
-                        type="text"
-                        {...register("cpf")}
-                        placeholder="000.000.000-00"
-                        onChange={(e) => setValue("cpf", maskCpf(e.target.value))}
-                    />
-                    {errors.cpf && (<p className="text-red-500 text-sm">*{errors.cpf.message}</p>)}
-                </div>
-                <div>
-                    <Label htmlFor="rg">RG</Label>
-                    <Input
-                        id="rg"
-                        type="text"
-                        {...register("rg")}
-                        placeholder="00.000.000-0"
-                        onChange={(e) => setValue("rg", maskRg(e.target.value))}
-                    />
-                    {errors.rg && (<p className="text-red-500 text-sm">*{errors.rg.message}</p>)}
-                </div>
-            </div>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mt-6">
-                <div>
-                    <Label htmlFor="birth_date">Data de Nascimento</Label>
-                    <Input
-                        id="birth_date"
-                        type="date"
-                        {...register("birth_date")}
-                    />
-                    {errors.birth_date && (<p className="text-red-500 text-sm">*{errors.birth_date.message}</p>)}
-                </div>
-                <div>
-                    <Label htmlFor="phone_number">Telefone</Label>
-                    <Input
-                        id="phone_number"
-                        type="text"
-                        {...register("phone_number")}
-                        placeholder="+55 (00) 00000-0000"
-                        onChange={(e) => setValue("phone_number", maskPhone(e.target.value))}
-                    />
-                    {errors.phone_number && (<p className="text-red-500 text-sm">*{errors.phone_number.message}</p>)}
-                </div>
+      <InputWithMask
+        label="CPF"
+        value={aluno.cpf}
+        name="cpf"
+        onChange={handleChange}
+        mask={maskCpf} // Aplica a máscara para CPF
+      />
 
-            </div>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mt-6">
+      <DatePickerField
+        label="Data de Nascimento"
+        value={aluno.birth_date ? dayjs(aluno.birth_date).format("YYYY-MM-DD") : ""} // Converte a data para o formato correto
+        name="birth_date"
+        onChange={handleChange}
+      />
 
-                <div>
-                    <Label htmlFor="entry_date">Data de Início</Label>
-                    <Input
-                        id="entry_date"
-                        type="date"
-                        {...register("entry_date")}
-                    />
-                    {errors.entry_date && (<p className="text-red-500 text-sm">*{errors.entry_date.message}</p>)}
-                </div>
-                <div>
-                    <Label htmlFor="exit_date">Data de Saída</Label>
-                    <Input
-                        id="exit_date"
-                        type="date"
-                        {...register("exit_date")}
-                    />
-                    {errors.exit_date && (<p className="text-red-500 text-sm">*{errors.exit_date.message}</p>)}
-                </div>
-            </div>
-        </div>
-    );
-}
+      <DatePickerField
+        label="Data de Entrada"
+        value={aluno.entry_date ? dayjs(aluno.entry_date).format("YYYY-MM-DD") : ""} // Converte a data para o formato correto
+        name="entry_date"
+        onChange={handleChange}
+      />
+
+      <DatePickerField
+        label="Data de Saída"
+        value={aluno.exit_date ? dayjs(aluno.exit_date).format("YYYY-MM-DD") : ""} // Converte a data para o formato correto
+        name="exit_date"
+        onChange={handleChange}
+      />
+    </form>
+  );
+};
+
+export default AlunoForm;

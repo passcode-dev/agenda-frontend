@@ -3,9 +3,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Separator } from '../ui/separator';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DateField } from "@mui/x-date-pickers/DateField";
 import "dayjs/locale/pt-br";
 
 const fadeInAndSlideDown = keyframes`
