@@ -3,9 +3,9 @@ import FilterGroup from "@/components/Filters/FilterGroup";
 import FilterModal from "@/components/Filters/FilterModal";
 import { PaginationUI } from "@/components/paginationCustom";
 import { Spinner } from "@/components/ui/spinner";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, LibraryBig } from "lucide-react";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -25,21 +25,24 @@ export default function Cursos() {
     const searchParams = useSearchParams();
     const { toast } = useToast();
 
-    const currentPage = Number(searchParams.get("page")) || 1
+    const currentPage = searchParams.get("page") || 1;
+
+    useEffect(() => {
+        fetchCursos(searchParams.toString());
+    }, [searchParams]);
+
     const filterSchema = [
-        { name: "Nome" },
+        { name: "Nome", parameterName: "name", icon: <LibraryBig className="text-black" /> },
     ];
 
     const columns = [
         { headerName: "#", field: "id" },
         { headerName: "Curso", field: "name" },
         {
-            headerName: "Turma", field: "name", renderCell: (params) => (
+            headerName: "Turma", field: "nameTurma", renderCell: (params) => (
                 <div className="flex flex-wrap  gap-1 justify-center">
                     {params.row.Classes.map((turma, index) => (
-                        <Badge className="p-2"
-                            key={index}
-                        >
+                        <Badge className="p-2" key={index}>
                             {turma.name}
                         </Badge>
                     ))}
@@ -62,18 +65,14 @@ export default function Cursos() {
         },
     ];
 
-    const fetchCursos = async (page) => {
+    const fetchCursos = async (params) => { //  nao muda url
         setLoading(true);
         const cursoService = new CursoService();
-        const cursos = await cursoService.Cursos(page);
+        const cursos = await cursoService.Cursos(params);
         setTurmas(cursos.data.courses);
         setTotalPage(Math.ceil(cursos.data.total_records / 10));
         setLoading(false);
     };
-
-    useEffect(() => {
-        fetchCursos(currentPage);
-    }, [currentPage]);
 
     const editarMateria = (id) => {
         router.push(`/admin/cursos/editar/${id}`);
@@ -85,14 +84,14 @@ export default function Cursos() {
             const cursoService = new CursoService();
             const deletar = await cursoService.deletarCurso(id);
             if (deletar.status == "success") {
-                fetchCursos(currentPage);
+                fetchCursos(searchParams.toString());
                 setShowDialog(false);
                 return toast({
                     title: "Sucesso",
                     description: deletar.message,
                 });
             }
-            fetchCursos(currentPage);
+            fetchCursos(searchParams.toString());
             setShowDialog(false);
             return toast({
                 title: "Erro",
@@ -102,7 +101,9 @@ export default function Cursos() {
     };
 
     const handlePageChange = (page) => {
-        fetchCursos(page);
+        const params = new URLSearchParams(searchParams);
+        params.set("page", page);
+        router.push(`?${params.toString()}`, { scroll: false });
     };
 
     return (
@@ -136,14 +137,10 @@ export default function Cursos() {
                         <FilterGroup filterSchema={filterSchema} />
                         <Tables data={turmas} columns={columns} isSubjects={true} />
                         <div className="mt-4 flex justify-end items-center">
-                            <PaginationUI
-                                totalPage={totalPage}
-                                onPageChange={handlePageChange}
-                            />
+                            <PaginationUI totalPage={totalPage} onPageChange={handlePageChange} />
                         </div>
                     </>
-                ) : null
-                }
+                ) : null}
             </div>
         </div>
     );

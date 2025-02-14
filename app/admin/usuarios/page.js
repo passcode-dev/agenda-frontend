@@ -1,5 +1,5 @@
 "use client";
-import { Mail, Pencil, Trash2, User } from "lucide-react";
+import { Mail, Pencil, Trash2, User, LibraryBig } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
@@ -27,7 +27,7 @@ export default function Usuarios() {
     const { user } = useContext(UserContext);
     const { toast } = useToast();
     const filterSchema = [
-        { name: "Usuário", parameterName: "user", icon: <User className="text-black" /> },
+        { name: "Usuário", parameterName: "username", icon: <User className="text-black" /> },
         { name: "Email", parameterName: "email", icon: <Mail className="text-black" />, },
 
     ];
