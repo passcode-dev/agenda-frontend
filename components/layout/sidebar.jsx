@@ -11,7 +11,7 @@ import styled from "styled-components";
 import { handleLogout } from "@/lib/functions";
 
 // LinkStyled agora usa $isActive
-const LinkStyled = styled.a`
+const LinkStyled = styled(Link)`
   display: flex;
   align-items: center;
   gap: 24px;
