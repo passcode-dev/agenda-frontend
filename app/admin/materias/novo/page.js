@@ -39,7 +39,7 @@ export default function Novo() {
             toast({
                 title: "Sucesso",
                 description: materia.message,
-                status: "success",
+                variant: "success",
             });
             return router.push("/admin/materias");
         };
@@ -47,7 +47,7 @@ export default function Novo() {
        return toast({
             title: "Erro",
             description: materia.data.details,
-            status: "error",
+            variant: "destructive",
         });
     }
 

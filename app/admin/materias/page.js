@@ -94,6 +94,7 @@ export default function Materias() {
                 return toast({
                     title: "Sucesso",
                     description: deletar.message,
+                    variant: "success"
                 });
             }
             fetchMateria(currentPage);
@@ -101,6 +102,7 @@ export default function Materias() {
             return toast({
                 title: "Erro",
                 description: deletar.data.details,
+                variant: "destructive"
             });
         });
     };

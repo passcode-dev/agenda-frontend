@@ -89,6 +89,7 @@ export default function Cursos() {
                 return toast({
                     title: "Sucesso",
                     description: deletar.message,
+                    variant: "success"
                 });
             }
             fetchCursos(searchParams.toString());
@@ -96,6 +97,7 @@ export default function Cursos() {
             return toast({
                 title: "Erro",
                 description: deletar.data.details,
+                variant: "destructive"
             });
         });
     };

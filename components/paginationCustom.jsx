@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from 'react';
 
 import {
     Pagination,
@@ -19,6 +20,12 @@ export function PaginationUI() {
         paramUrl.set("page",page);
         router.push(`?${paramUrl.toString()}`, { scroll: false });
     };
+
+    useEffect(() => {
+        if (currentPage) {
+            handlePageChange(currentPage);
+        }
+    }, [searchParams]);
 
     return (
         <Pagination>

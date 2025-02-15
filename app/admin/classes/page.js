@@ -78,6 +78,7 @@ export default function Classes() {
                 return toast({
                     title: "Sucesso",
                     description: deletar.message,
+                    variant: "success"
                 });
             }
             setShowDialog(false);
@@ -85,6 +86,7 @@ export default function Classes() {
             return toast({
                 title: "Erro",
                 description: deletar.data.details,
+                variant: "destructive"
             });
         });
     };

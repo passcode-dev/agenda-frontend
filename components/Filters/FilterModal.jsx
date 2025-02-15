@@ -152,6 +152,7 @@ const GenericModal = ({ isOpen, onClose, filterName, onSubmit, selectedFilter, s
     const handleSubmit = () => {
         const params = new URLSearchParams(searchParams.toString());
         params.set(selectedFilter.parameterName, inputValue);
+        params.delete('page')
         router.push(`${window.location.pathname}?${params.toString()}`);
         onSubmit(inputValue, selectedFilter);
         onClose();
@@ -229,6 +230,7 @@ const FilterModal = ({ filterSchema }) => {
     };
 
     const clearFilters = useCallback(() => {
+        params.delete('page')
         router.push(window.location.pathname);
         setIsModalOpen(false);
     }, [router]);

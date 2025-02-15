@@ -40,7 +40,7 @@ export default function Novo() {
             toast({
                 title: "Sucesso",
                 description: turma.message,
-                status: "success",
+                variant: "success",
             });
             return router.push("/admin/turmas");
         };
@@ -48,7 +48,7 @@ export default function Novo() {
         return toast({
             title: "Erro",
             description: turma.data.details,
-            status: "error",
+            variant: "destructive",
         });
     }
 

@@ -59,26 +59,15 @@ const RemoveButton = styled.div`
 
 const FilterGroup = ({ filterSchema }) => {
     const searchParams = useSearchParams();
-    const router = useRouter();
+    const router = useRouter(); 
     const [filter, setFilter] = useState([]);
 
     useEffect(() => {
         const params = [];
-        const filter = false;
         searchParams.forEach((value, key) => {
-            if (key !== 'page') {
-                params.push({ key, value });
-                filter = true;
-            };
+            if (key !== 'page') params.push({ key, value });
         });
         setFilter(params);
-
-        if (filter && searchParams.get('page') !== 1) {
-            const newParams = new URLSearchParams(searchParams.toString());
-            newParams.set("page", 1);
-            router.replace(`?${newParams.toString()}`);
-        }
-
     }, [searchParams]);
 
 
@@ -86,6 +75,7 @@ const FilterGroup = ({ filterSchema }) => {
     const removeFilter = (keyToRemove) => {
         const newParams = new URLSearchParams(searchParams.toString());
         newParams.delete(keyToRemove);
+        newParams.delete('page')
         router.push(`?${newParams.toString()}`);
     };
 
@@ -107,7 +97,7 @@ const FilterGroup = ({ filterSchema }) => {
                                     <Name>{schema?.name}:</Name>
                                     <Value>{filterItem.value}</Value>
                                 </div>
-                                <RemoveButton onClick={() => removeFilter(filterItem.key)}><CloseIcon /></RemoveButton>
+                                <RemoveButton onClick={() => removeFilter(filterItem.key)}><CloseIcon/></RemoveButton>
                             </Filter>
                         </div>
                     );

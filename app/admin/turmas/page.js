@@ -78,6 +78,7 @@ export default function Turmas() {
             return toast({
                 title: "Errooo",
                 description: error.message,
+                variant: "destructive"
             });
         }
     }
@@ -108,6 +109,7 @@ export default function Turmas() {
                 return toast({
                     title: "Sucesso",
                     description: deletar.message,
+                    variant: "success"
                 });
             }
             fetchTurmas(currentPage);
@@ -115,6 +117,7 @@ export default function Turmas() {
             return toast({
                 title: "Erro",
                 description: deletar.message,
+                variant: "destructive"
             });
         });
     };

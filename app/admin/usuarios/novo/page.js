@@ -30,6 +30,7 @@ export default function Novo() {
             toast({
                 title: "Sucesso",
                 description: cadastrar.message,
+                variant: "success",
             });
             return router.push("/admin/usuarios");
         }
@@ -37,7 +38,6 @@ export default function Novo() {
         return toast({
             title: "Erro",
             description: cadastrar.data.details,
-            status: "error",
             variant: "destructive",
         });
     };

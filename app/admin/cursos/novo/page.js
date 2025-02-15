@@ -38,7 +38,7 @@ export default function Novo() {
             toast({
                 title: "Sucesso",
                 description: cursos.message,
-                status: "success",
+                variant: "success",
             });
             return router.push("/admin/cursos");
         };
@@ -46,7 +46,7 @@ export default function Novo() {
         return toast({
             title: "Erro",
             description: cursos.data.details,
-            status: "error",
+            variant: "destructive",
         });
     }
 
