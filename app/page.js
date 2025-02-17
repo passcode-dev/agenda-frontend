@@ -47,7 +47,7 @@ export default function LoginPage() {
                 toast({
                     title: "Sucesso",
                     description: "Você será redirecionado para a página inicial",
-                    status: "success",
+                    variant: "success",
                 });
                 router.push("/admin");
                 setLoading(false);
@@ -55,8 +55,7 @@ export default function LoginPage() {
                 toast({
                     title: "Email e/ou username ou senha inválidos",
                     description: "Por favor, tente novamente",
-                    status: "error",
-                    variant: "destructive"
+                    variant: "error",
                 });
                 setLoading(false);
             }

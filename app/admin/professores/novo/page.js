@@ -31,7 +31,7 @@ export default function Novo() {
                 toast({
                     title: "Sucesso",
                     description: cadastrar.message,
-                    status: "success",
+                    variant: "success"
                 });
                 setLoading(false);
                 return router.push("/admin/professores");
@@ -40,7 +40,6 @@ export default function Novo() {
             return toast({
                 title: "Erro",
                 description: cadastrar.data.details,
-                status: "error",
                 variant: "destructive"
             });
         }

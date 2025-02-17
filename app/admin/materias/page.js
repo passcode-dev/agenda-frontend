@@ -4,151 +4,259 @@ import FilterModal from "@/components/Filters/FilterModal";
 import { PaginationUI } from "@/components/paginationCustom";
 import { Spinner } from "@/components/ui/spinner";
 import { ArrowLeft, Pencil, Trash2, UserRound } from "lucide-react";
-import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import Tables from "@/components/tables/Tables";
 import { AlertDialogUI } from "@/components/alert";
 import MateriaService from "@/lib/service/materiaService";
 import { Badge } from "@/components/ui/badge";
+import styled from "styled-components";
+import MateriaForm from "@/components/forms/materiaForm";
+import Tables from "@/components/tables/Tables";
+
+const Backdrop = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  z-index: 99;
+`;
+
+const GenericModalContent = styled.div`
+  position: fixed;
+  top: 50px;
+  left: 0;
+  right: 0;
+  margin: auto;
+  max-width: 1000px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+
+  opacity: 0;
+  transform: translateY(-20px);
+  animation: slideDown 0.3s ease-out forwards;
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
 
 export default function Materias() {
-    const [loading, setLoading] = useState(false);
-    const [materias, setMaterias] = useState([]);
-    const [showDialog, setShowDialog] = useState(false);
-    const [confirmCallback, setConfirmCallback] = useState(null);
-    const [totalPage, setTotalPage] = useState(3);
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const [materias, setMaterias] = useState([]);
+  const [showDialog, setShowDialog] = useState(false);
+  const [confirmCallback, setConfirmCallback] = useState(null);
+  const [editMateria, setEditMateria] = useState(null);
+  const [novaMateria, setNovaMateria] = useState(null);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { toast } = useToast();
 
-    const currentPage = Number(searchParams.get("page")) || 1
-    const filterSchema = [
-        { name: "Nome", parameterName:"name", icon: <UserRound/> },
-    ];
+  const currentPage = Number(searchParams.get("page")) || 1;
+  const filterSchema = [
+    { name: "Nome", parameterName: "name", icon: <UserRound /> },
+  ];
 
-    const columns = [
-        { headerName: "#", field: "id" },
-        { headerName: "Nome", field: "name" },
-        {
-            headerName: "Professores", field: "name", renderCell: (params) => (
-                <div className="flex flex-wrap  gap-1 justify-center">
-                    {params.row.Teachers.map((professor, index) => (
-                        <Badge className="p-2"
-                            key={index}
-                        >
-                            {professor.name}
-                        </Badge>
-                    ))}
-                </div>
-            ),
-        },
-        {
-            headerName: "Ações",
-            field: "acoes",
-            renderCell: (params) => (
-                <div className="flex justify-center gap-3">
-                    <Button size="sm" onClick={() => editarMateria(params.row.id)}>
-                        <Pencil className="w-4 h-4" />
-                    </Button>
-                    <Button size="sm" onClick={() => deletarMateria(params.row.id)}>
-                        <Trash2 className="w-4 h-4" />
-                    </Button>
-                </div>
-            ),
-        },
-    ];
+  const columns = [
+    { headerName: "#", field: "id" },
+    { headerName: "Nome", field: "name" },
+    {
+      headerName: "Ações",
+      field: "acoes",
+      renderCell: (params) => (
+        <div className="flex justify-center gap-3">
+          <Button size="sm" onClick={(e) => editarMateria(params.row, e)}>
+            <Pencil className="w-4 h-4" />
+          </Button>
+          <Button size="sm" onClick={(e) => deletarMateria(params.row.id, e)}>
+            <Trash2 className="w-4 h-4" />
+          </Button>
+        </div>
+      ),
+    },
+  ];
 
-    const fetchMateria = async (page) => {
-        setLoading(true);
-        const materiaService = new MateriaService();
-        const materias = await materiaService.Materias(page);
-        setMaterias(materias.data.subjects);
-        setTotalPage(Math.ceil(materias.data.total_records / 10));
-        setLoading(false);
-    };
+  const fetchMateria = async (params) => {
+    setLoading(true);
+    const materiaService = new MateriaService();
+    const materias = await materiaService.Materias(params);
+    setHasNextPage(false);
+    if (materias?.data?.subjects?.length > 10) {
+      setHasNextPage(true);
+      materias.data.subjects.pop();
+    }
+    setMaterias(materias?.data?.subjects);
+    setLoading(false);
+  };
 
-    useEffect(() => {
-        fetchMateria(currentPage);
-    }, [currentPage]);
+  useEffect(() => {
+    fetchMateria(searchParams.toString());
+  }, [searchParams]);
 
-    const editarMateria = (id) => {
-        router.push(`/admin/materias/editar/${id}`);
-    };
+  const editarMateria = (materia, e) => {
+    setEditMateria(materia);
+    e.stopPropagation(); // Evita que o clique propague para a célula da tabela
+  };
 
+  const fetchEditarMateria = async (materia) => {
+    const materiaService = new MateriaService();
+    const editar = await materiaService.editarMateria(materia.id, materia);
+    if (editar.status != "error") {
+      setEditMateria(null);
+      fetchMateria(searchParams.toString());
+      return toast({
+        title: "Sucesso",
+        description: "Matéria editada com sucesso",
+        variant: "success",
+      });
+    } else {
+      return toast({
+        title: "Erro ao editar matéria",
+        description: editar?.data?.details,
+        variant: "destructive",
+      });
+    }
+  };
 
-
-
-
-    const deletarMateria = async (id) => {
-        setShowDialog(true);
-        setConfirmCallback(() => async () => {
-            const materiaService = new MateriaService();
-            const deletar = await materiaService.deletarMateria(id);
-            if (deletar.status == "success") {
-                fetchMateria(currentPage);
-                setShowDialog(false);
-                return toast({
-                    title: "Sucesso",
-                    description: deletar.message,
-                });
-            }
-            fetchMateria(currentPage);
-            setShowDialog(false);
-            return toast({
-                title: "Erro",
-                description: deletar.data.details,
-            });
+  const deletarMateria = async (id, e) => {
+    setShowDialog(true);
+    e.stopPropagation();
+    setConfirmCallback(() => async () => {
+      const materiaService = new MateriaService();
+      const deletar = await materiaService.deletarMateria(id);
+      if (deletar.status == "success") {
+        fetchMateria(searchParams.toString());
+        setShowDialog(false);
+        return toast({
+          title: "Sucesso",
+          description: deletar?.message,
+          variant: "success",
         });
-    };
+      }
+      setShowDialog(false);
+      return toast({
+        title: "Erro",
+        description: deletar?.data?.details,
+        variant: "destructive",
+      });
+    });
+  };
 
-    const handlePageChange = (page) => {
-        fetchProfessor(page);
-    };
+  const fetchNovaMateria = async (materia) => {
+    const materiaService = new MateriaService();
+    const cadastrar = await materiaService.cadastrarMateria(materia);
+    if (cadastrar.status != "error") {
+      setNovaMateria(null);
+      fetchMateria(searchParams.toString());
+      return toast({
+        title: "Sucesso",
+        description: "Matéria cadastrada com sucesso",
+        variant: "success",
+      });
+    } else {
+      return toast({
+        title: "Erro ao cadastrar matéria",
+        description: cadastrar?.data?.details,
+        variant: "destructive",
+      });
+    }
+  };
 
-    return (
-        <div className="container max-w-4xl justify-center items-center mx-auto p-6">
-            <AlertDialogUI
-                title="Confirmação de exclusão"
-                description="Deseja realmente deletar esta matéria?"
-                showDialog={showDialog}
-                setShowDialog={setShowDialog}
-                onConfirm={confirmCallback}
+  return (
+    <>
+      {!!novaMateria && (
+        <>
+          <Backdrop onClick={() => setNovaMateria(false)} />
+          <GenericModalContent>
+            <MateriaForm
+              materia={novaMateria}
+              setMateriaData={setNovaMateria}
             />
-            <div className="mb-8 flex justify-between items-center">
-                <div>
-                    <h1 className="mt-4 text-3xl font-bold">Matérias</h1>
-                    <p className="text-muted-foreground">Lista de matérias cadastrados</p>
-                </div>
-                <div className="flex flex-row justify-center items-center gap-2">
-                    <FilterModal filterSchema={filterSchema} />
-                    <Link className="flex items-center justify-center" href="/admin/materias/novo">
-                        <Button className="px-4 ">Nova Matéria</Button>
-                    </Link>
-                </div>
+            <div>
+              <button onClick={() => fetchNovaMateria(novaMateria)}>
+                Salvar{" "}
+              </button>
+              <button onClick={() => setNovaMateria(null)}>Cancelar</button>
             </div>
-            <div className="mt-8">
-                {loading ? (
-                    <div className="flex justify-center items-center h-64">
-                        <Spinner message="Carregando..." />
-                    </div>
-                ) : materias.length >= 0 ? (
-                    <>
-                        <FilterGroup filterSchema={filterSchema} />
-                        <Tables data={materias} columns={columns} isSubjects={true} />
-                        <div className="mt-4 flex justify-end items-center">
-                            <PaginationUI
-                                totalPage={totalPage}
-                                onPageChange={handlePageChange}
-                            />
-                        </div>
-                    </>
-                ) : null
-                }
+          </GenericModalContent>
+        </>
+      )}
+
+      {!!editMateria && (
+        <>
+          <Backdrop onClick={() => setEditMateria(false)} />
+          <GenericModalContent>
+            <MateriaForm
+              materia={editMateria}
+              setMateriaData={setEditMateria}
+            />
+            <div>
+              <button onClick={() => fetchEditarMateria(editMateria)}>
+                Salvar{" "}
+              </button>
+              <button onClick={() => setEditMateria(null)}>Cancelar</button>
             </div>
-        </div >
-    );
+          </GenericModalContent>
+        </>
+      )}
+
+      <div className="container max-w-4xl justify-center items-center mx-auto p-6">
+        <AlertDialogUI
+          title="Confirmação de exclusão"
+          description="Deseja realmente deletar essa Matéria?"
+          showDialog={showDialog}
+          setShowDialog={setShowDialog}
+          onConfirm={confirmCallback}
+        />
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="mt-4 text-3xl font-bold">Matérias</h1>
+            <p className="text-muted-foreground">
+              Lista de Matérias cadastrados
+            </p>
+          </div>
+          <div className="flex flex-row justify-center items-center gap-2">
+            <FilterModal filterSchema={filterSchema} />
+            <Button className="px-4" onClick={() => setNovaMateria({})}>
+              Nova Matéria
+            </Button>
+          </div>
+        </div>
+        <div className="mt-8">
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <Spinner message="Carregando..." />
+            </div>
+          ) : materias.length >= 0 ? (
+            <>
+              <FilterGroup filterSchema={filterSchema} />
+              <Tables data={materias} columns={columns} />
+              <div className="mt-4 flex justify-end items-center">
+                <PaginationUI hasNextPage={hasNextPage} />
+              </div>
+            </>
+          ) : null}
+        </div>
+      </div>
+    </>
+  );
 }

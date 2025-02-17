@@ -16,7 +16,7 @@ const InputWithMask = ({ label, value, name, onChange, type = "text", mask }) =>
         type={type}
         id={name}
         name={name}
-        value={value}
+        defaultValue={value}
         onChange={handleInputChange}
         required
       />

@@ -33,8 +33,22 @@ const PaginationLink = ({
   className,
   isActive,
   size = "icon",
+  disabled,
   ...props
-}) => (
+}) => {
+  if (disabled) {
+    return (
+      <span
+        aria-disabled
+        className={cn(buttonVariants({
+          variant: "ghost",
+          size,
+          className: "cursor-not-allowed opacity-50",
+        }), className)}
+        {...props} />
+    )
+  }
+  return (
   <a
     aria-current={isActive ? "page" : undefined}
     className={cn(buttonVariants({
@@ -42,7 +56,8 @@ const PaginationLink = ({
       size,
     }), className)}
     {...props} />
-)
+  )
+  }
 PaginationLink.displayName = "PaginationLink"
 
 const PaginationPrevious = ({
@@ -50,12 +65,13 @@ const PaginationPrevious = ({
   ...props
 }) => (
   <PaginationLink
+    disabled={props.disabled}
     aria-label="Go to previous page"
     size="default"
     className={cn("gap-1 pl-2.5", className)}
     {...props}>
     <ChevronLeft className="h-4 w-4" />
-    <span>Previous</span>
+    <span>Anterior</span>
   </PaginationLink>
 )
 PaginationPrevious.displayName = "PaginationPrevious"
@@ -65,11 +81,12 @@ const PaginationNext = ({
   ...props
 }) => (
   <PaginationLink
+    disabled={props.disabled}
     aria-label="Go to next page"
     size="default"
     className={cn("gap-1 pr-2.5", className)}
     {...props}>
-    <span>Next</span>
+    <span>Próximo</span>
     <ChevronRight className="h-4 w-4" />
   </PaginationLink>
 )
