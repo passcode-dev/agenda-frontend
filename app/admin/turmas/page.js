@@ -34,7 +34,7 @@ export default function Turmas() {
         { headerName: "#", field: "id" },
         { headerName: "Turma", field: "name" },
         {
-            headerName: "Alunos", field: "name", renderCell: (params) => (
+            headerName: "Alunos", field: "nameAluno", renderCell: (params) => (
                 <div className="flex flex-wrap  gap-1 justify-center">
                     {params.row.Students.map((aluno, index) => (
                         <Badge className="p-2"

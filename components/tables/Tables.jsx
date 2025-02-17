@@ -11,7 +11,8 @@ import React, { useState } from "react";
 function Tables({
     data,
     columns,
-    setSelectedLine
+    setSelectedLine,
+    clickable
 }) {
     const isListValid = Array.isArray(data) && data.length > 0;
     return (
@@ -33,11 +34,11 @@ function Tables({
                         </TableHeader>
                         <TableBody>
                             {data.map((row, rowIndex) => (
-                                <TableRow onClick={()=>setSelectedLine(row)} key={rowIndex} className="text-center align-middle" >
+                                <TableRow onClick={clickable ? ()=>setSelectedLine(row): undefined} key={rowIndex} className="text-center align-middle" >
                                     
                                     {columns.map((col) => (
 
-                                        <TableCell key={col.field} className="px-4 py-2 align-middle">
+                                        <TableCell key={`${col.headerName}.${col.field}`} className="px-4 py-2 align-middle">
                                             {col.renderCell
                                                 ? col.renderCell({ row })
                                                 : row[col.field]

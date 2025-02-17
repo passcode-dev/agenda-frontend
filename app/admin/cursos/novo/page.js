@@ -86,7 +86,7 @@ export default function Novo() {
                         items={turmas}
                         setSelectedItems={setTurmaCurso}
                         selectedItems={turmaCurso}
-                        label="Curso"
+                        label="Nome do curso"
                         placeholder="Selecione uma turma..."
                         itemName="Classes"
                         searchPlaceholder="Buscar turma..."

@@ -65,7 +65,7 @@ export default function Cursos() {
         },
     ];
 
-    const fetchCursos = async (params) => { //  nao muda url
+    const fetchCursos = async (params) => { 
         setLoading(true);
         const cursoService = new CursoService();
         const cursos = await cursoService.Cursos(params);
@@ -135,7 +135,7 @@ export default function Cursos() {
                 ) : turmas.length >= 0 ? (
                     <>
                         <FilterGroup filterSchema={filterSchema} />
-                        <Tables data={turmas} columns={columns} isSubjects={true} />
+                        <Tables data={turmas} columns={columns} isSubjects={true} clickable={false} />
                         <div className="mt-4 flex justify-end items-center">
                             <PaginationUI totalPage={totalPage} onPageChange={handlePageChange} />
                         </div>

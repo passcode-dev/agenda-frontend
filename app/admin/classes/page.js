@@ -4,7 +4,7 @@ import FilterModal from "@/components/Filters/FilterModal";
 import { PaginationUI } from "@/components/paginationCustom";
 import { Spinner } from "@/components/ui/spinner";
 import ProfessoresService from "@/lib/service/professoresService";
-import { Pencil, Trash2 } from "lucide-react";
+import { LibraryBig, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -27,8 +27,8 @@ export default function Classes() {
 
     const currentPage = Number(searchParams.get("page")) || 1
     const filterSchema = [
-        { name: "Data de Nascimento", Value: <input /> },
-        { name: "Nome" }
+        { name: "Nome", parameterName: "name", icon: <LibraryBig className="text-black" /> },
+
     ];
 
     const columns = [
