@@ -3,7 +3,7 @@ import FilterGroup from "@/components/Filters/FilterGroup";
 import FilterModal from "@/components/Filters/FilterModal";
 import { PaginationUI } from "@/components/paginationCustom";
 import { Spinner } from "@/components/ui/spinner";
-import { Pencil, Trash2 } from "lucide-react";
+import { LibraryBig, Pencil, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
@@ -70,7 +70,11 @@ export default function Classes() {
   const currentPage = Number(searchParams.get("page")) || 1;
   const { toast } = useToast();
 
-  const filterSchema = [{ name: "Nome" }];
+    const currentPage = Number(searchParams.get("page")) || 1
+    const filterSchema = [
+        { name: "Nome", parameterName: "name", icon: <LibraryBig className="text-black" /> },
+
+    ];
 
   const columns = [
     { headerName: "#", field: "id" },

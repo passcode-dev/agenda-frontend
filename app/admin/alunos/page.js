@@ -25,6 +25,7 @@ import dayjs from "dayjs";
 import FilterModal from "@/components/Filters/FilterModal";
 import styled from "styled-components";
 import AlunoForm from "@/components/forms/alunoForm";
+import FormatDate from "@/app/utils/FormatDate";
 
 const Backdrop = styled.div`
   position: fixed;
@@ -213,7 +214,8 @@ export default function Alunos() {
       field: "birth_date",
       renderCell: (params) => {
         const date = params.row.birth_date;
-        return date?.split(" ")[0];
+
+        return FormatDate(date);
       },
     },
     {
@@ -221,7 +223,7 @@ export default function Alunos() {
       field: "entry_date",
       renderCell: (params) => {
         const date = params.row.entry_date;
-        return date?.split(" ")[0];
+        return FormatDate(date);
       },
     },
     {
@@ -229,7 +231,7 @@ export default function Alunos() {
       field: "exit_date",
       renderCell: (params) => {
         const date = params.row.exit_date;
-        return date?.split(" ")[0];
+        return date ? FormatDate(date):"Sem previsão";
       },
     },
     {

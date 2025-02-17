@@ -11,7 +11,8 @@ import React, { useState } from "react";
 function Tables({
     data,
     columns,
-    setSelectedLine
+    setSelectedLine,
+    clickable
 }) {
     const isListValid = Array.isArray(data) && data.length > 0;
     return (
