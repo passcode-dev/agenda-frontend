@@ -252,12 +252,11 @@ export default function Alunos() {
     setLoading(true);
     const alunoService = new AlunoService();
     const alunos = await alunoService.alunos(params);
+    setHasNextPage(false)
     if(alunos?.data?.students?.length > 10){
       setHasNextPage(true);
       alunos.data.students.pop();
     }
-    else
-      setHasNextPage(false)
     setAlunos(alunos?.data?.students);
     setLoading(false);
   };
