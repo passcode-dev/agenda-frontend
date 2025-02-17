@@ -163,7 +163,7 @@ export default function Alunos() {
   const [showDialog, setShowDialog] = useState(false);
   const [confirmCallback, setConfirmCallback] = useState(null);
   const [editAluno, setEditAluno] = useState(null);
-  const [novoAluno, setNovoAluno] = useState(null); // Novo estado para o cadastro
+  const [novoAluno, setNovoAluno] = useState(null); 
   const [hasNextPage, setHasNextPage] = useState(false);
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -255,10 +255,12 @@ export default function Alunos() {
     const alunoService = new AlunoService();
     const alunos = await alunoService.alunos(params);
     setHasNextPage(false);
+
     if (alunos?.data?.students?.length > 10) {
       setHasNextPage(true);
       alunos.data.students.pop();
     }
+    
     setAlunos(alunos?.data?.students);
     setLoading(false);
   };

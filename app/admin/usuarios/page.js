@@ -13,18 +13,68 @@ import FilterGroup from "@/components/Filters/FilterGroup";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AlertDialogUI } from "@/components/alert";
 import { UserContext } from "@/app/context/userContext";
+import UserForm from "@/components/forms/userForm";
+import styled from "styled-components";
+
+
+
+const GenericModalContent = styled.div`
+  position: fixed;
+  top: 50px;
+  left: 0;
+  right: 0;
+  margin: auto;
+  max-width: 1000px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+
+  opacity: 0;
+  transform: translateY(-20px);
+  animation: slideDown 0.3s ease-out forwards;
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
+
+const Backdrop = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  z-index: 99;
+`;
 
 
 export default function Usuarios() {
     const [loading, setLoading] = useState(false);
     const searchParams = useSearchParams();
     const router = useRouter();
+    const [editUser, setEditUser] = useState(null);
+    const [novoUser, setNovoUser] = useState(null); 
     const currentPage = Number(searchParams.get("page")) || 1;
     const [usuarios, setUsuarios] = useState([]);
-    const [totalPage, setTotalPage] = useState(3);
     const [showDialog, setShowDialog] = useState(false);
     const [confirmCallback, setConfirmCallback] = useState(false);
     const { user } = useContext(UserContext);
+    const [hasNextPage, setHasNextPage] = useState(false);
     const { toast } = useToast();
     const filterSchema = [
         { name: "Usuário", parameterName: "username", icon: <User className="text-black" /> },
@@ -39,10 +89,10 @@ export default function Usuarios() {
         {
             headerName: "Ações", field: "acoes", renderCell: (params) => (
                 <div className="flex justify-center gap-3">
-                    <Button size="sm" onClick={() => editarUsuario(params.row.id)}>
+                    <Button size="sm" onClick={(e) => editarUsuario(params.row, e)}>
                         <Pencil className="w-4 h-4" />
                     </Button>
-                    <Button size="sm" onClick={() => deletarUsuario(params.row.id)}>
+                    <Button size="sm" onClick={(e) => deletarUsuario(params.row.id, e)}>
                         <Trash2 className="w-4 h-4" />
                     </Button>
                 </div>
@@ -56,8 +106,12 @@ export default function Usuarios() {
             const usuarios = await usuarioService.usuarios(page);
             setUsuarios(usuarios?.data.users ? usuarios?.data.users : []);
 
-            const totalRecords = Number(usuarios?.data?.total_records);
-            setTotalPage(Math.ceil(totalRecords / 10) || 1);
+
+            if (usuarios?.data?.users?.length > 10) {
+                setHasNextPage(true);
+                usuarios.data.users.pop();
+            }
+
             setLoading(false);
         } catch (error) {
             toast({
@@ -70,64 +124,85 @@ export default function Usuarios() {
 
     };
 
-    useEffect(() => {
-        fetchUsuarios(searchParams);
-    }, [currentPage]);
-
-    useEffect(() => {
-        const params = new URLSearchParams();
-        params.set("page", currentPage);
-        router.push(`${window.location.pathname}?${params.toString()}`)
-    }, []);
-
-    const editarUsuario = (id) => {
-        if (user.id == id) {
-            return toast({
-                title: "Erro",
-                description: "Você não pode editar o próprio usuário, vai até a página de perfil para alterar seus dados.",
-                variant: "destructive",
-            });
-        }
-        router.push(`/admin/usuarios/editar/${id}`);
-    };
-
-    const deletarUsuario = (id) => {
-        if (user.id == id) {
-            return toast({
-                title: "Erro",
-                description: "Você não pode deletar o próprio usuário, vai até a página de perfil para deletar sua conta.",
-                variant: "destructive",
-            });
-        }
-
+    const deletarUsuario = async (id, e) => {
+        setShowDialog(true);
+        e.stopPropagation();
         setConfirmCallback(() => async () => {
+
             const usuarioService = new UsuarioService();
             const deletar = await usuarioService.deletarUsuario(id);
+
             if (deletar.status == "success") {
+                fetchUsuarios(searchParams.toString());
                 setShowDialog(false);
-                fetchUsuarios(searchParams);
+
                 return toast({
                     title: "Sucesso",
-                    description: deletar.message,
+                    description: deletar?.message,
                     variant: "success",
                 });
-
             }
 
             setShowDialog(false);
-            fetchUsuarios(searchParams);
             return toast({
                 title: "Erro",
-                description: deletar.data.details,
+                description: deletar?.data?.details,
                 variant: "destructive",
             });
         });
-        setShowDialog(true);
     };
 
-    const handlePageChange = () => {
-        fetchUsuarios(searchParams);
+    useEffect(() => {
+        fetchUsuarios(searchParams.toString());
+    }, [searchParams]);
+
+
+    const editarUsuario = (user, e) => {
+        setEditUser(user);
+        e.stopPropagation();
     };
+
+    const fetchEditarUser = async (user) => {
+        const userService = new UsuarioService();
+        const editar = await userService.alterarUsuario(user.id, user);
+        console.log(editar);
+        if (editar.status != "error") {
+            setEditUser(null);
+            fetchUsuarios(searchParams.toString());
+            return toast({
+                title: "Sucesso",
+                description: "Usuario editado com sucesso",
+                variant: "success",
+            });
+        } else {
+            return toast({
+                title: "Erro ao editar usuario",
+                description: editar?.data?.details,
+                variant: "destructive",
+            });
+        }
+    };
+
+    const cadastrarUsuario = async (user) => {
+        const userService = new UsuarioService();
+        const resultado = await userService.CadastrarUsuario(user);
+    
+        if (resultado.status === "success") {
+          setNovoUser(null); // Fechar o modal
+          fetchUsuarios(searchParams.toString()); // Recarregar a lista de alunos
+          toast({
+            title: "Sucesso",
+            description: "Usuario cadastrado com sucesso",
+            variant: "success",
+          });
+        } else {
+          toast({
+            title: "Erro",
+            description: resultado?.data?.details,
+            variant: "destructive",
+          });
+        }
+      };
 
     return (
         <div className="container max-w-4xl mx-auto p-6">
@@ -145,9 +220,9 @@ export default function Usuarios() {
                 </div>
                 <div className="flex flex-row justify-center items-center gap-2">
                     <FilterModal filterSchema={filterSchema} />
-                    <Link className="flex items-center justify-center" href="/admin/usuarios/novo">
-                        <Button className="px-4">Novo Usuário</Button>
-                    </Link>
+                    
+                        <Button className="px-4" onClick={() => setNovoUser({})}>Novo Usuário</Button>
+                  
                 </div>
             </div>
             <FilterGroup filterSchema={filterSchema} />
@@ -165,14 +240,44 @@ export default function Usuarios() {
                             />
                             <div className="mt-4 flex justify-end items-center">
                                 <PaginationUI
-                                    totalPage={totalPage}
-                                    onPageChange={handlePageChange}
+                                    hasNextPage={hasNextPage}
                                 />
                             </div>
                         </>
                     ) : null
                 )}
             </div>
+
+
+            {!!editUser && (
+                <>
+                    <Backdrop onClick={() => setEditUser(false)} />
+                    <GenericModalContent>
+                        <UserForm user={editUser} setUserData={setEditUser} />
+                        <div>
+                            <button onClick={() => fetchEditarUser(editUser)}>
+                                Salvar{" "}
+                            </button>
+                            <button onClick={() => setEditUser(null)}>Cancelar</button>
+                        </div>
+                    </GenericModalContent>
+                </>
+            )}
+
+            {!!novoUser && (
+                <>
+                    <Backdrop onClick={() => setNovoUser(null)} />
+                    <GenericModalContent>
+                        <UserForm user={novoUser} setUserData={setNovoUser} />
+                        <div>
+                            <button onClick={() => cadastrarUsuario(novoUser)}>Salvar</button>
+                            <button onClick={() => setNovoUser(null)}>Cancelar</button>
+                        </div>
+                    </GenericModalContent>
+                </>
+            )}
+
         </div>
+
     );
 }

@@ -20,12 +20,6 @@ export const Items = [
     href: "/admin/alunos"
   },
   {
-    title: "Cursos",
-    icon: BookMarked,
-    variant: "default",
-    href: "/admin/cursos"
-  },
-  {
     title: "Classes",
     icon: Layers,
     variant: "default",

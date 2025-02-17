@@ -70,7 +70,6 @@ export default function Classes() {
   const currentPage = Number(searchParams.get("page")) || 1;
   const { toast } = useToast();
 
-    const currentPage = Number(searchParams.get("page")) || 1
     const filterSchema = [
         { name: "Nome", parameterName: "name", icon: <LibraryBig className="text-black" /> },
 
