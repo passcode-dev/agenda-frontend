@@ -16,7 +16,7 @@ import Table from "@/components/tables/Tables";
 import { PaginationUI } from "@/components/paginationCustom";
 import FilterGroup from "@/components/Filters/FilterGroup";
 import { useToast } from "@/hooks/use-toast";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { AlertDialogUI } from "@/components/alert";
 import { DateField, LocalizationProvider } from "@mui/x-date-pickers";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
@@ -163,7 +163,7 @@ export default function Alunos() {
   const [confirmCallback, setConfirmCallback] = useState(null);
   const [editAluno, setEditAluno] = useState(null);
   const [novoAluno, setNovoAluno] = useState(null); // Novo estado para o cadastro
-  const [hasNextPage, setHasNextPage] = useState(false)
+  const [hasNextPage, setHasNextPage] = useState(false);
   const searchParams = useSearchParams();
   const { toast } = useToast();
 
@@ -252,8 +252,8 @@ export default function Alunos() {
     setLoading(true);
     const alunoService = new AlunoService();
     const alunos = await alunoService.alunos(params);
-    setHasNextPage(false)
-    if(alunos?.data?.students?.length > 10){
+    setHasNextPage(false);
+    if (alunos?.data?.students?.length > 10) {
       setHasNextPage(true);
       alunos.data.students.pop();
     }
@@ -285,6 +285,7 @@ export default function Alunos() {
       });
     }
   };
+
   const deletarAluno = async (id, e) => {
     setShowDialog(true);
     e.stopPropagation();
@@ -456,7 +457,7 @@ export default function Alunos() {
                 setSelectedLine={setSelectedLine}
               />
               <div className="mt-4 flex justify-end items-center">
-                <PaginationUI hasNextPage={hasNextPage}/>
+                <PaginationUI hasNextPage={hasNextPage} />
               </div>
             </>
           ) : null}
