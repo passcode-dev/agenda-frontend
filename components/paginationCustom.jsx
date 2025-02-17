@@ -10,7 +10,7 @@ import {
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 
-export function PaginationUI() {
+export function PaginationUI({hasNextPage}) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const currentPage = Number(searchParams.get("page")) || 1;
@@ -31,15 +31,14 @@ export function PaginationUI() {
         <Pagination>
             <PaginationContent className="flex items-center gap-2">
                 <PaginationPrevious
-                    onClick={() => handlePageChange(currentPage - 1)}
+                    onClick={() => currentPage !== 1 ? handlePageChange(currentPage - 1): ''}
                     disabled={currentPage === 1}
                 >
                 </PaginationPrevious>
 
-                {currentPage}
-
                 <PaginationNext
-                    onClick={() => handlePageChange(currentPage + 1)} 
+                    onClick={() => hasNextPage ? handlePageChange(currentPage + 1) : ''} 
+                    disabled={!hasNextPage}
                 >
                 </PaginationNext>
 

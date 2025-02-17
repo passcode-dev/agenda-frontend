@@ -159,11 +159,11 @@ export default function Alunos() {
   const [selectedLine, setSelectedLine] = useState();
   const [loading, setLoading] = useState(false);
   const [alunos, setAlunos] = useState([]);
-  const [totalPage, setTotalPage] = useState(0);
   const [showDialog, setShowDialog] = useState(false);
   const [confirmCallback, setConfirmCallback] = useState(null);
   const [editAluno, setEditAluno] = useState(null);
   const [novoAluno, setNovoAluno] = useState(null); // Novo estado para o cadastro
+  const [hasNextPage, setHasNextPage] = useState(false)
   const searchParams = useSearchParams();
   const { toast } = useToast();
 
@@ -252,8 +252,13 @@ export default function Alunos() {
     setLoading(true);
     const alunoService = new AlunoService();
     const alunos = await alunoService.alunos(params);
-    setAlunos(alunos.data?.students);
-    setTotalPage(Math.ceil(alunos.data?.total_records / 10));
+    if(alunos?.data?.students?.length > 10){
+      setHasNextPage(true);
+      alunos.data.students.pop();
+    }
+    else
+      setHasNextPage(false)
+    setAlunos(alunos?.data?.students);
     setLoading(false);
   };
 
@@ -452,7 +457,7 @@ export default function Alunos() {
                 setSelectedLine={setSelectedLine}
               />
               <div className="mt-4 flex justify-end items-center">
-                <PaginationUI />
+                <PaginationUI hasNextPage={hasNextPage}/>
               </div>
             </>
           ) : null}
