@@ -15,7 +15,7 @@ export default function ClasseForm({ classe, setClasseData }) {
       <InputWithMask
         label="Nome"
         name="name"
-        value={classe.name}
+        defaultValue={classe.name}
         onChange={handleChange}
       />
     </form>

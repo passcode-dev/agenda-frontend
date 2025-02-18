@@ -12,7 +12,6 @@ function Tables({
     data,
     columns,
     setSelectedLine,
-    clickable
 }) {
     const isListValid = Array.isArray(data) && data.length > 0;
     return (
@@ -27,7 +26,6 @@ function Tables({
                                         key={`${column.headerName}_${column.field}`}
                                         className="px-4 py-2 font-bold text-center align-middle"
                                     >
-                                        {console.log(column)}
                                         {column.headerName}
                                     </TableCell>
                                 ))}
@@ -37,7 +35,6 @@ function Tables({
                             {data.map((row, rowIndex) => (
                                 <TableRow onClick={()=>setSelectedLine ? setSelectedLine(row) : "" } key={rowIndex} className="text-center align-middle" >
                                     {columns.map((col) => (
-
                                         <TableCell key={`${col.headerName}_${col.field}`} className="px-4 py-2 align-middle">
                                             {col.renderCell
                                                 ? col.renderCell({ row })

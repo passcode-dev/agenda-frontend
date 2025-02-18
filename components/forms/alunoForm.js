@@ -54,21 +54,21 @@ const AlunoForm = ({ aluno, setAlunoData }) => {
 
       <DatePickerField
         label="Data de Nascimento"
-        value={aluno.birth_date ? dayjs(aluno.birth_date).format("YYYY-MM-DD") : ""} // Converte a data para o formato correto
+        value={aluno.birth_date ?? ''}
         name="birth_date"
         onChange={handleChange}
       />
 
       <DatePickerField
         label="Data de Entrada"
-        value={aluno.entry_date ? dayjs(aluno.entry_date).format("YYYY-MM-DD") : ""} // Converte a data para o formato correto
+        value={aluno.entry_date  ?? ''}
         name="entry_date"
         onChange={handleChange}
       />
 
       <DatePickerField
         label="Data de Saída"
-        value={aluno.exit_date ? dayjs(aluno.exit_date).format("YYYY-MM-DD") : ""} // Converte a data para o formato correto
+        value={aluno.exit_date ?? ''} // Converte a data para o formato correto
         name="exit_date"
         onChange={handleChange}
       />

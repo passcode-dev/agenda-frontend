@@ -11,6 +11,7 @@ import { useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import styled from "styled-components";
 
+
 const dataBar = [
     { name: "Pedro", vendas: 20 },
     { name: "Leonardo", vendas: 25 },

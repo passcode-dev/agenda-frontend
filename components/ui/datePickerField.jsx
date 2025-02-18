@@ -3,7 +3,10 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { DateField } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import styled from "styled-components";
+
+dayjs.extend(utc); // Certifique-se de ativar o plugin UTC
 
 const LocalizationProviderStyled = styled(LocalizationProvider)`
   height: 10px;
@@ -30,8 +33,8 @@ const DatePickerField = ({
   className = "",
   placeholder = "DD/MM/YYYY",
 }) => {
-  const formattedValue = value ? dayjs(value) : null;
-  
+  // Força a hora para meio-dia (12:00) para evitar problemas com fuso horário
+  const formattedValue = value ? dayjs(value).utc(): null;
   const isValidDate = formattedValue && formattedValue.isValid();
 
   return (
@@ -39,8 +42,10 @@ const DatePickerField = ({
       <Label htmlFor={name}>{label}</Label>
       <LocalizationProviderStyled dateAdapter={AdapterDayjs}>
         <DateField
-          value={isValidDate ? formattedValue : null} // Só passa uma data válida ou null
-          onChange={(date) => onChange(name, date ? date.format("YYYY-MM-DD") : "")}
+          defaultValue={isValidDate ? formattedValue : null} // Só passa uma data válida ou null
+          onChange={(date) =>
+            onChange(name, date ?? '')
+          }
           format="DD/MM/YYYY"
           placeholder={placeholder}
         />

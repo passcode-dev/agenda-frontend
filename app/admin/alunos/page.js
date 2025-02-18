@@ -21,11 +21,12 @@ import { AlertDialogUI } from "@/components/alert";
 import { DateField, LocalizationProvider } from "@mui/x-date-pickers";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs from "dayjs";
 import FilterModal from "@/components/Filters/FilterModal";
 import styled from "styled-components";
 import AlunoForm from "@/components/forms/alunoForm";
 import FormatDate from "@/app/utils/FormatDate";
+import utc from "dayjs/plugin/utc";
+import dayjs from "dayjs";
 
 const Backdrop = styled.div`
   position: fixed;
@@ -157,6 +158,10 @@ export default function Alunos() {
     },
   ];
 
+  const date = dayjs.utc("2022-04-30T00:00:00Z");
+  console.log(date.format("DD/MM/YYYY HH:mm:ss")); // 30/04/2022 00:00:00
+
+  
   const [selectedLine, setSelectedLine] = useState();
   const [loading, setLoading] = useState(false);
   const [alunos, setAlunos] = useState([]);
@@ -173,33 +178,6 @@ export default function Alunos() {
     { name: "RG", parameterName: "rg", icon: <IdCard /> },
     { name: "CPF", parameterName: "cpf", icon: <IdCard /> },
     { name: "Telefone", parameterName: "phone_number", icon: <Phone /> },
-    {
-      parameterName: "Data de Nascimento",
-      name: "birth_date",
-      type: "text", // Tipo de filtro
-      renderCell: (value, setValue) => {
-        // Aqui, 'value' seria o valor do filtro atual, passado a partir de seu estado.
-        return (
-          <LocalizationProvider
-            dateAdapter={AdapterDayjs}
-            adapterLocale="pt-br"
-          >
-            <DemoContainer components={["DateField"]}>
-              <DateField
-                value={value ? dayjs(value, "DD-MM-YYYY") : null} // Use o valor passado para 'renderCell'
-                onChange={(e) => {
-                  const formattedDate = e ? e.format("DD-MM-YYYY") : ""; // Formata a data
-                  setValue(formattedDate); // Atualiza o valor do filtro
-                }}
-                className="w-full"
-                label="Digite a data"
-                format="DD/MM/YYYY" // Formato da exibição da data
-              />
-            </DemoContainer>
-          </LocalizationProvider>
-        );
-      },
-    },
   ];
 
   const columns = [
@@ -317,13 +295,12 @@ export default function Alunos() {
 
   const editarAluno = (aluno, e) => {
     setEditAluno(aluno);
-    e.stopPropagation(); // Evita que o clique propague para a célula da tabela
+    e.stopPropagation(); 
   };
 
   const fetchEditarAluno = async (aluno) => {
     const alunoService = new AlunoService();
     const editar = await alunoService.editarAluno(aluno.id, aluno);
-    console.log(editar);
     if (editar.status != "error") {
       setEditAluno(null);
       fetchAlunos(searchParams.toString());
@@ -367,15 +344,15 @@ export default function Alunos() {
               </InfoItem>
               <InfoItem>
                 <span>Data de nascimento</span>
-                {selectedLine.birth_date}
+                { FormatDate(selectedLine.birth_date)}
               </InfoItem>
               <InfoItem>
                 <span>Data de entrada</span>
-                {selectedLine.entry_date}
+                {FormatDate(selectedLine.entry_date)}
               </InfoItem>
               <InfoItem>
                 <span>Data de saída</span>
-                {selectedLine.exit_date}
+                {selectedLine.exit_date ? FormatDate(selectedLine.exit_date) : "Sem previsão de saída"}
               </InfoItem>
             </InfoContainer>
             {/* 
@@ -425,7 +402,7 @@ export default function Alunos() {
         </>
       )}
 
-      <div className="container max-w-4xl justify-center items-center mx-auto p-6">
+      <div className="container justify-center items-center mx-auto p-6">
         <AlertDialogUI
           title="Confirmação de exclusão"
           description="Deseja realmente deletar este aluno?"
@@ -457,7 +434,6 @@ export default function Alunos() {
               <Table
                 data={alunos}
                 columns={columns}
-                open={true}
                 setSelectedLine={setSelectedLine}
               />
               <div className="mt-4 flex justify-end items-center">

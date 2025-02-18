@@ -4,15 +4,12 @@ import FilterModal from "@/components/Filters/FilterModal";
 import { PaginationUI } from "@/components/paginationCustom";
 import { Spinner } from "@/components/ui/spinner";
 import { Pencil, Trash2, UserRound } from "lucide-react";
-import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import Tables from "@/components/tables/Tables";
+import Table from "@/components/tables/Tables";
 import { AlertDialogUI } from "@/components/alert";
-import { Badge } from "@/components/ui/badge";
 import TurmaService from "@/lib/service/turmaService";
 import styled from "styled-components";
 import TurmaForm from "@/components/forms/turmaForm";
@@ -29,6 +26,7 @@ const Backdrop = styled.div`
 `;
 
 const GenericModalContent = styled.div`
+
   position: fixed;
   top: 50px;
   left: 0;
@@ -43,7 +41,7 @@ const GenericModalContent = styled.div`
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   z-index: 9999;
-
+  
   opacity: 0;
   transform: translateY(-20px);
   animation: slideDown 0.3s ease-out forwards;
@@ -60,6 +58,33 @@ const GenericModalContent = styled.div`
   }
 `;
 
+const DetailsWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+`;
+
+const TitlteItem = styled.div`
+  font-size: 32px;
+  
+`
+
+const DetailItem = styled.div`
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  background-color:#f4f4f4;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+
+  span {
+    font-size: 14px;
+    color: #6c757d;
+  }
+`;
+
 export default function Turmas() {
   const [loading, setLoading] = useState(false);
   const [turmas, setTurmas] = useState([]);
@@ -69,6 +94,7 @@ export default function Turmas() {
   const [novaTurma, setNovaTurma] = useState(null);
   const [hasNextPage, setHasNextPage] = useState(false);
   const searchParams = useSearchParams();
+  const [selectedLine, setSelectedLine] = useState();
   const { toast } = useToast();
 
   const filterSchema = [
@@ -78,19 +104,6 @@ export default function Turmas() {
   const columns = [
     { headerName: "#", field: "id" },
     { headerName: "Turma", field: "name" },
-    {
-      headerName: "Alunos",
-      field: "name",
-      renderCell: (params) => (
-        <div className="flex flex-wrap  gap-1 justify-center">
-          {params.row.Students.map((aluno, index) => (
-            <Badge className="p-2" key={index}>
-              {aluno.name}
-            </Badge>
-          ))}
-        </div>
-      ),
-    },
     {
       headerName: "Ações",
       field: "acoes",
@@ -107,6 +120,14 @@ export default function Turmas() {
     },
   ];
 
+  const columnsStudents = [
+
+    { headerName: "#", field: "id" },
+    { headerName: "Nome", field: "name" },
+    { headerName: "Sobrenome", field: "last_name" },
+    { headerName: "Telefone", field: "phone_number" },
+  ]
+
   const fetchTurmas = async (params) => {
     setLoading(true);
     const turmaService = new TurmaService();
@@ -117,6 +138,7 @@ export default function Turmas() {
       turmas.data.classes.pop();
     }
     setTurmas(turmas?.data?.classes);
+
     setLoading(false);
   };
 
@@ -126,7 +148,7 @@ export default function Turmas() {
 
   const editarTurma = (turma, e) => {
     setEditTurma(turma);
-    e.stopPropagation(); // Evita que o clique propague para a célula da tabela
+    e.stopPropagation();
   };
 
   const fetchEditarProfessor = async (turma) => {
@@ -166,7 +188,7 @@ export default function Turmas() {
       });
     }
   };
-  
+
   const cadastrarTurma = async (turma) => {
     const turmaService = new TurmaService();
     const cadastrar = await turmaService.cadastrarTurma(turma);
@@ -189,6 +211,34 @@ export default function Turmas() {
 
   return (
     <>
+      {!!selectedLine && (
+        <>
+          <Backdrop onClick={() => setSelectedLine(false)} />
+          <GenericModalContent>
+            <div className="flex justify-center">
+              <h2 className="text-[26px] font-semibold">Detalhes da Turma</h2>
+            </div>
+            <DetailsWrapper>
+              <DetailItem>
+                <TitlteItem>{selectedLine.name}</TitlteItem>
+              </DetailItem>
+              {loading ? (
+                <div className="flex justify-center items-center h-64">
+                  <Spinner message="Carregando..." />
+                </div>
+              ) : turmas?.length >= 0 ? (
+                <>
+                  <Table
+                    data={selectedLine.Students}
+                    columns={columnsStudents}
+                  />
+                </>
+              ) : null}
+
+            </DetailsWrapper>
+          </GenericModalContent>
+        </>
+      )}
       {!!editTurma && (
         <>
           <Backdrop onClick={() => setEditTurma(false)} />
@@ -217,7 +267,7 @@ export default function Turmas() {
           </GenericModalContent>
         </>
       )}
-      
+
       <div className="container max-w-4xl justify-center items-center mx-auto p-6">
         <AlertDialogUI
           title="Confirmação de exclusão"
@@ -248,7 +298,12 @@ export default function Turmas() {
           ) : turmas.length >= 0 ? (
             <>
               <FilterGroup filterSchema={filterSchema} />
-              <Tables data={turmas} columns={columns} isSubjects={true} />
+              <Table
+                data={turmas}
+                columns={columns}
+                isSubjects={true}
+                setSelectedLine={setSelectedLine}
+              />
               <div className="mt-4 flex justify-end items-center">
                 <PaginationUI hasNextPage={hasNextPage} />
               </div>

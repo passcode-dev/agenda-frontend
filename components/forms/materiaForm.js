@@ -17,7 +17,7 @@ export default function MateriaForm({ materia, setMateriaData }) {
       <InputWithMask
         label="Nome"
         name="name"
-        value={materia.name}
+        defaultValue={materia.name}
         onChange={handleChange}
       />
     </form>
