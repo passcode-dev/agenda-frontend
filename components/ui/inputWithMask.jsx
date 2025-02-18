@@ -1,7 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const InputWithMask = ({ label, value, name, onChange, type = "text", mask }) => {
+const InputWithMask = ({ label, value, defaultValue, name, onChange, type = "text", mask }) => {
   const handleInputChange = (e) => {
     const { value } = e.target;
     // Aplica a máscara ao valor
@@ -16,7 +16,8 @@ const InputWithMask = ({ label, value, name, onChange, type = "text", mask }) =>
         type={type}
         id={name}
         name={name}
-        defaultValue={value}
+        value={value}
+        defaultValue={defaultValue}
         onChange={handleInputChange}
         required
       />

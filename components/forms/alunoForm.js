@@ -16,14 +16,14 @@ const AlunoForm = ({ aluno, setAlunoData }) => {
     <form className="space-y-4">
       <InputWithMask
         label="Nome"
-        value={aluno.name}
+        defaultValue={aluno.name}
         name="name"
         onChange={handleChange}
       />
       
       <InputWithMask
         label="Último nome"
-        value={aluno.last_name}
+        defaultValue={aluno.last_name}
         name="last_name"  
         onChange={handleChange}
       />
