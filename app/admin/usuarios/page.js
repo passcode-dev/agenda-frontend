@@ -106,7 +106,7 @@ export default function Usuarios() {
             const usuarios = await usuarioService.usuarios(page);
             setUsuarios(usuarios?.data.users ? usuarios?.data.users : []);
 
-
+            setHasNextPage(false)
             if (usuarios?.data?.users?.length > 10) {
                 setHasNextPage(true);
                 usuarios.data.users.pop();

@@ -35,7 +35,7 @@ function Tables({
                         </TableHeader>
                         <TableBody>
                             {data.map((row, rowIndex) => (
-                                <TableRow onClick={()=>setSelectedLine(row)} key={rowIndex} className="text-center align-middle" >
+                                <TableRow onClick={()=>setSelectedLine ? setSelectedLine(row) : "" } key={rowIndex} className="text-center align-middle" >
                                     {columns.map((col) => (
 
                                         <TableCell key={`${col.headerName}_${col.field}`} className="px-4 py-2 align-middle">
