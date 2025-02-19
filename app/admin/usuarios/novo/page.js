@@ -1,6 +1,6 @@
 "use client";
 import { ArrowLeft } from "lucide-react";
-import UsuarioForm from "@/components/forms/usuarioForm";
+import UsuarioForm from "@/components/forms/perfilForm";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";

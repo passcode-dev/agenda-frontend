@@ -59,6 +59,53 @@ const GenericModalContent = styled.div`
   }
 `;
 
+const ButtonGroup = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 1rem;
+`;
+
+const StyledButtonPrimary = styled.button`
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+
+  &:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
+const StyledButtonSecondary = styled.button`
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+
+  &:hover {
+    background-color: #e53935;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
 export default function Materias() {
   const [loading, setLoading] = useState(false);
   const [materias, setMaterias] = useState([]);
@@ -191,12 +238,12 @@ export default function Materias() {
               materia={novaMateria}
               setMateriaData={setNovaMateria}
             />
-            <div>
-              <button onClick={() => fetchNovaMateria(novaMateria)}>
+            <ButtonGroup>
+              <StyledButtonPrimary onClick={() => fetchNovaMateria(novaMateria)}>
                 Salvar{" "}
-              </button>
-              <button onClick={() => setNovaMateria(null)}>Cancelar</button>
-            </div>
+              </StyledButtonPrimary>
+              <StyledButtonSecondary onClick={() => setNovaMateria(null)}>Cancelar</StyledButtonSecondary>
+            </ButtonGroup>
           </GenericModalContent>
         </>
       )}
@@ -209,12 +256,12 @@ export default function Materias() {
               materia={editMateria}
               setMateriaData={setEditMateria}
             />
-            <div>
-              <button onClick={() => fetchEditarMateria(editMateria)}>
+            <ButtonGroup>
+              <StyledButtonPrimary onClick={() => fetchEditarMateria(editMateria)}>
                 Salvar{" "}
-              </button>
-              <button onClick={() => setEditMateria(null)}>Cancelar</button>
-            </div>
+              </StyledButtonPrimary>
+              <StyledButtonSecondary onClick={() => setEditMateria(null)}>Cancelar</StyledButtonSecondary>
+            </ButtonGroup>
           </GenericModalContent>
         </>
       )}

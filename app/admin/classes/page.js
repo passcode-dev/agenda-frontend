@@ -58,6 +58,53 @@ const GenericModalContent = styled.div`
   }
 `;
 
+const ButtonGroup = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 1rem;
+`;
+
+const StyledButtonPrimary = styled.button`
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+
+  &:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
+const StyledButtonSecondary = styled.button`
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+
+  &:hover {
+    background-color: #e53935;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
 export default function Classes() {
   const [loading, setLoading] = useState(false);
   const [classes, setClasses] = useState([]);
@@ -192,12 +239,12 @@ export default function Classes() {
           <Backdrop onClick={() => setEditClasse(false)} />
           <GenericModalContent>
             <ClasseForm classe={editClasse} setClasseData={setEditClasse} />
-            <div>
-              <button onClick={() => fetchEditarClasses(editClasse)}>
+            <ButtonGroup>
+              <StyledButtonPrimary onClick={() => fetchEditarClasses(editClasse)}>
                 Salvar{" "}
-              </button>
-              <button onClick={() => setEditClasse(null)}>Cancelar</button>
-            </div>
+              </StyledButtonPrimary>
+              <StyledButtonSecondary onClick={() => setEditClasse(null)}>Cancelar</StyledButtonSecondary>
+            </ButtonGroup>
           </GenericModalContent>
         </>
       )}
@@ -207,12 +254,12 @@ export default function Classes() {
           <Backdrop onClick={() => setNovaClasse(null)} />
           <GenericModalContent>
             <ClasseForm classe={novaClasse} setClasseData={setNovaClasse} />
-            <div>
-              <button onClick={() => cadastrarClasse(novaClasse)}>
+            <ButtonGroup>
+              <StyledButtonPrimary onClick={() => cadastrarClasse(novaClasse)}>
                 Salvar
-              </button>
-              <button onClick={() => setNovaClasse(null)}>Cancelar</button>
-            </div>
+              </StyledButtonPrimary>
+              <StyledButtonSecondary onClick={() => setNovaClasse(null)}>Cancelar</StyledButtonSecondary>
+            </ButtonGroup>
           </GenericModalContent>
         </>
       )}

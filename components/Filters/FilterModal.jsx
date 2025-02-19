@@ -146,8 +146,14 @@ const Icon = styled.i`
 
 const GenericModal = ({ isOpen, onClose, filterName, onSubmit, selectedFilter, searchParams, router }) => {
     const [inputValue, setInputValue] = useState("");
+    
+    useEffect(() => {
+        const valorFiltro= searchParams.get(selectedFilter?.parameterName || "");
+        setInputValue(valorFiltro);
+    }, [selectedFilter]);
 
-    if (!isOpen) return null;
+    if (!isOpen)return null;
+    
 
     const handleSubmit = () => {
         const params = new URLSearchParams(searchParams.toString());
@@ -169,11 +175,10 @@ const GenericModal = ({ isOpen, onClose, filterName, onSubmit, selectedFilter, s
                 <div className='flex flex-col justify-center h-full'>
                     {selectedFilter?.renderCell ? (
                         selectedFilter.renderCell(inputValue, setInputValue)
-                    )
-                         : (
+                        ):(
                         <Input
                             type="text"
-                            value={inputValue}
+                            defaultValue={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                             placeholder={`Digite o valor para ${filterName}`}
                         />
@@ -230,7 +235,9 @@ const FilterModal = ({ filterSchema }) => {
     };
 
     const clearFilters = useCallback(() => {
+        const params = new URLSearchParams(searchParams.toString());
         params.delete('page')
+
         router.push(window.location.pathname);
         setIsModalOpen(false);
     }, [router]);

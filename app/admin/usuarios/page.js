@@ -63,6 +63,54 @@ const Backdrop = styled.div`
 `;
 
 
+const ButtonGroup = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 1rem;
+`;
+
+const StyledButtonPrimary = styled.button`
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+
+  &:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
+const StyledButtonSecondary = styled.button`
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+
+  &:hover {
+    background-color: #e53935;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
+
 export default function Usuarios() {
     const [loading, setLoading] = useState(false);
     const searchParams = useSearchParams();
@@ -254,12 +302,12 @@ export default function Usuarios() {
                     <Backdrop onClick={() => setEditUser(false)} />
                     <GenericModalContent>
                         <UserForm user={editUser} setUserData={setEditUser} />
-                        <div>
-                            <button onClick={() => fetchEditarUser(editUser)}>
+                        <ButtonGroup>
+                            <StyledButtonPrimary onClick={() => fetchEditarUser(editUser)}>
                                 Salvar{" "}
-                            </button>
-                            <button onClick={() => setEditUser(null)}>Cancelar</button>
-                        </div>
+                            </StyledButtonPrimary>
+                            <StyledButtonSecondary onClick={() => setEditUser(null)}>Cancelar</StyledButtonSecondary>
+                        </ButtonGroup>
                     </GenericModalContent>
                 </>
             )}
@@ -269,10 +317,10 @@ export default function Usuarios() {
                     <Backdrop onClick={() => setNovoUser(null)} />
                     <GenericModalContent>
                         <UserForm user={novoUser} setUserData={setNovoUser} />
-                        <div>
-                            <button onClick={() => cadastrarUsuario(novoUser)}>Salvar</button>
-                            <button onClick={() => setNovoUser(null)}>Cancelar</button>
-                        </div>
+                        <ButtonGroup>
+                            <StyledButtonPrimary onClick={() => cadastrarUsuario(novoUser)}>Salvar</StyledButtonPrimary>
+                            <StyledButtonSecondary onClick={() => setNovoUser(null)}>Cancelar</StyledButtonSecondary>
+                        </ButtonGroup>
                     </GenericModalContent>
                 </>
             )}

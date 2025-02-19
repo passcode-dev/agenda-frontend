@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { zodUsuario } from "@/lib/schemas/zod";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import UsuarioForm from "@/components/forms/usuarioForm";
+import UsuarioForm from "@/components/forms/perfilForm";
 import UsuarioService from "@/lib/service/usuarioService";
 import { useContext, useEffect, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
@@ -19,9 +19,7 @@ export default function Perfil() {
     const [loading, setLoading] = useState(false);
     const [showDialog, setShowDialog] = useState(false);
     const [confirmCallback, setConfirmCallback] = useState(false);
-    const { register, reset, handleSubmit, setValue, formState: { errors } } = useForm({
-        resolver: zodResolver(zodUsuario),
-    });
+    
 
     const { toast } = useToast();
 
@@ -39,7 +37,7 @@ export default function Perfil() {
         setLoading(false);
         return toast({
             title: "Erro",
-            description: alterar.data.details,
+            description: alterar.data,
             variant: "destructive"
         });
     };
@@ -69,12 +67,12 @@ export default function Perfil() {
                     onConfirm={confirmCallback}
                     hidden={true}
                 />
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <UsuarioForm register={register} errors={errors} setValue={setValue} initialValues={usuario} />
-                    <Button type="submit" className="mt-4 w-24" disabled={loading}>
-                        {loading ? <Spinner className="text-gray-800" /> : "Editar"}
-                    </Button>
-                </form>
+
+                <UsuarioForm setUsuario={setUsuario} usuarios={usuario} />
+                <Button type="submit" className="mt-4 w-24" disabled={loading}>
+                    {loading ? <Spinner className="text-gray-800" /> : "Editar"}
+                </Button>
+
             </div>
         </div>
     );

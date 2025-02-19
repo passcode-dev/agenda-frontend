@@ -13,6 +13,7 @@ import Tables from "@/components/tables/Tables";
 import { AlertDialogUI } from "@/components/alert";
 import styled from "styled-components";
 import ProfessorForm from "@/components/forms/professorForm";
+import FormatDate from "@/app/utils/FormatDate";
 
 const Backdrop = styled.div`
   position: fixed;
@@ -57,6 +58,53 @@ const GenericModalContent = styled.div`
   }
 `;
 
+const ButtonGroup = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 1rem;
+`;
+
+const StyledButtonPrimary = styled.button`
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+
+  &:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
+const StyledButtonSecondary = styled.button`
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+
+  &:hover {
+    background-color: #e53935;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
 export default function Professores() {
   const [loading, setLoading] = useState(false);
   const [professores, setProfessores] = useState([]);
@@ -86,7 +134,7 @@ export default function Professores() {
       field: "BirthDate",
       renderCell: (params) => {
         const date = new Date(params.row.BirthDate);
-        return date.toLocaleDateString("pt-BR");
+        return FormatDate(date);
       },
     },
     {
@@ -127,8 +175,8 @@ export default function Professores() {
     const resultado = await professorService.cadastrarProfessor(professor);
 
     if (resultado.status === "success") {
-      setNovoProfessor(null); // Fechar o modal
-      fetchProfessores(searchParams.toString()); // Recarregar a lista de professores
+      setNovoProfessor(null); 
+      fetchProfessores(searchParams.toString());
       toast({
         title: "Sucesso",
         description: "Professor cadastrado com sucesso",
@@ -198,18 +246,18 @@ export default function Professores() {
     <>
       {!!novoProfessor && (
         <>
-          <Backdrop onClick={() => setNovoAluno(null)} />
+          <Backdrop onClick={() => setNovoProfessor(null)} />
           <GenericModalContent>
             <ProfessorForm
               professor={novoProfessor}
               setProfessorData={setNovoProfessor}
             />
-            <div>
-              <button onClick={() => cadastrarProfessor(novoProfessor)}>
+            <ButtonGroup>
+              <StyledButtonPrimary onClick={() => cadastrarProfessor(novoProfessor)}>
                 Salvar
-              </button>
-              <button onClick={() => cadastrarProfessor(null)}>Cancelar</button>
-            </div>
+              </StyledButtonPrimary>
+              <StyledButtonSecondary onClick={() => setNovoProfessor(null)}>Cancelar</StyledButtonSecondary>
+            </ButtonGroup>
           </GenericModalContent>
         </>
       )}
@@ -221,12 +269,12 @@ export default function Professores() {
               professor={editProfessor}
               setProfessorData={setEditProfessor}
             />
-            <div>
-              <button onClick={() => fetchEditarProfessor(editProfessor)}>
+            <ButtonGroup>
+              <StyledButtonPrimary onClick={() => fetchEditarProfessor(editProfessor)}>
                 Salvar{" "}
-              </button>
-              <button onClick={() => setEditProfessor(null)}>Cancelar</button>
-            </div>
+              </StyledButtonPrimary>
+              <StyledButtonSecondary onClick={() => setEditProfessor(null)}>Cancelar</StyledButtonSecondary>
+            </ButtonGroup>
           </GenericModalContent>
         </>
       )}

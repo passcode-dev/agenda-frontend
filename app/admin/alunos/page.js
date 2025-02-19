@@ -118,6 +118,53 @@ const InfoItem = styled.div`
   }
 `;
 
+const ButtonGroup = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 1rem;
+`;
+
+const StyledButtonPrimary = styled.button`
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+
+  &:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
+const StyledButtonSecondary = styled.button`
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+
+  &:hover {
+    background-color: #e53935;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
 export default function Alunos() {
   const aulasMarcadas = [
     {
@@ -379,12 +426,14 @@ export default function Alunos() {
           <Backdrop onClick={() => setEditAluno(false)} />
           <GenericModalContent>
             <AlunoForm aluno={editAluno} setAlunoData={setEditAluno} />
-            <div>
-              <button onClick={() => fetchEditarAluno(editAluno)}>
-                Salvar{" "}
-              </button>
-              <button onClick={() => setEditAluno(null)}>Cancelar</button>
-            </div>
+            <ButtonGroup>
+              <StyledButtonPrimary onClick={() => fetchEditarAluno(editAluno)}>
+                Salvar
+              </StyledButtonPrimary>
+              <StyledButtonSecondary onClick={() => setEditAluno(null)}>
+                Cancelar
+              </StyledButtonSecondary>
+            </ButtonGroup>
           </GenericModalContent>
         </>
       )}
@@ -394,10 +443,10 @@ export default function Alunos() {
           <Backdrop onClick={() => setNovoAluno(null)} />
           <GenericModalContent>
             <AlunoForm aluno={novoAluno} setAlunoData={setNovoAluno} />
-            <div>
-              <button onClick={() => cadastrarAluno(novoAluno)}>Salvar</button>
-              <button onClick={() => setNovoAluno(null)}>Cancelar</button>
-            </div>
+            <ButtonGroup>
+              <StyledButtonPrimary onClick={() => cadastrarAluno(novoAluno)}>Salvar</StyledButtonPrimary>
+              <StyledButtonSecondary onClick={() => setNovoAluno(null)}>Cancelar</StyledButtonSecondary>
+            </ButtonGroup>
           </GenericModalContent>
         </>
       )}

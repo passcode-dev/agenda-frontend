@@ -85,6 +85,53 @@ const DetailItem = styled.div`
   }
 `;
 
+const ButtonGroup = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 1rem;
+`;
+
+const StyledButtonPrimary = styled.button`
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+
+  &:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
+const StyledButtonSecondary = styled.button`
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+
+  &:hover {
+    background-color: #e53935;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
 export default function Turmas() {
   const [loading, setLoading] = useState(false);
   const [turmas, setTurmas] = useState([]);
@@ -151,7 +198,7 @@ export default function Turmas() {
     e.stopPropagation();
   };
 
-  const fetchEditarProfessor = async (turma) => {
+  const fetchEditarTurma = async (turma) => {
     const turmaService = new TurmaService();
     const editar = await turmaService.editarTurma(turma.id, turma);
     if (editar.status != "error") {
@@ -244,12 +291,12 @@ export default function Turmas() {
           <Backdrop onClick={() => setEditTurma(false)} />
           <GenericModalContent>
             <TurmaForm turma={editTurma} setTurma={setEditTurma} />
-            <div>
-              <button onClick={() => fetchEditarProfessor(editTurma)}>
+            <ButtonGroup>
+              <StyledButtonPrimary onClick={() => fetchEditarTurma(editTurma)}>
                 Salvar{" "}
-              </button>
-              <button onClick={() => setTurma(null)}>Cancelar</button>
-            </div>
+              </StyledButtonPrimary>
+              <StyledButtonSecondary onClick={() => setEditTurma(null)}>Cancelar{console.log("clicou?")}</StyledButtonSecondary>
+            </ButtonGroup>
           </GenericModalContent>
         </>
       )}
@@ -258,12 +305,12 @@ export default function Turmas() {
           <Backdrop onClick={() => setNovaTurma(false)} />
           <GenericModalContent>
             <TurmaForm turma={novaTurma} setTurma={setNovaTurma} />
-            <div>
-              <button onClick={() => cadastrarTurma(novaTurma)}>
+            <ButtonGroup>
+              <StyledButtonPrimary onClick={() => cadastrarTurma(novaTurma)}>
                 Salvar{" "}
-              </button>
-              <button onClick={() => setNovaTurma(null)}>Cancelar</button>
-            </div>
+              </StyledButtonPrimary>
+              <StyledButtonSecondary onClick={() => setNovaTurma(null)}>Cancelar</StyledButtonSecondary>
+            </ButtonGroup>
           </GenericModalContent>
         </>
       )}
@@ -295,7 +342,7 @@ export default function Turmas() {
             <div className="flex justify-center items-center h-64">
               <Spinner message="Carregando..." />
             </div>
-          ) : turmas.length >= 0 ? (
+          ) : turmas?.length >= 0 ? (
             <>
               <FilterGroup filterSchema={filterSchema} />
               <Table

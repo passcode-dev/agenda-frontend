@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { zodUsuario } from "@/lib/schemas/zod";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import UsuarioForm from "@/components/forms/usuarioForm";
+import UsuarioForm from "@/components/forms/perfilForm";
 import UsuarioService from "@/lib/service/usuarioService";
 import { use, useEffect, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";

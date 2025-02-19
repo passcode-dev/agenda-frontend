@@ -26,8 +26,8 @@ export default function TurmaForm({ turma, setTurma }) {
 
       <SelectAutoComplete
         label="Aluno"
-        value={turma.Students || []}  // Garantir que seja um array vazio se students for undefined
-        setValue={(value) => setTurma({ ...turma, Students: value })}  // Atualizando os estudantes
+        value={turma.Students || []}
+        setValue={(value) => setTurma({ ...turma, Students: value })}
         api="/students"
         labelKey="name"
         valueKey="id"
