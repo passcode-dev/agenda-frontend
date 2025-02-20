@@ -20,7 +20,7 @@ export default function TurmaForm({ turma, setTurma }) {
       <InputWithMask
         label="Nome"
         name="name"
-        value={turma.name}
+        defaultValue={turma.name}
         onChange={handleChange}
       />
 

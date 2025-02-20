@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { zodUsuario } from "@/lib/schemas/zod";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import UsuarioForm from "@/components/forms/perfilForm";
+import PerfilForm from "@/components/forms/perfilForm";
 import UsuarioService from "@/lib/service/usuarioService";
 import { useContext, useEffect, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
@@ -22,11 +22,11 @@ export default function Perfil() {
     
 
     const { toast } = useToast();
-
+console.log("valores usuario: ",usuario);
     const onSubmit = async (data) => {
         setLoading(true);
         const usuarioService = new UsuarioService();
-        const alterar = await usuarioService.alterarUsuario(user.id, data);
+        const alterar = await usuarioService.alterarUsuario(user.id, usuario);
         if (alterar.status == "success") {
             setLoading(false);
             setConfirmCallback(() => () => {
@@ -37,7 +37,7 @@ export default function Perfil() {
         setLoading(false);
         return toast({
             title: "Erro",
-            description: alterar.data,
+            description: data.usuario,
             variant: "destructive"
         });
     };
@@ -68,8 +68,8 @@ export default function Perfil() {
                     hidden={true}
                 />
 
-                <UsuarioForm setUsuario={setUsuario} usuarios={usuario} />
-                <Button type="submit" className="mt-4 w-24" disabled={loading}>
+                <PerfilForm setUsuario={setUsuario} usuarios={usuario} />
+                <Button onClick={onSubmit} type="submit" className="mt-4 w-24" disabled={loading}>
                     {loading ? <Spinner className="text-gray-800" /> : "Editar"}
                 </Button>
 
