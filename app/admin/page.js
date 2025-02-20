@@ -7,9 +7,11 @@ import Table from "@/components/tables/Tables";
 import { ProLayout, PageContainer, ProCard } from "@ant-design/pro-components";
 import { Layout, Row, Col, Statistic } from "antd";
 import { UserRound } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import styled from "styled-components";
+import AlunoService from "@/lib/service/alunoService";
+import { useSearchParams } from "next/navigation";
 
 
 const dataBar = [
@@ -52,10 +54,10 @@ const columns = [
             const date = new Date(params.row.BirthDate);
             return date.toLocaleDateString("pt-BR");
         },
-
     },
-
 ];
+
+
 
 const dataTable = [
     { key: "1", name: "Professor Carlos", subject: "Matemática", classesGiven: 120, rating: "4.8" },
@@ -66,7 +68,8 @@ const dataTable = [
 export default function Admin() {
     const [teacher, setTeacher] = useState(dataTable);
     const [filterValue, setFilterValue] = useState("");
-
+    const searchParams = useSearchParams();
+    const [totalAlunos, setTotalAlunos]= useState("");
     const filterSchema = [
         {
             name: "Nome", parameterName: "name", icon: <UserRound />, renderCell: (filterValue, setFilterValue) => {
@@ -79,6 +82,22 @@ export default function Admin() {
             }
         },
     ];
+
+    const fetchUsuarios = async () => {
+        try {
+            const alunoService = new AlunoService();
+            const alunos = await alunoService.totalStudents();
+            console.log(alunos);
+            setTotalAlunos(alunos.data.total_students);
+        } catch (error) {
+            console.log(error)
+        }
+    };
+
+
+    useEffect(() => {
+        fetchUsuarios();
+    }, [searchParams]);
 
     return (
         <PageContainer>
@@ -99,7 +118,7 @@ export default function Admin() {
                     </Col>
                     <Col span={8}>
                         <StyledProCard>
-                            <Statistic title="Faturamento" value={12500} prefix="R$" valueStyle={{ color: '#FFC107' }} />
+                            <Statistic title="Total de alunos" value={totalAlunos} prefix="" valueStyle={{ color: '#FFC107' }} />
                         </StyledProCard>
                     </Col>
                 </Row>
