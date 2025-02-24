@@ -46,15 +46,7 @@ const StyledProCard = styled(ProCard)`
 const columns = [
     { headerName: "#", field: "id" },
     { headerName: "Nome", field: "name" },
-    { headerName: "CPF", field: "cpf" },
-    {
-        headerName: "Data de Nascimento",
-        field: "BirthDate",
-        renderCell: (params) => {
-            const date = new Date(params.row.BirthDate);
-            return date.toLocaleDateString("pt-BR");
-        },
-    },
+    { headerName: "Aulas dadas", field: "classesGiven" },
 ];
 
 
@@ -72,7 +64,7 @@ export default function Admin() {
     const [totalAlunos, setTotalAlunos]= useState("");
     const filterSchema = [
         {
-            name: "Nome", parameterName: "name", icon: <UserRound />, renderCell: (filterValue, setFilterValue) => {
+            name: "Nome da Turma", parameterName: "name", icon: <UserRound />, renderCell: (filterValue, setFilterValue) => {
                 return (
                     <AutoCompleteComponent
                         value={filterValue}
@@ -142,7 +134,7 @@ export default function Admin() {
                         <FilterModal filterSchema={filterSchema} />
                     </div>
                     <div className="w-full flex flex-row">
-                        <div className="flex w-full max-w-md border justify-center">
+                        <div className="flex w-full max-w-md justify-center">
                             <ResponsiveContainer width="50%" height={300}>
                                 <PieChart>
                                     <Pie data={dataPie} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
@@ -154,7 +146,7 @@ export default function Admin() {
                                 </PieChart>
                             </ResponsiveContainer>
                         </div>
-                        <div className="w-full max-w-md">
+                        <div className="w-full">
                             <Table columns={columns} data={teacher} />
                         </div>
                     </div>
