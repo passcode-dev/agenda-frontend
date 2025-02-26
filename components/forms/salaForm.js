@@ -23,7 +23,7 @@ const CustomInputWithMask = styled(InputWithMask)`
   }
 
   input {
-    width: 100%;  /* Ocupa toda a largura disponível */
+    width: 100%;  
     padding: 12px;
     border-radius: 4px;
     border: 1px solid #ddd;
@@ -43,9 +43,9 @@ const CustomInputWithMask = styled(InputWithMask)`
 `;
 
 
-export default function ClasseForm({ classe, setClasseData }) {
+export default function SalaForm({ sala, setSalaData }) {
   const handleChange = (name, value) => {
-    setClasseData((prevState) => ({
+    setSalaData((prevState) => ({
       ...prevState,
       [name]: value,
     }));
@@ -58,7 +58,7 @@ export default function ClasseForm({ classe, setClasseData }) {
       <CustomInputWithMask
         label="Nome"
         name="name"
-        defaultValue={classe.name}
+        defaultValue={sala.name}
         onChange={handleChange}
       />
     </StyledForm>

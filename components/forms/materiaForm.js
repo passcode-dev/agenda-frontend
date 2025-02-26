@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect } from "react";
 import InputWithMask from "../ui/inputWithMask";
+import styled from "styled-components";
 
 export default function MateriaForm({ materia, setMateriaData }) {
   const handleChange = (name, value) => {

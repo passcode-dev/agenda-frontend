@@ -20,10 +20,10 @@ export const Items = [
     href: "/admin/alunos"
   },
   {
-    title: "Classes",
+    title: "Salas",
     icon: Layers,
     variant: "default",
-    href: "/admin/classes"
+    href: "/admin/salas"
   },
   {
     title: "Matérias",

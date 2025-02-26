@@ -36,8 +36,8 @@ export default function ModalAgendamento({
         }));
         setSearchResults(mapped);
       } else if (selectedType === "turma") {
-        const classes = await agendaService.getClassesByName(nome);
-        const mapped = (classes ?? []).map((c) => ({
+        const salas = await agendaService.getSalasByName(nome);
+        const mapped = (salas ?? []).map((c) => ({
           id: c.id,
           label: c.name,
         }));

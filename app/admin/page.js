@@ -12,21 +12,8 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pi
 import styled from "styled-components";
 import AlunoService from "@/lib/service/alunoService";
 import { useSearchParams } from "next/navigation";
-
-
-const dataBar = [
-    { name: "Pedro", vendas: 20 },
-    { name: "Leonardo", vendas: 25 },
-    { name: "Gabriel", vendas: 22 },
-    { name: "Leonardo2", vendas: 15 },
-    { name: "Rodrigo", vendas: 10 },
-    { name: "Luan", vendas: 9 },
-    { name: "Clarinha", vendas: 18 },
-    { name: "Vitoria", vendas: 16 },
-    { name: "Luana", vendas: 26 },
-    { name: "Marcos", vendas: 38 },
-    { name: "Rogéria", vendas: 1 },
-];
+import ProfessoresService from "@/lib/service/professoresService";
+import TurmaService from "@/lib/service/turmaService";
 
 const dataPie = [
     { name: "Aulas realizadas", value: 40 },
@@ -44,51 +31,62 @@ const StyledProCard = styled(ProCard)`
 `;
 
 const columns = [
-    { headerName: "#", field: "id" },
-    { headerName: "Nome", field: "name" },
-    { headerName: "Aulas dadas", field: "classesGiven" },
+    { headerName: "#", field: "teacher_id" },
+    { headerName: "Nome", field: "teacher_name" },
+    { headerName: "Aulas dadas", field: "completed_classes" },
 ];
 
-
-
-const dataTable = [
-    { key: "1", name: "Professor Carlos", subject: "Matemática", classesGiven: 120, rating: "4.8" },
-    { key: "2", name: "Professora Ana", subject: "Português", classesGiven: 95, rating: "4.6" },
-    { key: "3", name: "Professor João", subject: "Física", classesGiven: 110, rating: "4.7" },
-];
 
 export default function Admin() {
-    const [teacher, setTeacher] = useState(dataTable);
+    const [teacher, setTeacher] = useState([]);
     const [filterValue, setFilterValue] = useState("");
     const searchParams = useSearchParams();
-    const [totalAlunos, setTotalAlunos]= useState("");
-    const filterSchema = [
-        {
-            name: "Nome da Turma", parameterName: "name", icon: <UserRound />, renderCell: (filterValue, setFilterValue) => {
-                return (
-                    <AutoCompleteComponent
-                        value={filterValue}
-                        setValue={setFilterValue}
-                    />
-                );
-            }
-        },
-    ];
+    const [turmas, setTurmas] = useState([]);
+    const [totalAlunos, setTotalAlunos] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const fetchUsuarios = async () => {
+    const filterSchema = [
+    { name: "Nome", parameterName: "name", icon: <UserRound /> },
+  ];
+
+
+    const fetchAulasProf = async () => {
         try {
-            const alunoService = new AlunoService();
-            const alunos = await alunoService.totalStudents();
-            console.log(alunos);
-            setTotalAlunos(alunos.data.total_students);
+            const professorService = new ProfessoresService();
+            const prof = await professorService.GetAulasPendentes();
+            console.log("professores: ", prof.data);
+            setTeacher(prof.data);
         } catch (error) {
             console.log(error)
         }
+    }
+
+    const fetchUsuarios = async () => {
+
+        const alunoService = new AlunoService();
+        const alunos = await alunoService.totalStudents();
+        console.log(alunos);
+        setTotalAlunos(alunos.data.total_students);
     };
+
+    const fetchTurmas = async (params) => {
+        setLoading(true);
+        const turmaService = new TurmaService();
+        const turmas = await turmaService.Turmas(params);
+        setHasNextPage(false);
+        if (turmas?.data?.classes?.length > 10) {
+          setHasNextPage(true);
+          turmas.data.classes.pop();
+        }
+        setTurmas(turmas?.data?.classes);
+        setLoading(false);
+      };
 
 
     useEffect(() => {
         fetchUsuarios();
+        
+        fetchAulasProf();
     }, [searchParams]);
 
     return (
@@ -118,11 +116,11 @@ export default function Admin() {
                 {/* Gráfico de Barras */}
                 <StyledProCard title="Aulas Mensais Realizadas">
                     <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={dataBar.sort((a, b) => a.vendas - b.vendas)}>
-                            <XAxis dataKey="name" stroke="#4CAF50" />
+                        <BarChart data={teacher.sort((a, b) => a.completed_classes - b.completed_classes)}>
+                            <XAxis dataKey="teacher_name" stroke="#4CAF50" />
                             <YAxis />
                             <Tooltip />
-                            <Bar dataKey="vendas" fill="#4CAF50" barSize={40} />
+                            <Bar dataKey="completed_classes" fill="#4CAF50" barSize={40} />
                         </BarChart>
                     </ResponsiveContainer>
                 </StyledProCard>
@@ -147,7 +145,20 @@ export default function Admin() {
                             </ResponsiveContainer>
                         </div>
                         <div className="w-full">
-                            <Table columns={columns} data={teacher} />
+
+                            {loading ? (
+                                <div className="flex justify-center items-center h-64">
+                                    <Spinner message="Carregando..." />
+                                </div>
+                            ) : teacher?.length >= 0 ? (
+                                <>
+                                    <FilterGroup filterSchema={filterSchema} />
+                                    <Table
+                                        data={teacher}
+                                        columns={columns}
+                                    />
+                                </>
+                            ) : null}
                         </div>
                     </div>
                 </StyledProCard>

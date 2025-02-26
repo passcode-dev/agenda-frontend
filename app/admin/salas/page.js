@@ -11,9 +11,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import Tables from "@/components/tables/Tables";
 import { AlertDialogUI } from "@/components/alert";
-import ClasseService from "@/lib/service/classeService";
+import SalaService from "@/lib/service/salaService";
 import styled from "styled-components";
-import ClasseForm from "@/components/forms/classeForm";
+import SalaForm from "@/components/forms/salaForm";
 
 const Backdrop = styled.div`
   position: fixed;
@@ -105,13 +105,13 @@ const StyledButtonSecondary = styled.button`
   }
 `;
 
-export default function Classes() {
+export default function Salas() {
   const [loading, setLoading] = useState(false);
-  const [classes, setClasses] = useState([]);
+  const [salas, setSalas] = useState([]);
   const [showDialog, setShowDialog] = useState(false);
   const [confirmCallback, setConfirmCallback] = useState(null);
-  const [editClasse, setEditClasse] = useState(null);
-  const [novaClasse, setNovaClasse] = useState(null);
+  const [editSala, setEditSala] = useState(null);
+  const [novaSala, setNovaSala] = useState(null);
   const [hasNextPage, setHasNextPage] = useState(false);
   const searchParams = useSearchParams();
   const currentPage = Number(searchParams.get("page")) || 1;
@@ -130,10 +130,10 @@ export default function Classes() {
       field: "acoes",
       renderCell: (params) => (
         <div className="flex justify-center gap-3">
-          <Button size="sm" onClick={(e) => editarClasse(params.row, e)}>
+          <Button size="sm" onClick={(e) => editarSala(params.row, e)}>
             <Pencil className="w-4 h-4" />
           </Button>
-          <Button size="sm" onClick={(e) => deletarClasse(params.row.id, e)}>
+          <Button size="sm" onClick={(e) => deletarSala(params.row.id, e)}>
             <Trash2 className="w-4 h-4" />
           </Button>
         </div>
@@ -141,14 +141,14 @@ export default function Classes() {
     },
   ];
 
-  const deletarClasse = async (id, e) => {
+  const deletarSala = async (id, e) => {
     setShowDialog(true);
     e.stopPropagation();
     setConfirmCallback(() => async () => {
-      const classeService = new ClasseService();
-      const deletar = await classeService.deletarClasse(id);
+      const salaService = new SalaService();
+      const deletar = await salaService.deletarSala(id);
       if (deletar.status == "success") {
-        fetchClasses(searchParams.toString());
+        fetchSalas(searchParams.toString());
         setShowDialog(false);
         return toast({
           title: "Sucesso",
@@ -165,22 +165,22 @@ export default function Classes() {
     });
   };
 
-  const editarClasse = (classe, e) => {
-    console.log(classe);
-    setEditClasse(classe);
+  const editarSala = (sala, e) => {
+    console.log(sala);
+    setEditSala(sala);
     e.stopPropagation(); // Evita que o clique propague para a célula da tabela
   };
 
-  const cadastrarClasse = async (classe) => {
-    const classeService = new ClasseService();
-    const resultado = await classeService.cadastrarClasse(classe);
+  const cadastrarSala = async (sala) => {
+    const salaService = new SalaService();
+    const resultado = await salaService.cadastrarSala(sala);
 
     if (resultado.status === "success") {
-      setNovaClasse(null); // Fechar o modal
-      fetchClasses(searchParams.toString()); // Recarregar a lista de alunos
+      setNovaSala(null); // Fechar o modal
+      fetchSalas(searchParams.toString()); // Recarregar a lista de alunos
       toast({
         title: "Sucesso",
-        description: "Classe cadastrado com sucesso",
+        description: "Sala cadastrada com sucesso",
         variant: "success",
       });
     } else {
@@ -192,73 +192,76 @@ export default function Classes() {
     }
   };
 
-  const fetchClasses = async (params) => {
+  const fetchSalas = async (params) => {
     setLoading(true);
-    const classeService = new ClasseService();
-    const classes = await classeService.classes(params);
-    console.log(classes);
+    const salaService = new SalaService();
+    const salas = await salaService.Salas(params);
     setHasNextPage(false);
-    if (classes?.data?.classrooms?.length > 10) {
+    
+    if (salas?.data?.classrooms?.length > 10) {
       setHasNextPage(true);
-      classes.data.classrooms.pop();
+      salas.data.classrooms.pop();
     }
-    setClasses(classes.data.classrooms);
+    setSalas(salas?.data?.classrooms);
+    console.log("salas aqui ",salas.data.classrooms);
     setLoading(false);
   };
+  
+  useEffect(() => {
+    fetchSalas(searchParams.toString());
+  }, [searchParams]);
 
-  const fetchEditarClasses = async (classe) => {
-    const editClasse = { name: classe.name };
-    const classeService = new ClasseService();
-    const editar = await classeService.editarClasse(classe.id, editClasse);
+  const fetchEditarSalas = async (sala) => {
+    const editSala = { name: sala.name };
+    const salaService = new SalaService();
+    const editar = await salaService.editarSala(sala.id, editSala);
     console.log(editar);
     if (editar.status != "error") {
-      setEditClasse(null);
-      fetchClasses(searchParams.toString());
+      setEditSala(null);
+      fetchSalas(searchParams.toString());
       return toast({
         title: "Sucesso",
-        description: "Classe editada com sucesso",
+        description: "Sala editada com sucesso",
         variant: "success",
       });
     } else {
       return toast({
-        title: "Erro ao editar classe",
+        title: "Erro ao editar sala",
         description: editar?.data?.details,
         variant: "destructive",
       });
     }
   };
 
-  useEffect(() => {
-    fetchClasses(searchParams.toString());
-  }, [currentPage]);
+  
 
   return (
     <>
-      {!!editClasse && (
+      {!!editSala && (
         <>
-          <Backdrop onClick={() => setEditClasse(false)} />
+          <Backdrop onClick={() => setEditSala(false)} />
           <GenericModalContent>
-            <ClasseForm classe={editClasse} setClasseData={setEditClasse} />
+            <SalaForm sala={editSala} setSalaData={setEditSala} />
             <ButtonGroup>
-              <StyledButtonPrimary onClick={() => fetchEditarClasses(editClasse)}>
+              <StyledButtonPrimary onClick={() => fetchEditarSalas(editSala)}>
                 Salvar{" "}
               </StyledButtonPrimary>
-              <StyledButtonSecondary onClick={() => setEditClasse(null)}>Cancelar</StyledButtonSecondary>
+              <StyledButtonSecondary onClick={() => setEditSala(null)}>Cancelar</StyledButtonSecondary>
             </ButtonGroup>
           </GenericModalContent>
         </>
       )}
 
-      {!!novaClasse && (
+      {!!novaSala && (
         <>
-          <Backdrop onClick={() => setNovaClasse(null)} />
+          <Backdrop onClick={() => setNovaSala(null)} />
           <GenericModalContent>
-            <ClasseForm classe={novaClasse} setClasseData={setNovaClasse} />
+            <SalaForm sala={novaSala} setSalaData={setNovaSala} />
             <ButtonGroup>
-              <StyledButtonPrimary onClick={() => cadastrarClasse(novaClasse)}>
+              <StyledButtonPrimary onClick={() => cadastrarSala(novaSala)}>
                 Salvar
               </StyledButtonPrimary>
-              <StyledButtonSecondary onClick={() => setNovaClasse(null)}>Cancelar</StyledButtonSecondary>
+              <StyledButtonSecondary onClick={() => setNovaSala(null)}>Cancelar</StyledButtonSecondary>
             </ButtonGroup>
           </GenericModalContent>
         </>
@@ -266,22 +269,22 @@ export default function Classes() {
       <div className="container max-w-4xl justify-center items-center mx-auto p-6">
         <AlertDialogUI
           title="Confirmação de exclusão"
-          description="Deseja realmente deletar essa classe?"
+          description="Deseja realmente deletar essa sala?"
           showDialog={showDialog}
           setShowDialog={setShowDialog}
           onConfirm={confirmCallback}
         />
         <div className="mb-8 flex justify-between items-center">
           <div>
-            <h1 className="mt-4 text-3xl font-bold">Classes</h1>
+            <h1 className="mt-4 text-3xl font-bold">Salas</h1>
             <p className="text-muted-foreground">
-              Lista de classes cadastrados
+              Lista de salas cadastradas
             </p>
           </div>
           <div className="flex flex-row justify-center items-center gap-2">
             <FilterModal filterSchema={filterSchema} />
-            <Button className="px-4" onClick={() => setNovaClasse({})}>
-              Nova Classe
+            <Button className="px-4" onClick={() => setNovaSala({})}>
+              Nova Sala
             </Button>
           </div>
         </div>
@@ -290,10 +293,10 @@ export default function Classes() {
             <div className="flex justify-center items-center h-64">
               <Spinner message="Carregando..." />
             </div>
-          ) : classes.length >= 0 ? (
+          ) : salas.length >= 0 ? (
             <>
               <FilterGroup filterSchema={filterSchema} />
-              <Tables data={classes} columns={columns} />
+              <Tables data={salas} columns={columns} />
               <div className="mt-4 flex justify-end items-center">
                 <PaginationUI hasNextPage={hasNextPage} />
               </div>

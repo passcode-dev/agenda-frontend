@@ -52,21 +52,21 @@ const AlunoForm = ({ aluno, setAlunoData }) => {
         mask={maskCpf}
       />
 
-      <CustomDatePickerField
+      <CustomDatePicker
         label="Data de Nascimento"
         value={aluno.birth_date ?? ''}
         name="birth_date"
         onChange={handleChange}
       />
 
-      <CustomDatePickerField
+      <CustomDatePicker
         label="Data de Entrada"
         value={aluno.entry_date ?? ''}
         name="entry_date"
         onChange={handleChange}
       />
 
-      <CustomDatePickerField
+      <CustomDatePicker
         label="Data de Saída"
         value={aluno.exit_date ?? ''}
         name="exit_date"
@@ -114,33 +114,23 @@ const CustomInputWithMask = styled(InputWithMask)`
   }
 `;
 
-const CustomDatePickerField = styled(DatePickerField)`
-  margin-bottom: 16px;
+const CustomDatePicker = styled(DatePickerField)`
+  .MuiOutlinedInput-root {
+    height: 40px;
+    border: 1px solid #e5e5e5; 
+    padding: 0;
+    border-radius: 4px;
 
-  label {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #555;
-    margin-bottom: 8px;
+    &.Mui-focused {
+      box-shadow: none;
+      border-color: initial;
+      border: 1px solid black;
+    }
+
   }
 
-  input {
-    width: 100%;  /* Ocupa toda a largura disponível */
-    padding: 12px;
-    border-radius: 4px;
-    border: 1px solid #ddd;
-    font-size: 1rem;
-    outline: none;
-    transition: all 0.3s ease;
-
-    &:focus {
-      border-color: #4caf50;
-      box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
-    }
-
-    &::placeholder {
-      color: #aaa;
-    }
+  .MuiOutlinedInput-notchedOutline {
+    border-color: white !important; /* Cor padrão da borda */
   }
 `;
 
