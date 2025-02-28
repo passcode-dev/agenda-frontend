@@ -50,8 +50,22 @@ const CustomInputWithMask = styled(InputWithMask)`
   }
 `;
 
+const CustomAlert=styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: red;
+`;
   return (
     <StyledForm className="space-y-4">
+      {!!error &&(
+        <>
+          <CustomAlert>
+            <div>Complete todos os campos destacados!</div>
+          </CustomAlert>
+        </>
+      )}
       <CustomInputWithMask
         label="Nome"
         name="name"

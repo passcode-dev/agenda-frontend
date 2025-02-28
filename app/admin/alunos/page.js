@@ -292,7 +292,7 @@ export default function Alunos() {
   };
 
   const verificaInputs = async (aluno) => {
-    if (!aluno.name || !aluno.cpf || !aluno.birth_date || !aluno.rg || !aluno.phone_number || !aluno.entry_date) {
+    if (!aluno.name || !aluno.cpf || !aluno.birth_date || !aluno.rg || !aluno.entry_date) {
       setError(true);
     } else {
       setError(false);

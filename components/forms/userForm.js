@@ -12,6 +12,14 @@ const UserForm = ({ user, setUserData, error }) => {
 
   return (
     <StyledForm className="space-y-4">
+
+      {!!error && (
+        <>
+          <CustomAlert>
+            <div>Complete todos os campos destacados!</div>
+          </CustomAlert>
+        </>
+      )}
       <CustomInputWithMask
         label="Nome"
         defaultValue={user.username}
@@ -29,7 +37,7 @@ const UserForm = ({ user, setUserData, error }) => {
         error={error}
         isRequired={true}
       />
-      
+
       <CustomInputWithMask
         label="Senha"
         defaultValue={user.password || ''}
@@ -81,5 +89,13 @@ const CustomInputWithMask = styled(InputWithMask)`
       color: #aaa;
     }
   }
+`;
+
+const CustomAlert=styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: red;
 `;
 export default UserForm;

@@ -12,7 +12,9 @@ const InputWithMask = ({ label, value, defaultValue, name, onChange, type = "tex
 
   return (
     <div className={className}>
-      <Label htmlFor={name}>{label}</Label>
+      <Label htmlFor={name}>
+        {label}<span className="text-red-500">{isRequired && " *"}</span>
+        </Label>
       <Input
         type={type}
         id={name}

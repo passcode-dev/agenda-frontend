@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import InputWithMask from "../ui/inputWithMask";
 import SelectAutoComplete from "../ui/selectAutoComplete";
+import styled from "styled-components";
 
 export default function TurmaForm({ turma, setTurma, error }) {
 
@@ -13,10 +14,23 @@ export default function TurmaForm({ turma, setTurma, error }) {
     }));
   };
 
-  {console.log("turma ",turma);}
+  const CustomAlert=styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: red;
+`;
 
   return (
     <form className="space-y-4">
+      {!!error &&(
+        <>
+          <CustomAlert>
+            <div>Complete todos os campos destacados!</div>
+          </CustomAlert>
+        </>
+      )}
       <InputWithMask
         label="Nome"
         name="name"

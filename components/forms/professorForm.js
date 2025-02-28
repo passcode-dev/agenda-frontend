@@ -57,6 +57,13 @@ const CustomInputWithMask = styled(InputWithMask)`
     }
   }
 `;
+  const CustomAlert = styled.div`
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: red;
+  `;
 
 
 export default function ProfessorForm({ professor, setProfessorData, error }) {
@@ -68,6 +75,14 @@ export default function ProfessorForm({ professor, setProfessorData, error }) {
 
   return (
     <StyledForm className="space-y-4">
+
+      {!!error && (
+        <>
+          <CustomAlert>
+            <div>Complete todos os campos destacados!</div>
+          </CustomAlert>
+        </>
+      )}
       <CustomInputWithMask
         label="Nome"
         name="name"
@@ -75,7 +90,7 @@ export default function ProfessorForm({ professor, setProfessorData, error }) {
         onChange={handleChange}
         error={error}
         isRequired={true}
-       
+
       />
 
 
@@ -101,6 +116,6 @@ export default function ProfessorForm({ professor, setProfessorData, error }) {
     </StyledForm>
   );
 
-  
+
 }
 

@@ -32,6 +32,7 @@ const DatePickerField = ({
   onChange,
   className = "",
   placeholder = "DD/MM/YYYY",
+  isRequired
 }) => {
   // Força a hora para meio-dia (12:00) para evitar problemas com fuso horário
   const formattedValue = value ? dayjs(value).utc(): null;
@@ -39,13 +40,14 @@ const DatePickerField = ({
 
   return (
     <div className={`flex flex-col ${className}`}>
-      <Label htmlFor={name}>{label}</Label>
+      <Label htmlFor={name}>{label}<span className="text-red-500">{isRequired && " *"}</span></Label>
       <LocalizationProviderStyled dateAdapter={AdapterDayjs}>
         <DateField
           defaultValue={isValidDate ? formattedValue : null} // Só passa uma data válida ou null
           onChange={(date) =>
             onChange(name, date ?? '')
           }
+          
           format="DD/MM/YYYY"
           placeholder={placeholder}
         />

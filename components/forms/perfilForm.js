@@ -44,7 +44,15 @@ const CustomInputWithMask = styled(InputWithMask)`
     }
   `;
 
-  
+  const CustomAlert = styled.div`
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: red;
+  `;
+
+
 export default function UsuarioForm({ setUsuario, usuarios, error }) {
   const handleChange = (name, value) => {
 
@@ -56,6 +64,13 @@ export default function UsuarioForm({ setUsuario, usuarios, error }) {
 
   return (
     <StyledForm>
+      {!!error && (
+        <>
+          <CustomAlert>
+            <div>Complete todos os campos destacados!</div>
+          </CustomAlert>
+        </>
+      )}
       <CustomInputWithMask
         label="Nome"
         defaultValue={usuarios.username ?? ''}

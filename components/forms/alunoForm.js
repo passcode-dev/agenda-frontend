@@ -14,6 +14,16 @@ const AlunoForm = ({ aluno, setAlunoData, error }) => {
 
   return (
     <StyledForm>
+
+      {!!error &&(
+        <>
+          <CustomAlert>
+            <div>Complete todos os campos destacados!</div>
+          </CustomAlert>
+        </>
+      )}
+
+
       <CustomInputWithMask
         label="Nome"
         defaultValue={aluno.name}
@@ -38,8 +48,6 @@ const AlunoForm = ({ aluno, setAlunoData, error }) => {
         name="phone_number"
         onChange={handleChange}
         mask={maskPhone}
-        error={error}
-        isRequired={true}
       />
 
       <CustomInputWithMask
@@ -97,6 +105,14 @@ const StyledForm = styled.form`
   gap: 1.25rem;
   width: 100%;  
   padding: 1.5rem;
+`;
+
+const CustomAlert=styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: red;
 `;
 
 const CustomInputWithMask = styled(InputWithMask)`
