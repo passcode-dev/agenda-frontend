@@ -218,6 +218,7 @@ export default function Alunos() {
   const [novoAluno, setNovoAluno] = useState(null); 
   const [hasNextPage, setHasNextPage] = useState(false);
   const searchParams = useSearchParams();
+  const [error, setError]= useState(false);
   const { toast } = useToast();
 
   const filterSchema = [
@@ -288,6 +289,15 @@ export default function Alunos() {
     
     setAlunos(alunos?.data?.students);
     setLoading(false);
+  };
+
+  const verificaInputs = async (aluno) => {
+    if (!aluno.name || !aluno.cpf || !aluno.birth_date || !aluno.rg || !aluno.phone_number || !aluno.entry_date) {
+      setError(true);
+    } else {
+      setError(false);
+      cadastrarAluno(aluno);
+    }
   };
 
   useEffect(() => {
@@ -442,9 +452,9 @@ export default function Alunos() {
         <>
           <Backdrop onClick={() => setNovoAluno(null)} />
           <GenericModalContent>
-            <AlunoForm aluno={novoAluno} setAlunoData={setNovoAluno} />
+            <AlunoForm aluno={novoAluno} setAlunoData={setNovoAluno} error={error}/>
             <ButtonGroup>
-              <StyledButtonPrimary onClick={() => cadastrarAluno(novoAluno)}>Salvar</StyledButtonPrimary>
+              <StyledButtonPrimary onClick={() => verificaInputs(novoAluno)}>Salvar</StyledButtonPrimary>
               <StyledButtonSecondary onClick={() => setNovoAluno(null)}>Cancelar</StyledButtonSecondary>
             </ButtonGroup>
           </GenericModalContent>

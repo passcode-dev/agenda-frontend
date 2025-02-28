@@ -43,7 +43,7 @@ const CustomInputWithMask = styled(InputWithMask)`
 `;
 
 
-export default function SalaForm({ sala, setSalaData }) {
+export default function SalaForm({ sala, setSalaData, error }) {
   const handleChange = (name, value) => {
     setSalaData((prevState) => ({
       ...prevState,
@@ -60,6 +60,8 @@ export default function SalaForm({ sala, setSalaData }) {
         name="name"
         defaultValue={sala.name}
         onChange={handleChange}
+        error={error}
+        isRequired={true}
       />
     </StyledForm>
   );

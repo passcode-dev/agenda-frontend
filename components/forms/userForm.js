@@ -2,7 +2,7 @@ import React from "react";
 import InputWithMask from "../ui/inputWithMask";
 import styled from "styled-components";
 
-const UserForm = ({ user, setUserData }) => {
+const UserForm = ({ user, setUserData, error }) => {
   const handleChange = (name, value) => {
     setUserData((prevState) => ({
       ...prevState,
@@ -14,23 +14,29 @@ const UserForm = ({ user, setUserData }) => {
     <StyledForm className="space-y-4">
       <CustomInputWithMask
         label="Nome"
-        value={user.username}
+        defaultValue={user.username}
         name="username"
         onChange={handleChange}
+        error={error}
+        isRequired={true}
       />
 
       <CustomInputWithMask
         label="Email"
-        value={user.email}
+        defaultValue={user.email}
         name="email"
         onChange={handleChange}
+        error={error}
+        isRequired={true}
       />
       
       <CustomInputWithMask
         label="Senha"
-        value={user.password || ''}
+        defaultValue={user.password || ''}
         name="password"
         onChange={handleChange}
+        error={error}
+        isRequired={true}
       />
 
 

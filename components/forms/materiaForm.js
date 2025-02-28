@@ -4,7 +4,7 @@ import { useCallback, useEffect } from "react";
 import InputWithMask from "../ui/inputWithMask";
 import styled from "styled-components";
 
-export default function MateriaForm({ materia, setMateriaData }) {
+export default function MateriaForm({ materia, setMateriaData, error }) {
   const handleChange = (name, value) => {
     setMateriaData((prevState) => ({
       ...prevState,
@@ -57,6 +57,8 @@ const CustomInputWithMask = styled(InputWithMask)`
         name="name"
         defaultValue={materia.name}
         onChange={handleChange}
+        error={error}
+        isRequired={true}
       />
     </StyledForm>
   );

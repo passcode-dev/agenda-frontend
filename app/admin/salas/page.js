@@ -115,6 +115,7 @@ export default function Salas() {
   const [hasNextPage, setHasNextPage] = useState(false);
   const searchParams = useSearchParams();
   const currentPage = Number(searchParams.get("page")) || 1;
+  const [error,setError]=useState(false);
   const { toast } = useToast();
 
     const filterSchema = [
@@ -206,6 +207,16 @@ export default function Salas() {
     console.log("salas aqui ",salas.data.classrooms);
     setLoading(false);
   };
+
+
+  const verificaInputs = async (sala) => {
+    if (!sala.name) {
+      setError(true);
+    } else {
+      setError(false);
+      cadastrarSala(sala);
+    }
+  };
   
   useEffect(() => {
     fetchSalas(searchParams.toString());
@@ -255,10 +266,10 @@ export default function Salas() {
       {!!novaSala && (
         <>
           <Backdrop onClick={() => setNovaSala(null)} />
-          <GenericModalContent>
-            <SalaForm sala={novaSala} setSalaData={setNovaSala} />
+          <GenericModalContent> 
+            <SalaForm sala={novaSala} setSalaData={setNovaSala} error={error}/>
             <ButtonGroup>
-              <StyledButtonPrimary onClick={() => cadastrarSala(novaSala)}>
+              <StyledButtonPrimary onClick={() => verificaInputs(novaSala)}>
                 Salvar
               </StyledButtonPrimary>
               <StyledButtonSecondary onClick={() => setNovaSala(null)}>Cancelar</StyledButtonSecondary>

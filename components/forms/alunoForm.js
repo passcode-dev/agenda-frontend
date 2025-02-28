@@ -4,7 +4,7 @@ import styled from "styled-components";
 import InputWithMask from "../ui/inputWithMask";
 import DatePickerField from "../ui/datePickerField";
 
-const AlunoForm = ({ aluno, setAlunoData }) => {
+const AlunoForm = ({ aluno, setAlunoData, error }) => {
   const handleChange = (name, value) => {
     setAlunoData((prevState) => ({
       ...prevState,
@@ -19,6 +19,8 @@ const AlunoForm = ({ aluno, setAlunoData }) => {
         defaultValue={aluno.name}
         name="name"
         onChange={handleChange}
+        error={error}
+        isRequired={true}
       />
       
       <CustomInputWithMask
@@ -26,6 +28,8 @@ const AlunoForm = ({ aluno, setAlunoData }) => {
         defaultValue={aluno.last_name}
         name="last_name"
         onChange={handleChange}
+        error={error}
+        isRequired={true}
       />
 
       <CustomInputWithMask
@@ -34,6 +38,8 @@ const AlunoForm = ({ aluno, setAlunoData }) => {
         name="phone_number"
         onChange={handleChange}
         mask={maskPhone}
+        error={error}
+        isRequired={true}
       />
 
       <CustomInputWithMask
@@ -42,6 +48,8 @@ const AlunoForm = ({ aluno, setAlunoData }) => {
         name="rg"
         onChange={handleChange}
         mask={maskRg}
+        error={error}
+        isRequired={true}
       />
 
       <CustomInputWithMask
@@ -50,6 +58,8 @@ const AlunoForm = ({ aluno, setAlunoData }) => {
         name="cpf"
         onChange={handleChange}
         mask={maskCpf}
+        error={error}
+        isRequired={true}
       />
 
       <CustomDatePicker
@@ -57,6 +67,8 @@ const AlunoForm = ({ aluno, setAlunoData }) => {
         value={aluno.birth_date ?? ''}
         name="birth_date"
         onChange={handleChange}
+        error={error}
+        isRequired={true}
       />
 
       <CustomDatePicker
@@ -64,6 +76,8 @@ const AlunoForm = ({ aluno, setAlunoData }) => {
         value={aluno.entry_date ?? ''}
         name="entry_date"
         onChange={handleChange}
+        error={error}
+        isRequired={true}
       />
 
       <CustomDatePicker
@@ -71,6 +85,7 @@ const AlunoForm = ({ aluno, setAlunoData }) => {
         value={aluno.exit_date ?? ''}
         name="exit_date"
         onChange={handleChange}
+        
       />
     </StyledForm>
   );

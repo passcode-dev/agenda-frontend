@@ -116,7 +116,7 @@ export default function Admin() {
                 {/* Gráfico de Barras */}
                 <StyledProCard title="Aulas Mensais Realizadas">
                     <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={teacher.sort((a, b) => a.completed_classes - b.completed_classes)}>
+                        <BarChart data={teacher?.sort((a, b) => a.completed_classes - b.completed_classes)}>
                             <XAxis dataKey="teacher_name" stroke="#4CAF50" />
                             <YAxis />
                             <Tooltip />

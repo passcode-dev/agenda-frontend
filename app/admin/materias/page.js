@@ -114,6 +114,7 @@ export default function Materias() {
   const [editMateria, setEditMateria] = useState(null);
   const [novaMateria, setNovaMateria] = useState(null);
   const [hasNextPage, setHasNextPage] = useState(false);
+  const [error, setError] = useState(false);	  
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -228,6 +229,16 @@ export default function Materias() {
     }
   };
 
+
+  const verificaInputs = async (materia) => {
+    if (!materia.name) {
+      setError(true);
+    } else {
+      setError(false);
+      cadastrarMateria(materia);
+    }
+  };
+
   return (
     <>
       {!!novaMateria && (
@@ -237,9 +248,10 @@ export default function Materias() {
             <MateriaForm
               materia={novaMateria}
               setMateriaData={setNovaMateria}
+              error={error}
             />
             <ButtonGroup>
-              <StyledButtonPrimary onClick={() => fetchNovaMateria(novaMateria)}>
+              <StyledButtonPrimary onClick={() => verificaInputs(novaMateria)}>
                 Salvar{" "}
               </StyledButtonPrimary>
               <StyledButtonSecondary onClick={() => setNovaMateria(null)}>Cancelar</StyledButtonSecondary>

@@ -123,6 +123,7 @@ export default function Usuarios() {
     const [confirmCallback, setConfirmCallback] = useState(false);
     const { user } = useContext(UserContext);
     const [hasNextPage, setHasNextPage] = useState(false);
+    const [error, setError] = useState(false);
     const { toast } = useToast();
     const filterSchema = [
         { name: "Usuário", parameterName: "username", icon: <User className="text-black" /> },
@@ -251,6 +252,15 @@ export default function Usuarios() {
           });
         }
       };
+      const verificaInputs = async (usuario) => {
+        if (!usuario.name || !usuario.email || !usuario.password) {
+          setError(true);
+        } else {
+          setError(false);
+          cadastrarUsuario(usuario);
+        }
+      };
+      
 
     return (
         <div className="container max-w-4xl mx-auto p-6">
@@ -316,9 +326,9 @@ export default function Usuarios() {
                 <>
                     <Backdrop onClick={() => setNovoUser(null)} />
                     <GenericModalContent>
-                        <UserForm user={novoUser} setUserData={setNovoUser} />
+                        <UserForm user={novoUser} setUserData={setNovoUser} error={error}/>
                         <ButtonGroup>
-                            <StyledButtonPrimary onClick={() => cadastrarUsuario(novoUser)}>Salvar</StyledButtonPrimary>
+                            <StyledButtonPrimary onClick={() => verificaInputs(novoUser)}>Salvar</StyledButtonPrimary>
                             <StyledButtonSecondary onClick={() => setNovoUser(null)}>Cancelar</StyledButtonSecondary>
                         </ButtonGroup>
                     </GenericModalContent>

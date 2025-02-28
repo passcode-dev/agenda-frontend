@@ -114,6 +114,7 @@ export default function Professores() {
   const [novoProfessor, setNovoProfessor] = useState(null);
   const [hasNextPage, setHasNextPage] = useState(false);
   const searchParams = useSearchParams();
+  const [error, setError]=useState(false);
   const { toast } = useToast();
 
   const filterSchema = [
@@ -190,6 +191,19 @@ export default function Professores() {
       });
     }
   };
+
+
+  const verificaInputs = async (professor) => {
+    if (!professor.name || !professor.cpf || !professor.birth_date) {
+      setError(true);
+    } else {
+      setError(false);
+      cadastrarProfessor(professor);
+    }
+  };
+  
+
+
   const deletarProfessor = async (id, e) => {
     setShowDialog(true);
     e.stopPropagation();
@@ -251,9 +265,10 @@ export default function Professores() {
             <ProfessorForm
               professor={novoProfessor}
               setProfessorData={setNovoProfessor}
+              error={error}
             />
             <ButtonGroup>
-              <StyledButtonPrimary onClick={() => cadastrarProfessor(novoProfessor)}>
+              <StyledButtonPrimary onClick={() => verificaInputs(novoProfessor)}>
                 Salvar
               </StyledButtonPrimary>
               <StyledButtonSecondary onClick={() => setNovoProfessor(null)}>Cancelar</StyledButtonSecondary>
@@ -261,6 +276,7 @@ export default function Professores() {
           </GenericModalContent>
         </>
       )}
+
       {!!editProfessor && (
         <>
           <Backdrop onClick={() => setEditProfessor(false)} />

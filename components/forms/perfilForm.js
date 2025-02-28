@@ -45,7 +45,7 @@ const CustomInputWithMask = styled(InputWithMask)`
   `;
 
   
-export default function UsuarioForm({ setUsuario, usuarios }) {
+export default function UsuarioForm({ setUsuario, usuarios, error }) {
   const handleChange = (name, value) => {
 
     setUsuario((prevState) => ({
@@ -61,6 +61,8 @@ export default function UsuarioForm({ setUsuario, usuarios }) {
         defaultValue={usuarios.username ?? ''}
         name="username"
         onChange={handleChange}
+        error={error}
+        isRequired={true}
       />
 
       <CustomInputWithMask
@@ -68,12 +70,16 @@ export default function UsuarioForm({ setUsuario, usuarios }) {
         defaultValue={usuarios.email ?? ''}
         name="email"
         onChange={handleChange}
+        error={error}
+        isRequired={true}
       />
 
       <InputPassword
         label="Senha"
         onChange={handleChange}
         defaultValue={usuarios.password ?? ''}
+        error={error}
+        isRequired={true}
       />
     </StyledForm>
   );

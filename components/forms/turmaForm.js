@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import InputWithMask from "../ui/inputWithMask";
 import SelectAutoComplete from "../ui/selectAutoComplete";
 
-export default function TurmaForm({ turma, setTurma }) {
+export default function TurmaForm({ turma, setTurma, error }) {
 
   const handleChange = (name, value) => {
     setTurma((prevState) => ({
@@ -22,6 +22,8 @@ export default function TurmaForm({ turma, setTurma }) {
         name="name"
         defaultValue={turma.name}
         onChange={handleChange}
+        error={error}
+        isRequired={true}
       />
 
       <SelectAutoComplete

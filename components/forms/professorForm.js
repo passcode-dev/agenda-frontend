@@ -15,15 +15,15 @@ padding: 1.5rem;
 
 
 const CustomDatePicker = styled(DatePickerField)`
+
   .MuiOutlinedInput-root {
     height: 40px;
-    border: 1px solid #e5e5e5; 
+    border: 1px solid #ccc; 
     padding: 0;
 
     &.Mui-focused {
       box-shadow: none;
       border-color: initial;
-      border: 1px solid black;
     }
 
   }
@@ -35,38 +35,36 @@ const CustomDatePicker = styled(DatePickerField)`
 
 
 const CustomInputWithMask = styled(InputWithMask)`
-margin-bottom: 16px;
-
-label {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #555;
-  margin-bottom: 8px;
-}
-
-input {
-  width: 100%;  
-  padding: 12px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  font-size: 1rem;
-  outline: none;
-
-  &::placeholder {
-    color: #aaa;
+ 
+  label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 8px;
   }
-}
+
+  input {
+    width: 100%;  
+    padding: 12px;
+    border-radius: 4px;
+    border: 1px solid ${({ error }) => (error ? "red" : "#ccc")};
+    font-size: 1rem;
+    outline: none;
+  
+
+    &::placeholder {
+      color: #aaa;
+    }
+  }
 `;
 
-export default function ProfessorForm({ professor, setProfessorData }) {
 
-  const handleChange = (name, value) => {
-    setProfessorData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+export default function ProfessorForm({ professor, setProfessorData, error }) {
+
+
+  const handleChange = (nome, value) => {
+    setProfessorData({ ...professor, [nome]: value })
   };
-
 
   return (
     <StyledForm className="space-y-4">
@@ -75,7 +73,11 @@ export default function ProfessorForm({ professor, setProfessorData }) {
         name="name"
         defaultValue={professor.name}
         onChange={handleChange}
+        error={error}
+        isRequired={true}
+       
       />
+
 
       <CustomInputWithMask
         label="CPF"
@@ -83,6 +85,8 @@ export default function ProfessorForm({ professor, setProfessorData }) {
         name="cpf"
         onChange={handleChange}
         mask={maskCpf}
+        error={error}
+        isRequired={true}
       />
 
       <CustomDatePicker
@@ -90,8 +94,13 @@ export default function ProfessorForm({ professor, setProfessorData }) {
         value={professor.BirthDate}
         name="birth_date"
         onChange={handleChange}
+        error={error}
+        isRequired={true}
       />
 
     </StyledForm>
   );
+
+  
 }
+

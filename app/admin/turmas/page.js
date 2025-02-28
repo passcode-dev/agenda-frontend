@@ -142,6 +142,7 @@ export default function Turmas() {
   const [hasNextPage, setHasNextPage] = useState(false);
   const searchParams = useSearchParams();
   const [selectedLine, setSelectedLine] = useState();
+  const [error, setError] = useState(false);
   const { toast } = useToast();
 
   const filterSchema = [
@@ -256,6 +257,16 @@ export default function Turmas() {
     }
   };
 
+  const verificaInputs = async (turma) => {
+    if (!turma.name) {
+      setError(true);
+    } else {
+      setError(false);
+      cadastrarTurma(turma);
+    }
+  };
+  
+
   return (
     <>
       {!!selectedLine && (
@@ -286,11 +297,12 @@ export default function Turmas() {
           </GenericModalContent>
         </>
       )}
+      
       {!!editTurma && (
         <>
           <Backdrop onClick={() => setEditTurma(false)} />
           <GenericModalContent>
-            <TurmaForm turma={editTurma} setTurma={setEditTurma} />
+            <TurmaForm turma={editTurma} setTurma={setEditTurma} error={error}/>
             <ButtonGroup>
               <StyledButtonPrimary onClick={() => fetchEditarTurma(editTurma)}>
                 Salvar{" "}
@@ -304,9 +316,9 @@ export default function Turmas() {
         <>
           <Backdrop onClick={() => setNovaTurma(false)} />
           <GenericModalContent>
-            <TurmaForm turma={novaTurma} setTurma={setNovaTurma} />
+            <TurmaForm turma={novaTurma} setTurma={setNovaTurma} error={error} />
             <ButtonGroup>
-              <StyledButtonPrimary onClick={() => cadastrarTurma(novaTurma)}>
+              <StyledButtonPrimary onClick={() => verificaInputs(novaTurma)}>
                 Salvar{" "}
               </StyledButtonPrimary>
               <StyledButtonSecondary onClick={() => setNovaTurma(null)}>Cancelar</StyledButtonSecondary>
