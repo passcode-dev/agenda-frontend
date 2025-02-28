@@ -32,7 +32,8 @@ const DatePickerField = ({
   onChange,
   className = "",
   placeholder = "DD/MM/YYYY",
-  isRequired
+  isRequired, 
+  error
 }) => {
   // Força a hora para meio-dia (12:00) para evitar problemas com fuso horário
   const formattedValue = value ? dayjs(value).utc(): null;
@@ -47,7 +48,11 @@ const DatePickerField = ({
           onChange={(date) =>
             onChange(name, date ?? '')
           }
-          
+          sx={{
+            '.MuiOutlinedInput-root': {
+              borderColor: error && isRequired && !value ? 'red' : '#ccc', // Aqui você aplica a borda condicional
+            },
+          }}
           format="DD/MM/YYYY"
           placeholder={placeholder}
         />

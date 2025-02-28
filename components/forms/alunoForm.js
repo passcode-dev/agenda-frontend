@@ -146,6 +146,7 @@ const CustomInputWithMask = styled(InputWithMask)`
 `;
 
 const CustomDatePicker = styled(DatePickerField)`
+  
   .MuiOutlinedInput-root {
     height: 40px;
     border: 1px solid #e5e5e5; 
@@ -157,7 +158,6 @@ const CustomDatePicker = styled(DatePickerField)`
       border-color: initial;
       border: 1px solid black;
     }
-
   }
 
   .MuiOutlinedInput-notchedOutline {
