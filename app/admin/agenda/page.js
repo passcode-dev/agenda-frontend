@@ -4,39 +4,58 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import ModalAgendamento from "@/components/Modal/ModalAgendamento";
+import AgendaService from "@/lib/service/agendaService";
 
-// Mock de eventos
-const mockEvents = {
-  "2025-02-05T06:00": {
-    turmaAluno: "Turma A",
-    curso: "Matemática",
-    professor: "",
-    inicio: "06:00",
-    fim: "09:00",
-    reposicao: false,
-    recorrente: false,
-    days: [],
-  },
-  "2025-02-05T10:00": {
-    turmaAluno: "Turma B",
-    curso: "História",
-    professor: "",
-    inicio: "10:30",
-    fim: "11:30",
-    reposicao: true,
-    recorrente: false,
-    days: [],
-  },
-  "2025-03-08T14:00": {
-    turmaAluno: "Turma C",
-    curso: "Química",
-    professor: "",
-    inicio: "14:00",
-    fim: "15:00",
-    reposicao: false,
-    recorrente: false,
-    days: [],
-  },
+// Função auxiliar para renderizar os detalhes do evento de forma organizada e estilizada
+// Função auxiliar para renderizar os detalhes do evento de forma organizada e estilizada
+const renderEventDetails = (entry, startStr, endStr) => {
+  return (
+    <div className="text-white text-xs leading-tight">
+      <div>
+        <span className="font-bold">Sala: </span>
+        {entry.classroom && entry.classroom.name}
+      </div>
+      <div>
+        <span className="font-bold">Professor: </span>
+        {entry.teacher && entry.teacher.name}
+      </div>
+      <div>
+        <span className="font-bold">
+          {entry.student
+            ? "Aluno: "
+            : entry.class && entry.class.id !== 0
+            ? "Turma: "
+            : ""}
+        </span>
+        {entry.student
+          ? `${entry.student.name} ${entry.student.last_name}`
+          : entry.class && entry.class.id !== 0
+          ? entry.class.name
+          : ""}
+      </div>
+      <div>
+        <span className="font-bold">Matéria: </span>
+        {entry.subject && entry.subject.name}
+      </div>
+      <div>
+        <span className="font-bold">Curso: </span>
+        {entry.course && entry.course.name}
+      </div>
+      {entry.is_makeup_class && (
+        <div className="font-bold">Aula de Reposição</div>
+      )}
+      {entry.notes && <div className="italic">Obs: {entry.notes}</div>}
+    </div>
+  );
+};
+
+// Função para definir a classe do balão com base no tipo de evento,
+// removendo os efeitos de hover e utilizando a cor forte por padrão
+const getBalloonClass = (entry, defaultClass) => {
+  if (entry.is_makeup_class) {
+    return "bg-gradient-to-r from-pink-500 to-red-500 shadow-lg";
+  }
+  return defaultClass;
 };
 
 export default function Agenda() {
@@ -53,85 +72,120 @@ export default function Agenda() {
     reposicao: false,
     recorrente: false,
     days: [],
+    notes: "",
   });
+  // "events" será um objeto com chave slotKey e valor um array de diary entries
   const [events, setEvents] = useState({});
-
-  // Estado para definir o tipo: "aluno" ou "turma"
   const [selectedType, setSelectedType] = useState("aluno");
+  const [classrooms, setClassrooms] = useState([]);
+  const [selectedClassroom, setSelectedClassroom] = useState(null);
+  const [refreshDiary, setRefreshDiary] = useState(false);
 
+  // Busca das salas via AgendaService
   useEffect(() => {
-    const { startOfWeek, endOfWeek } = getWeekRange();
-
-    const fetchData = () => {
-      const eventsFromApi = Object.keys(mockEvents).reduce((acc, key) => {
-        const eventDate = new Date(key);
-        if (eventDate >= startOfWeek && eventDate <= endOfWeek) {
-          acc[key] = mockEvents[key];
+    const fetchClassrooms = async () => {
+      try {
+        const agendaService = new AgendaService();
+        const rooms = await agendaService.getClassroom();
+        if (rooms && rooms.length > 0) {
+          setClassrooms(rooms);
+          setSelectedClassroom(rooms[0]);
+        } else {
+          setClassrooms([]);
+          setSelectedClassroom(null);
         }
-        return acc;
-      }, {});
-
-      setEvents(eventsFromApi);
+      } catch (error) {
+        console.error("Erro na requisição de salas:", error);
+      }
     };
+    fetchClassrooms();
+  }, []);
 
-    fetchData();
-  }, [date]);
+  // Atualiza o classroom_id em eventDetails com base no selectedClassroom
+  useEffect(() => {
+    if (selectedClassroom && selectedClassroom.id) {
+      setEventDetails((prev) => ({ ...prev, classroom_id: selectedClassroom.id }));
+    }
+  }, [selectedClassroom, setEventDetails]);
 
   const getWeekRange = () => {
     const startOfWeek = new Date(date);
     startOfWeek.setDate(date.getDate() - date.getDay());
     startOfWeek.setHours(0, 0, 0, 0);
-
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 6);
     endOfWeek.setHours(23, 59, 59, 999);
-
     return { startOfWeek, endOfWeek };
   };
 
-  const filteredEvents = Object.keys(events).reduce((acc, key) => {
-    const eventDate = new Date(key);
+  // Busca os registros de diário conforme a semana e a sala selecionada
+  useEffect(() => {
     const { startOfWeek, endOfWeek } = getWeekRange();
-    if (eventDate >= startOfWeek && eventDate <= endOfWeek) {
-      acc[key] = events[key];
-    }
-    return acc;
-  }, {});
+    const fetchDiary = async () => {
+      try {
+        const agendaService = new AgendaService();
+        const jsonData = await agendaService.getDiary(
+          startOfWeek.toISOString(),
+          endOfWeek.toISOString(),
+          selectedClassroom.id
+        );
+        if (jsonData.status === "success") {
+          const diaryEntries = jsonData.data;
+          const diaryEventsBySlot = diaryEntries.reduce((acc, entry) => {
+            if (!entry.is_recurring && entry.start_time) {
+              const dt = new Date(entry.start_time);
+              const dayKey = dt.toISOString().split("T")[0];
+              const hour = dt.getHours();
+              const slotKey = `${dayKey}T${String(hour).padStart(2, "0")}:00`;
+              if (!acc[slotKey]) acc[slotKey] = [];
+              acc[slotKey].push(entry);
+            } else if (entry.is_recurring && entry.recurrence_pattern) {
+              const [dayCode, timeRange] = entry.recurrence_pattern.split("@");
+              const startTime = timeRange.split("-")[0];
+              const dayIndexMap = { MON: 1, TUE: 2, WED: 3, THU: 4, FRI: 5, SAT: 6, SUN: 0 };
+              const dayIndex = dayIndexMap[dayCode] ?? 0;
+              const recurrenceDate = new Date(startOfWeek);
+              recurrenceDate.setDate(startOfWeek.getDate() + ((dayIndex - startOfWeek.getDay() + 7) % 7));
+              const dayKey = recurrenceDate.toISOString().split("T")[0];
+              if (entry.start_time) {
+                const recurringStartDate = new Date(entry.start_time).toISOString().split("T")[0];
+                if (dayKey < recurringStartDate) {
+                  return acc;
+                }
+              }
+              const slotKey = `${dayKey}T${startTime}:00`.slice(0, 16);
+              if (!acc[slotKey]) acc[slotKey] = [];
+              acc[slotKey].push(entry);
+            }
+            return acc;
+          }, {});
+          setEvents(diaryEventsBySlot);
+        } else {
+          console.error("Erro ao buscar diary:", jsonData.message);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar diary:", error);
+      }
+    };
 
-  const handleSaveEvent = () => {
-    if (
-      !eventDetails.turmaAluno ||
-      !eventDetails.curso ||
-      !eventDetails.inicio ||
-      !eventDetails.fim
-    ) {
-      toast({
-        title: "Erro",
-        description: "Preencha todos os campos!",
-        variant: "destructive",
-        autoClose: 3000,
-      });
-      return;
-    }
+    fetchDiary();
+  }, [date, refreshDiary, selectedClassroom]);
 
-    setEvents({ ...events, [selectedSlot]: eventDetails });
-    setIsModalOpen(false);
-    setEventDetails({
-      turmaAluno: "",
-      curso: "",
-      professor: "",
-      inicio: "",
-      fim: "",
-      reposicao: false,
-      recorrente: false,
-      days: [],
-    });
-    toast({
-      title: "Sucesso",
-      description: "Evento agendado com sucesso!",
-      variant: "success",
-      autoClose: 3000,
-    });
+  const filteredEvents = events;
+
+  const calculateEventHeight = (startTime, endTime) => {
+    const [startHour, startMin] = startTime.split(":").map(Number);
+    const [endHour, endMin] = endTime.split(":").map(Number);
+    const startInMinutes = startHour * 60 + startMin;
+    const endInMinutes = endHour * 60 + endMin;
+    const durationInMinutes = endInMinutes - startInMinutes;
+    return (durationInMinutes / 1440) * 24 * 64;
+  };
+
+  const calculateEventTopPosition = (startTime) => {
+    const [hour, min] = startTime.split(":").map(Number);
+    const startInMinutes = hour * 60 + min;
+    return (startInMinutes / 1440) * 24 * 64 + 64;
   };
 
   const renderWeek = () => {
@@ -143,26 +197,6 @@ export default function Agenda() {
     });
   };
 
-  const calculateEventHeight = (startTime, endTime) => {
-    const startInMinutes =
-      parseInt(startTime.split(":")[0]) * 60 + parseInt(startTime.split(":")[1]);
-    const endInMinutes =
-      parseInt(endTime.split(":")[0]) * 60 + parseInt(endTime.split(":")[1]);
-
-    const durationInMinutes = endInMinutes - startInMinutes;
-    const height = (durationInMinutes / 1440) * 24 * 64;
-
-    return height;
-  };
-
-  const calculateEventTopPosition = (startTime) => {
-    const startInMinutes =
-      parseInt(startTime.split(":")[0]) * 60 + parseInt(startTime.split(":")[1]);
-    const top = (startInMinutes / 1440) * 24 * 64 + 64;
-    return top;
-  };
-
-  // Função para alternar a seleção dos dias da semana
   const handleToggleDay = (day) => {
     let days = eventDetails.days || [];
     if (days.includes(day)) {
@@ -173,23 +207,87 @@ export default function Agenda() {
     setEventDetails({ ...eventDetails, days });
   };
 
+  // Quando clicar num evento, transforma o registro para o formato esperado no modal
+  const handleEventClick = (slotKey, entry) => {
+    const dtStart = entry.start_time ? new Date(entry.start_time) : null;
+    const dtEnd = entry.end_time ? new Date(entry.end_time) : null;
+    const transformed = {
+      id: entry.id,
+      classroom_id: entry.classroom_id,
+      turmaAluno: entry.student
+        ? `${entry.student.name} ${entry.student.last_name}`
+        : entry.class
+        ? entry.class.name
+        : "",
+      curso: entry.course ? entry.course.name : "",
+      professor: entry.teacher ? entry.teacher.name : "",
+      inicio: dtStart
+        ? `${String(dtStart.getHours()).padStart(2, "0")}:${String(
+            dtStart.getMinutes()
+          ).padStart(2, "0")}`
+        : entry.recurrence_pattern
+        ? entry.recurrence_pattern.split("@")[1].split("-")[0]
+        : "",
+      fim: dtEnd
+        ? `${String(dtEnd.getHours()).padStart(2, "0")}:${String(
+            dtEnd.getMinutes()
+          ).padStart(2, "0")}`
+        : entry.recurrence_pattern
+        ? entry.recurrence_pattern.split("@")[1].split("-")[1]
+        : "",
+      reposicao: entry.is_makeup_class,
+      recorrente: entry.is_recurring,
+      days: [],
+      notes: entry.notes || "",
+      selectedItems: entry.student
+        ? [{ ...entry.student, label: `${entry.student.name} ${entry.student.last_name}` }]
+        : entry.class
+        ? [{ ...entry.class, label: entry.class.name }]
+        : [],
+      selectedTeacher: entry.teacher ? { ...entry.teacher, label: entry.teacher.name } : null,
+      selectedCourse: entry.course ? { ...entry.course, label: entry.course.name } : null,
+      selectedSubject: entry.subject ? { ...entry.subject, label: entry.subject.name } : null,
+      date: entry.start_time ? entry.start_time.split("T")[0] : "",
+    };
+    setSelectedSlot(slotKey);
+    setEventDetails(transformed);
+    setIsModalOpen(true);
+  };
+
+  // Callback para forçar refresh do diary após salvar/alterar
+  const onDiaryUpdatedCallback = () => {
+    setRefreshDiary((prev) => !prev);
+  };
+
   return (
-    <div className="flex flex-col items-center p-6 bg-white shadow-lg rounded-xl w-full transition-all duration-300">
+    <div className="flex flex-col items-center p-6 bg-white shadow-lg rounded-xl w-full transition-all duration-300 relative">
+      {/* Select de Salas */}
+      <div className="absolute top-4 right-4">
+        <select
+          value={selectedClassroom ? selectedClassroom.id : ""}
+          onChange={(e) => {
+            const selected = classrooms.find((c) => c.id === parseInt(e.target.value));
+            setSelectedClassroom(selected);
+          }}
+          className="p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+        >
+          {classrooms.map((classroom) => (
+            <option key={classroom.id} value={classroom.id}>
+              {classroom.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {/* Calendário */}
       <div className="flex w-full border-gray-300">
         <div className="flex flex-col mt-32 border-gray-300">
-          {Array.from({ length: 24 }, (_, i) =>
-            `${String(i).padStart(2, "0")}:00`
-          ).map((hour, index) => (
-            <div
-              key={index}
-              className="flex items-start justify-center h-16 w-20 text-sm text-gray-500"
-            >
+          {Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, "0")}:00`).map((hour, index) => (
+            <div key={index} className="flex items-start justify-center h-16 w-20 text-sm text-gray-500">
               {hour}
             </div>
           ))}
         </div>
-
         <div className="w-full">
           <div className="flex items-center justify-center w-full mb-4 px-4 transition-transform duration-500">
             <button
@@ -210,24 +308,20 @@ export default function Agenda() {
           </div>
           <div className="grid grid-cols-7 border-t border-r flex-grow relative">
             {renderWeek().map((currentDate, dayIndex) => {
-              const isToday = currentDate.toDateString() === new Date().toDateString();
               const dayKey = currentDate.toISOString().split("T")[0];
-
               return (
                 <div key={dayIndex} className="border-l border-gray-300 relative">
                   <div
                     className={`p-2 text-center font-semibold ${
-                      isToday ? "bg-blue-500 text-white" : "bg-gray-100"
+                      currentDate.toDateString() === new Date().toDateString()
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-100"
                     } transition-colors duration-300 sticky top-0 z-10 border-b border-gray-300`}
                   >
-                    {"Dom Seg Ter Qua Qui Sex Sáb".split(" ")[currentDate.getDay()]}{" "}
-                    <br />
-                    {currentDate.getDate()}
+                    {"Dom Seg Ter Qua Qui Sex Sáb".split(" ")[currentDate.getDay()]} <br /> {currentDate.getDate()}
                   </div>
-
                   {Array.from({ length: 24 }, (_, hourIndex) => {
                     const slotKey = `${dayKey}T${String(hourIndex).padStart(2, "0")}:00`;
-
                     return (
                       <div key={hourIndex} className="transition-all duration-300">
                         <button
@@ -242,36 +336,62 @@ export default function Agenda() {
                               reposicao: false,
                               recorrente: false,
                               days: [],
+                              notes: "",
+                              date: dayKey,
                             });
                             setIsModalOpen(true);
                           }}
                           className="h-16 w-full border-t border-gray-300 flex justify-center items-center transition relative hover:bg-gray-200"
                         ></button>
-
-                        {filteredEvents[slotKey] && (
-                          <div
-                            onClick={() => {
-                              setSelectedSlot(slotKey);
-                              setEventDetails(filteredEvents[slotKey]);
-                              setIsModalOpen(true);
-                            }}
-                            className="absolute w-11/12 ml-1 bg-blue-200 p-1 rounded-md text-xs cursor-pointer transition-all duration-200 hover:bg-blue-300"
-                            style={{
-                              top: `${calculateEventTopPosition(
-                                filteredEvents[slotKey].inicio
-                              )}px`,
-                              height: `${calculateEventHeight(
-                                filteredEvents[slotKey].inicio,
-                                filteredEvents[slotKey].fim
-                              )}px`,
-                              zIndex: 1,
-                            }}
-                          >
-                            <span className="text-white font-bold text-sm">
-                              {filteredEvents[slotKey].turmaAluno} - {filteredEvents[slotKey].curso}
-                            </span>
-                          </div>
-                        )}
+                          
+                          {filteredEvents[slotKey] &&
+                            filteredEvents[slotKey].map((entry) => {
+                              if (!entry.is_recurring && entry.start_time && entry.end_time) {
+                                const dtStart = new Date(entry.start_time);
+                                const dtEnd = new Date(entry.end_time);
+                                const startStr = `${String(dtStart.getHours()).padStart(2, "0")}:${String(
+                                  dtStart.getMinutes()
+                                ).padStart(2, "0")}`;
+                                const endStr = `${String(dtEnd.getHours()).padStart(2, "0")}:${String(
+                                  dtEnd.getMinutes()
+                                ).padStart(2, "0")}`;
+                                const balloonClass = getBalloonClass(entry, "bg-gradient-to-r from-indigo-500 to-blue-500 shadow-lg");
+                                return (
+                                  <div
+                                    key={entry.id}
+                                    onClick={() => handleEventClick(slotKey, entry)}
+                                    className={`absolute w-11/12 ml-1 ${balloonClass} p-2 rounded-md text-xs cursor-pointer transition-all duration-200`}
+                                    style={{
+                                      top: `${calculateEventTopPosition(startStr)}px`,
+                                      height: `${calculateEventHeight(startStr, endStr)}px`,
+                                      zIndex: 1,
+                                    }}
+                                  >
+                                    {renderEventDetails(entry, startStr, endStr)}
+                                  </div>
+                                );
+                              }
+                              if (entry.is_recurring && entry.recurrence_pattern) {
+                                const [dayCode, timeRange] = entry.recurrence_pattern.split("@");
+                                const [startStr, endStr] = timeRange.split("-");
+                                const balloonClass = getBalloonClass(entry, "bg-gradient-to-r from-green-500 to-teal-500 shadow-lg");
+                                return (
+                                  <div
+                                    key={entry.id}
+                                    onClick={() => handleEventClick(slotKey, entry)}
+                                    className={`absolute w-11/12 ml-1 ${balloonClass} p-2 rounded-md text-xs cursor-pointer transition-all duration-200`}
+                                    style={{
+                                      top: `${calculateEventTopPosition(startStr)}px`,
+                                      height: `${calculateEventHeight(startStr, endStr)}px`,
+                                      zIndex: 1,
+                                    }}
+                                  >
+                                    {renderEventDetails(entry, startStr, endStr)}
+                                  </div>
+                                );
+                              }
+                              return null;
+                            })}
                       </div>
                     );
                   })}
@@ -282,7 +402,7 @@ export default function Agenda() {
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Modal de Agendamento */}
       <ModalAgendamento
         isModalOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -290,8 +410,9 @@ export default function Agenda() {
         setSelectedType={setSelectedType}
         eventDetails={eventDetails}
         setEventDetails={setEventDetails}
-        handleSaveEvent={handleSaveEvent}
         handleToggleDay={handleToggleDay}
+        selectedClassroom={selectedClassroom}
+        onDiaryUpdated={() => setRefreshDiary((prev) => !prev)}
       />
     </div>
   );
