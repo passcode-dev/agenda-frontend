@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { X } from "lucide-react"; // Ícone de fechar
 import AgendaService from "@/lib/service/agendaService";
 import { useToast } from "@/hooks/use-toast";
 
@@ -36,7 +37,7 @@ export default function ModalAgendamento({
     }
   }, [selectedClassroom, setEventDetails]);
 
-  // Funções de busca
+  // Função de busca para Aluno/Turma
   const handleSearchName = async (nome) => {
     if (nome.length < 2) {
       setSearchResults([]);
@@ -65,6 +66,7 @@ export default function ModalAgendamento({
     }
   };
 
+  // Função de busca para Professor
   const handleSearchTeacher = async (nome) => {
     if (nome.length < 2) {
       setTeacherSearchResults([]);
@@ -84,6 +86,7 @@ export default function ModalAgendamento({
     }
   };
 
+  // Função de busca para Matéria
   const handleSearchSubject = async (nome) => {
     if (nome.length < 2) {
       setSubjectsSearchResults([]);
@@ -103,6 +106,7 @@ export default function ModalAgendamento({
     }
   };
 
+  // Função de busca para Curso
   const handleSearchCourse = async (nome) => {
     if (nome.length < 2) {
       setCoursesSearchResults([]);
@@ -216,12 +220,10 @@ export default function ModalAgendamento({
           : null;
     }
 
-    // Se for recorrente
     if (eventDetails.recorrente) {
       payloadBase.is_recurring = true;
-      // Se houver mais de um dia selecionado e for criação de novo registro,
-      // enviamos uma requisição para cada dia selecionado.
-      if (!eventDetails.id && eventDetails.days && eventDetails.days.length > 0) {
+      // Se houver mais de um dia selecionado e for criação de novo registro, envia uma requisição para cada dia
+      if (!eventDetails.id && eventDetails.days && eventDetails.days.length > 1) {
         const promises = eventDetails.days.map((day) => {
           const dayFormatted = dayMap[day.toLowerCase()] || "";
           const payload = {
@@ -234,7 +236,6 @@ export default function ModalAgendamento({
         const responses = await Promise.all(promises);
         return responses;
       } else {
-        // Em modo de edição (ou se só houver um dia), usamos apenas o primeiro dia selecionado
         const selectedDay = eventDetails.days && eventDetails.days.length > 0 
           ? eventDetails.days[0].toLowerCase() 
           : "";
@@ -260,14 +261,12 @@ export default function ModalAgendamento({
     if (eventDetails.id) {
       data = await agendaService.putDiary(eventDetails.id, payloadBase);
     } else if (!eventDetails.recorrente || (eventDetails.recorrente && eventDetails.days.length === 1)) {
-      // Caso não seja recorrente ou seja recorrente com somente um dia selecionado
       data = await agendaService.postDiary(payloadBase);
     }
     console.log("Resposta recebida da API /diary:", data);
     return data;
   };
 
-  // Função de validação e submissão, chamando onDiaryUpdated após sucesso
   const validateAndSaveEvent = async () => {
     if (!eventDetails.selectedItems || eventDetails.selectedItems.length === 0) {
       toast({
@@ -335,7 +334,6 @@ export default function ModalAgendamento({
 
     try {
       await handleSubmitDiary();
-      // Reseta os dados do modal
       setEventDetails({
         turmaAluno: "",
         curso: "",
@@ -381,45 +379,23 @@ export default function ModalAgendamento({
       onClick={onClose}
     >
       <div
-        className="bg-white p-8 rounded-lg w-3/4 max-w-4xl shadow-lg"
+        className="bg-white p-8 rounded-lg w-3/4 max-w-4xl shadow-lg relative"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Botão de fechar */}
+        <button
+          className="absolute top-4 right-4 p-2 rounded-full text-gray-500 hover:text-gray-700 transition"
+          onClick={onClose}
+        >
+          <X size={24} />
+        </button>
         <h2 className="text-2xl font-bold mb-6 text-center">Novo Agendamento</h2>
+
+        {/* Organização dos inputs em duas colunas */}
         <div className="grid grid-cols-2 gap-4">
-          {/* Campo de Data */}
-          <div className="col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Data do Agendamento
-            </label>
-            <input
-              type="date"
-              value={eventDetails.date || ""}
-              onChange={(e) =>
-                setEventDetails({ ...eventDetails, date: e.target.value })
-              }
-              className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          {/* Campo de Observações */}
-          <div className="col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Observações
-            </label>
-            <textarea
-              placeholder="Digite suas observações..."
-              value={eventDetails.notes || ""}
-              onChange={(e) =>
-                setEventDetails({ ...eventDetails, notes: e.target.value })
-              }
-              className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              rows={3}
-            />
-          </div>
-          {/* Tipo de Usuário */}
+          {/* Checkbox de Tipo de Usuário */}
           <div className="col-span-2">
-            <p className="text-sm font-medium text-gray-700 mb-1">
-              Tipo de Usuário:
-            </p>
+            <p className="text-sm font-medium text-gray-700 mb-1">Tipo de Usuário:</p>
             <div className="flex items-center space-x-4">
               <label className="flex items-center">
                 <input
@@ -447,8 +423,9 @@ export default function ModalAgendamento({
               </label>
             </div>
           </div>
-          {/* Campo de busca para Aluno/Turma */}
-          <div className="col-span-2">
+
+          {/* Aluno/Turma */}
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               {selectedType === "aluno" ? "Aluno" : "Turma"}
             </label>
@@ -461,7 +438,7 @@ export default function ModalAgendamento({
                   setSearchText(e.target.value);
                   handleSearchName(e.target.value);
                 }}
-                className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {searchResults.length > 0 && (
                 <ul className="absolute left-0 right-0 bg-white border border-gray-300 mt-1 max-h-48 overflow-y-auto z-10">
@@ -480,15 +457,9 @@ export default function ModalAgendamento({
             {(eventDetails.selectedItems ?? []).length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
                 {(eventDetails.selectedItems ?? []).map((item) => (
-                  <div
-                    key={item.id}
-                    className="bg-gray-200 px-2 py-1 rounded flex items-center"
-                  >
+                  <div key={item.id} className="bg-gray-200 px-2 py-1 rounded flex items-center">
                     <span className="mr-2 text-sm">{item.label}</span>
-                    <button
-                      onClick={() => removeItem(item.id)}
-                      className="text-red-600 text-sm font-bold"
-                    >
+                    <button onClick={() => removeItem(item.id)} className="text-red-600 text-sm font-bold">
                       X
                     </button>
                   </div>
@@ -496,11 +467,10 @@ export default function ModalAgendamento({
               </div>
             )}
           </div>
-          {/* Campo de busca para Professor */}
-          <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Professor
-            </label>
+
+          {/* Professor */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Professor</label>
             <div className="relative">
               <input
                 type="text"
@@ -510,7 +480,7 @@ export default function ModalAgendamento({
                   setTeacherSearchText(e.target.value);
                   handleSearchTeacher(e.target.value);
                 }}
-                className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {teacherSearchResults.length > 0 && (
                 <ul className="absolute left-0 right-0 bg-white border border-gray-300 mt-1 max-h-48 overflow-y-auto z-10">
@@ -529,24 +499,18 @@ export default function ModalAgendamento({
             {eventDetails.selectedTeacher && (
               <div className="flex flex-wrap gap-2 mt-2">
                 <div className="bg-gray-200 px-2 py-1 rounded flex items-center">
-                  <span className="mr-2 text-sm">
-                    {eventDetails.selectedTeacher.label}
-                  </span>
-                  <button
-                    onClick={removeTeacher}
-                    className="text-red-600 text-sm font-bold"
-                  >
+                  <span className="mr-2 text-sm">{eventDetails.selectedTeacher.label}</span>
+                  <button onClick={removeTeacher} className="text-red-600 text-sm font-bold">
                     X
                   </button>
                 </div>
               </div>
             )}
           </div>
-          {/* Campo de busca para Curso */}
-          <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Curso
-            </label>
+
+          {/* Curso */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Curso</label>
             <div className="relative">
               <input
                 type="text"
@@ -556,7 +520,7 @@ export default function ModalAgendamento({
                   setCoursesearchText(e.target.value);
                   handleSearchCourse(e.target.value);
                 }}
-                className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {coursesSearchResults.length > 0 && (
                 <ul className="absolute left-0 right-0 bg-white border border-gray-300 mt-1 max-h-48 overflow-y-auto z-10">
@@ -575,24 +539,18 @@ export default function ModalAgendamento({
             {eventDetails.selectedCourse && (
               <div className="flex flex-wrap gap-2 mt-2">
                 <div className="bg-gray-200 px-2 py-1 rounded flex items-center">
-                  <span className="mr-2 text-sm">
-                    {eventDetails.selectedCourse.label}
-                  </span>
-                  <button
-                    onClick={removeCourse}
-                    className="text-red-600 text-sm font-bold"
-                  >
+                  <span className="mr-2 text-sm">{eventDetails.selectedCourse.label}</span>
+                  <button onClick={removeCourse} className="text-red-600 text-sm font-bold">
                     X
                   </button>
                 </div>
               </div>
             )}
           </div>
-          {/* Campo de busca para Matéria */}
-          <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Matéria
-            </label>
+
+          {/* Matéria */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Matéria</label>
             <div className="relative">
               <input
                 type="text"
@@ -602,7 +560,7 @@ export default function ModalAgendamento({
                   setSubjectsearchText(e.target.value);
                   handleSearchSubject(e.target.value);
                 }}
-                className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {subjectsSearchResults.length > 0 && (
                 <ul className="absolute left-0 right-0 bg-white border border-gray-300 mt-1 max-h-48 overflow-y-auto z-10">
@@ -621,103 +579,114 @@ export default function ModalAgendamento({
             {eventDetails.selectedSubject && (
               <div className="flex flex-wrap gap-2 mt-2">
                 <div className="bg-gray-200 px-2 py-1 rounded flex items-center">
-                  <span className="mr-2 text-sm">
-                    {eventDetails.selectedSubject.label}
-                  </span>
-                  <button
-                    onClick={removeSubject}
-                    className="text-red-600 text-sm font-bold"
-                  >
+                  <span className="mr-2 text-sm">{eventDetails.selectedSubject.label}</span>
+                  <button onClick={removeSubject} className="text-red-600 text-sm font-bold">
                     X
                   </button>
                 </div>
               </div>
             )}
           </div>
-          {/* Campos de Horário */}
-          <div className="col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Horário de Início
-            </label>
+        </div>
+
+        {/* Linha adicional para Data e Observações */}
+        <div className="grid grid-cols-2 gap-4 mt-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Data do Agendamento</label>
+            <input
+              type="date"
+              value={eventDetails.date || ""}
+              onChange={(e) => setEventDetails({ ...eventDetails, date: e.target.value })}
+              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Observações</label>
+            <textarea
+              placeholder="Digite suas observações..."
+              value={eventDetails.notes || ""}
+              onChange={(e) => setEventDetails({ ...eventDetails, notes: e.target.value })}
+              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              rows={3}
+            />
+          </div>
+        </div>
+
+        {/* Linha para Horários */}
+        <div className="grid grid-cols-2 gap-4 mt-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Horário de Início</label>
             <input
               type="time"
               value={eventDetails.inicio}
-              onChange={(e) =>
-                setEventDetails({ ...eventDetails, inicio: e.target.value })
-              }
-              className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => setEventDetails({ ...eventDetails, inicio: e.target.value })}
+              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <div className="col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Horário de Término
-            </label>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Horário de Término</label>
             <input
               type="time"
               value={eventDetails.fim}
-              onChange={(e) =>
-                setEventDetails({ ...eventDetails, fim: e.target.value })
-              }
-              className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => setEventDetails({ ...eventDetails, fim: e.target.value })}
+              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          {/* Checkbox de Reposição */}
-          <div className="col-span-2">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={eventDetails.reposicao}
-                onChange={(e) =>
-                  setEventDetails({ ...eventDetails, reposicao: e.target.checked })
-                }
-                className="form-checkbox h-4 w-4 text-blue-600"
-              />
-              <span className="ml-2 text-gray-700">Reposição</span>
-            </label>
+        </div>
+
+        {/* Linha para Checkboxes de Aula Recorrente e Reposição */}
+        <div className="grid grid-cols-2 gap-4 mt-6">
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              checked={eventDetails.recorrente}
+              onChange={(e) =>
+                setEventDetails({ ...eventDetails, recorrente: e.target.checked, days: [] })
+              }
+              className="form-checkbox h-5 w-5 text-blue-600"
+            />
+            <span className="ml-2 text-gray-700 text-sm">Aula Recorrente</span>
           </div>
-          {/* Checkbox de Aula Recorrente */}
-          <div className="col-span-2">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={eventDetails.recorrente}
-                onChange={(e) =>
-                  setEventDetails({ ...eventDetails, recorrente: e.target.checked, days: [] })
-                }
-                className="form-checkbox h-4 w-4 text-blue-600"
-              />
-              <span className="ml-2 text-gray-700">Aula Recorrente</span>
-            </label>
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              checked={eventDetails.reposicao}
+              onChange={(e) =>
+                setEventDetails({ ...eventDetails, reposicao: e.target.checked })
+              }
+              className="form-checkbox h-5 w-5 text-blue-600"
+            />
+            <span className="ml-2 text-gray-700 text-sm">Reposição</span>
           </div>
-          {eventDetails.recorrente && (
-            <div className="col-span-2">
-              <p className="text-sm font-medium text-gray-700 mb-2">
-                Selecione os dias da semana:
-              </p>
-              <div className="flex justify-between">
-                {["seg", "ter", "qua", "qui", "sex", "sab", "dom"].map((day) => (
-                  <label key={day} className="flex flex-col items-center">
-                    <input
-                      type="checkbox"
-                      checked={eventDetails.days.includes(day)}
-                      onChange={() => handleToggleDay(day)}
-                      className="form-checkbox h-5 w-5 text-blue-600"
-                    />
-                    <span className="mt-1 text-xs">{day.toUpperCase()}</span>
-                  </label>
-                ))}
-              </div>
+        </div>
+
+        {eventDetails.recorrente && (
+          <div className="col-span-2 mt-4">
+            <p className="text-sm font-medium text-gray-700 mb-2">Selecione os dias da semana:</p>
+            <div className="grid grid-cols-7 gap-2">
+              {["seg", "ter", "qua", "qui", "sex", "sab", "dom"].map((day) => (
+                <label key={day} className="flex flex-col items-center">
+                  <input
+                    type="checkbox"
+                    checked={eventDetails.days.includes(day)}
+                    onChange={() => handleToggleDay(day)}
+                    className="form-checkbox h-5 w-5 text-blue-600"
+                  />
+                  <span className="mt-1 text-xs">{day.toUpperCase()}</span>
+                </label>
+              ))}
             </div>
-          )}
-          {/* Botão de Envio */}
-          <div className="col-span-2">
-            <button
-              onClick={validateAndSaveEvent}
-              className="w-full py-3 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 transition-colors"
-            >
-              {eventDetails.id ? "Alterar" : "Salvar"}
-            </button>
           </div>
+        )}
+
+        {/* Botão de Envio */}
+        <div className="mt-6 text-center col-span-2">
+          <button
+            onClick={validateAndSaveEvent}
+            className="w-full py-3 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 transition-colors"
+          >
+            {eventDetails.id ? "Alterar" : "Salvar"}
+          </button>
         </div>
       </div>
     </div>
