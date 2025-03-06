@@ -235,7 +235,7 @@ export default function Materias() {
       setError(true);
     } else {
       setError(false);
-      cadastrarMateria(materia);
+      fetchNovaMateria(materia);
     }
   };
 

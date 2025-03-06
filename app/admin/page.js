@@ -14,6 +14,7 @@ import AlunoService from "@/lib/service/alunoService";
 import { useSearchParams } from "next/navigation";
 import ProfessoresService from "@/lib/service/professoresService";
 import TurmaService from "@/lib/service/turmaService";
+import dashService from "@/lib/service/dashService";
 
 const dataPie = [
     { name: "Aulas realizadas", value: 40 },
@@ -44,6 +45,8 @@ export default function Admin() {
     const [turmas, setTurmas] = useState([]);
     const [totalAlunos, setTotalAlunos] = useState("");
     const [loading, setLoading] = useState(false);
+    const [aulasC, setAulasC]= useState();
+    const [aulasP, setAulasP]= useState();
 
     const filterSchema = [
     { name: "Nome", parameterName: "name", icon: <UserRound /> },
@@ -54,8 +57,14 @@ export default function Admin() {
         try {
             const professorService = new ProfessoresService();
             const prof = await professorService.GetAulasPendentes();
-            console.log("professores: ", prof.data);
             setTeacher(prof.data);
+
+            const aulasService= new dashService();
+            const aulas= await aulasService.GetAulas();
+            setAulasC(aulas.total_classes_completed);
+            setAulasP(aulas.total_classes_pending);
+
+            console.log("aulas C: ",aulasC, "aulas P", aulasP);
         } catch (error) {
             console.log(error)
         }
@@ -98,12 +107,12 @@ export default function Admin() {
                 <Row gutter={[16, 24]}>
                     <Col span={8}>
                         <StyledProCard>
-                            <Statistic title="Aulas Pendentes" value={1200} valueStyle={{ color: '#FF5252' }} />
+                            <Statistic title="Aulas Pendentes" value={aulasP} valueStyle={{ color: '#FF5252' }} />
                         </StyledProCard>
                     </Col>
                     <Col span={8}>
                         <StyledProCard>
-                            <Statistic title="Aulas Concluídas" value={350} valueStyle={{ color: '#4CAF50' }} />
+                            <Statistic title="Aulas Concluídas" value={aulasC} valueStyle={{ color: '#4CAF50' }} />
                         </StyledProCard>
                     </Col>
                     <Col span={8}>
@@ -127,7 +136,7 @@ export default function Admin() {
 
 
 
-                <StyledProCard title="Distribuição de Aulas">
+                {/* <StyledProCard title="Distribuição de Aulas">
                     <div className="flex justify-end">
                         <FilterModal filterSchema={filterSchema} />
                     </div>
@@ -161,7 +170,7 @@ export default function Admin() {
                             ) : null}
                         </div>
                     </div>
-                </StyledProCard>
+                </StyledProCard> */}
             </div>
         </PageContainer >
     );
