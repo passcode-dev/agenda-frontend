@@ -4,15 +4,7 @@ import { useCallback, useEffect } from "react";
 import InputWithMask from "../ui/inputWithMask";
 import styled from "styled-components";
 
-export default function MateriaForm({ materia, setMateriaData, error }) {
-  const handleChange = (name, value) => {
-    setMateriaData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
-
-  const StyledForm = styled.form`
+const StyledForm = styled.form`
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -57,6 +49,16 @@ const CustomAlert=styled.div`
   justify-content: center;
   color: red;
 `;
+
+export default function MateriaForm({ materia, setMateriaData, error }) {
+  const handleChange = (name, value) => {
+    setMateriaData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  
   return (
     <StyledForm className="space-y-4">
       {!!error &&(
