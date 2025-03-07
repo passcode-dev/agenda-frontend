@@ -30,6 +30,18 @@ export default function ModalAgendamento({
 
   const { toast } = useToast();
 
+<<<<<<< HEAD
+=======
+  // Efeito para detectar automaticamente se é aluno ou turma com base nos dados carregados
+  useEffect(() => {
+    if (eventDetails && eventDetails.selectedItems && eventDetails.selectedItems.length > 0) {
+      const isTurma = eventDetails.selectedItems && eventDetails.selectedItems[0].label && selectedType === 'turma';
+      setSelectedType(isTurma ? "turma" : "aluno");
+    }
+  }, [eventDetails, setSelectedType]);
+  
+
+>>>>>>> feat/agenda
   // Atualiza o classroom_id com base no selectedClassroom
   useEffect(() => {
     if (selectedClassroom && selectedClassroom.id) {
@@ -393,31 +405,55 @@ export default function ModalAgendamento({
 
         {/* Organização dos inputs em duas colunas */}
         <div className="grid grid-cols-2 gap-4">
+<<<<<<< HEAD
           {/* Checkbox de Tipo de Usuário */}
+=======
+          {/* Checkbox (Radio) de Tipo de Usuário */}
+>>>>>>> feat/agenda
           <div className="col-span-2">
             <p className="text-sm font-medium text-gray-700 mb-1">Tipo de Usuário:</p>
             <div className="flex items-center space-x-4">
               <label className="flex items-center">
                 <input
+<<<<<<< HEAD
                   type="checkbox"
+=======
+                  type="radio"
+                  name="userType"
+                  value="aluno"
+>>>>>>> feat/agenda
                   checked={selectedType === "aluno"}
                   onChange={() => {
                     setSelectedType("aluno");
                     setEventDetails({ ...eventDetails, selectedItems: [] });
                   }}
+<<<<<<< HEAD
                   className="form-checkbox h-4 w-4 text-blue-600"
+=======
+                  className="form-radio h-4 w-4 text-blue-600"
+>>>>>>> feat/agenda
                 />
                 <span className="ml-2 text-gray-700">Aluno</span>
               </label>
               <label className="flex items-center">
                 <input
+<<<<<<< HEAD
                   type="checkbox"
+=======
+                  type="radio"
+                  name="userType"
+                  value="turma"
+>>>>>>> feat/agenda
                   checked={selectedType === "turma"}
                   onChange={() => {
                     setSelectedType("turma");
                     setEventDetails({ ...eventDetails, selectedItems: [] });
                   }}
+<<<<<<< HEAD
                   className="form-checkbox h-4 w-4 text-blue-600"
+=======
+                  className="form-radio h-4 w-4 text-blue-600"
+>>>>>>> feat/agenda
                 />
                 <span className="ml-2 text-gray-700">Turma</span>
               </label>

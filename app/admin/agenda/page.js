@@ -5,58 +5,65 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import ModalAgendamento from "@/components/Modal/ModalAgendamento";
 import AgendaService from "@/lib/service/agendaService";
+import { Trash,Pencil  } from "lucide-react";
+import Swal from 'sweetalert2';
 
-// Função auxiliar para renderizar os detalhes do evento de forma organizada e estilizada
-// Função auxiliar para renderizar os detalhes do evento de forma organizada e estilizada
-const renderEventDetails = (entry, startStr, endStr) => {
+// Função auxiliar para renderizar os detalhes do evento
+const renderEventDetails = (entry, isShortEvent) => {
+  const participantLabel = entry.class && entry.class.id !== 0 ? "Turma" : "Aluno";
+  const participantName =
+    entry.class && entry.class.id !== 0
+      ? entry.class.name
+      : entry.student
+      ? `${entry.student.name} ${entry.student.last_name}`
+      : "";
+
   return (
-    <div className="text-white text-xs leading-tight">
-      <div>
-        <span className="font-bold">Sala: </span>
-        {entry.classroom && entry.classroom.name}
-      </div>
+    <div className={`text-white ${isShortEvent ? 'text-[0.67rem] leading-none' : 'text-xs leading-tight'}`}>
       <div>
         <span className="font-bold">Professor: </span>
         {entry.teacher && entry.teacher.name}
       </div>
       <div>
-        <span className="font-bold">
-          {entry.student
-            ? "Aluno: "
-            : entry.class && entry.class.id !== 0
-            ? "Turma: "
-            : ""}
-        </span>
-        {entry.student
-          ? `${entry.student.name} ${entry.student.last_name}`
-          : entry.class && entry.class.id !== 0
-          ? entry.class.name
-          : ""}
+        <span className="font-bold">{participantLabel}: </span>
+        {participantName}
       </div>
       <div>
-        <span className="font-bold">Matéria: </span>
-        {entry.subject && entry.subject.name}
-      </div>
-      <div>
-        <span className="font-bold">Curso: </span>
-        {entry.course && entry.course.name}
-      </div>
-      {entry.is_makeup_class && (
-        <div className="font-bold">Aula de Reposição</div>
-      )}
-      {entry.notes && <div className="italic">Obs: {entry.notes}</div>}
+            <span className="font-bold">Matéria: </span>
+            {entry.subject && entry.subject.name}
+          </div>
+          <div>
+            <span className="font-bold">Curso: </span>
+            {entry.course && entry.course.name}
+          </div>
+
     </div>
   );
 };
 
-// Função para definir a classe do balão com base no tipo de evento,
-// removendo os efeitos de hover e utilizando a cor forte por padrão
+
+
+
+
+const getEventDurationInMinutes = (startStr, endStr) => {
+  const [startHour, startMin] = startStr.split(':').map(Number);
+  const [endHour, endMin] = endStr.split(':').map(Number);
+  return (endHour * 60 + endMin) - (startHour * 60 + startMin); // ✅ Correto: 60 minutos por hora
+};
+
+
+
+// Função para definir a classe do balão
 const getBalloonClass = (entry, defaultClass) => {
   if (entry.is_makeup_class) {
     return "bg-gradient-to-r from-pink-500 to-red-500 shadow-lg";
   }
   return defaultClass;
 };
+
+// Função no componente
+
+
 
 export default function Agenda() {
   const { toast } = useToast();
@@ -89,7 +96,7 @@ export default function Agenda() {
         const rooms = await agendaService.getClassroom();
         if (rooms && rooms.length > 0) {
           setClassrooms(rooms);
-          setSelectedClassroom(rooms[0]);
+          setSelectedClassroom(rooms[0]); // Define o primeiro como padrão
         } else {
           setClassrooms([]);
           setSelectedClassroom(null);
@@ -207,31 +214,29 @@ export default function Agenda() {
     setEventDetails({ ...eventDetails, days });
   };
 
-  // Quando clicar num evento, transforma o registro para o formato esperado no modal
+  // Ao clicar num evento, transforma o registro para o formato esperado no modal
   const handleEventClick = (slotKey, entry) => {
     const dtStart = entry.start_time ? new Date(entry.start_time) : null;
     const dtEnd = entry.end_time ? new Date(entry.end_time) : null;
+  
+    const isTurma = entry.class && entry.class.id !== 0;
+    setSelectedType(isTurma ? "turma" : "aluno"); // Aqui está a correção
+    
     const transformed = {
       id: entry.id,
       classroom_id: entry.classroom_id,
-      turmaAluno: entry.student
-        ? `${entry.student.name} ${entry.student.last_name}`
-        : entry.class
-        ? entry.class.name
-        : "",
+      turmaAluno: isTurma 
+        ? (entry.class ? entry.class.name : "") 
+        : (entry.student ? `${entry.student.name} ${entry.student.last_name}` : ""),
       curso: entry.course ? entry.course.name : "",
       professor: entry.teacher ? entry.teacher.name : "",
       inicio: dtStart
-        ? `${String(dtStart.getHours()).padStart(2, "0")}:${String(
-            dtStart.getMinutes()
-          ).padStart(2, "0")}`
+        ? `${String(dtStart.getHours()).padStart(2, "0")}:${String(dtStart.getMinutes()).padStart(2, "0")}`
         : entry.recurrence_pattern
         ? entry.recurrence_pattern.split("@")[1].split("-")[0]
         : "",
       fim: dtEnd
-        ? `${String(dtEnd.getHours()).padStart(2, "0")}:${String(
-            dtEnd.getMinutes()
-          ).padStart(2, "0")}`
+        ? `${String(dtEnd.getHours()).padStart(2, "0")}:${String(dtEnd.getMinutes()).padStart(2, "0")}`
         : entry.recurrence_pattern
         ? entry.recurrence_pattern.split("@")[1].split("-")[1]
         : "",
@@ -239,28 +244,93 @@ export default function Agenda() {
       recorrente: entry.is_recurring,
       days: [],
       notes: entry.notes || "",
-      selectedItems: entry.student
-        ? [{ ...entry.student, label: `${entry.student.name} ${entry.student.last_name}` }]
-        : entry.class
-        ? [{ ...entry.class, label: entry.class.name }]
-        : [],
+      selectedItems: isTurma 
+        ? (entry.class ? [{ ...entry.class, label: entry.class.name }] : [])
+        : (entry.student ? [{ ...entry.student, label: `${entry.student.name} ${entry.student.last_name}` }] : []),
       selectedTeacher: entry.teacher ? { ...entry.teacher, label: entry.teacher.name } : null,
       selectedCourse: entry.course ? { ...entry.course, label: entry.course.name } : null,
       selectedSubject: entry.subject ? { ...entry.subject, label: entry.subject.name } : null,
       date: entry.start_time ? entry.start_time.split("T")[0] : "",
     };
+    
     setSelectedSlot(slotKey);
     setEventDetails(transformed);
     setIsModalOpen(true);
   };
+  
+  
 
   // Callback para forçar refresh do diary após salvar/alterar
   const onDiaryUpdatedCallback = () => {
     setRefreshDiary((prev) => !prev);
   };
 
+  const handleDeleteEvent = async (entryId) => {
+    const confirmation = await Swal.fire({
+      title: 'Confirmar exclusão?',
+      text: 'Deseja realmente excluir este agendamento?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc2626',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Sim, excluir!',
+      cancelButtonText: 'Cancelar'
+    });
+  
+    if (confirmation.isConfirmed) {
+      try {
+        const agendaService = new AgendaService();
+        const result = await agendaService.deleteDiary(entryId);
+  
+        Swal.fire({
+          icon: 'success',
+          title: 'Sucesso',
+          text: result.message || 'Agendamento excluído com sucesso.',
+        });
+  
+        // Força o refresh do diário após exclusão
+        setRefreshDiary(prev => !prev);
+  
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: error.message || 'Falha ao excluir o agendamento.',
+        });
+      }
+    }
+  }
+
+
+  const handleViewEventDetails = (entry, startStr, endStr) => {
+    Swal.fire({
+      title: 'Detalhes do Agendamento',
+      html: `
+        <div style="text-align:left;">
+          <b>Sala:</b> ${entry.classroom?.name || '-'}<br/>
+          <b>Professor:</b> ${entry.teacher?.name || '-'}<br/>
+          ${entry.class && entry.class.id !== 0 
+            ? `<b>Turma:</b> ${entry.class.name}`
+            : entry.student ? `<b>Aluno:</b> ${entry.student.name} ${entry.student.last_name}` : ''}
+        <br>
+        <b>Matéria:</b> ${entry.subject?.name || ''}<br>
+        <b>Curso:</b> ${entry.course?.name || ''}<br>
+        ${entry.is_makeup_class ? '<b>Aula de Reposição</b><br>' : ''}
+        ${entry.notes ? `<i>Obs:</i> ${entry.notes}<br>` : ''}
+        <b>Horário:</b> ${startStr} - ${endStr}
+        </div>
+      `,
+      icon: 'info',
+      confirmButtonText: 'Fechar'
+    });
+  };
+  
+
   return (
     <div className="flex flex-col items-center p-6 bg-white shadow-lg rounded-xl w-full transition-all duration-300 relative">
+      {/* Legenda dos Balões */}
+
+
       {/* Select de Salas */}
       <div className="absolute top-4 right-4">
         <select
@@ -277,6 +347,20 @@ export default function Agenda() {
             </option>
           ))}
         </select>
+      </div>
+      <div className="absolute top-4 left-4 flex flex-col gap-1 bg-white bg-opacity-90  p-3 rounded-md text-xs">
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-full bg-gradient-to-r from-indigo-500 to-blue-500"></div>
+          <span>Aulas Normais</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-full bg-gradient-to-r from-pink-500 to-red-500"></div>
+          <span>Aulas de Reposição</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-full bg-gradient-to-r from-green-500 to-teal-500"></div>
+          <span>Aulas Recorrentes</span>
+        </div>
       </div>
 
       {/* Calendário */}
@@ -343,55 +427,95 @@ export default function Agenda() {
                           }}
                           className="h-16 w-full border-t border-gray-300 flex justify-center items-center transition relative hover:bg-gray-200"
                         ></button>
-                          
-                          {filteredEvents[slotKey] &&
-                            filteredEvents[slotKey].map((entry) => {
-                              if (!entry.is_recurring && entry.start_time && entry.end_time) {
-                                const dtStart = new Date(entry.start_time);
-                                const dtEnd = new Date(entry.end_time);
-                                const startStr = `${String(dtStart.getHours()).padStart(2, "0")}:${String(
-                                  dtStart.getMinutes()
-                                ).padStart(2, "0")}`;
-                                const endStr = `${String(dtEnd.getHours()).padStart(2, "0")}:${String(
-                                  dtEnd.getMinutes()
-                                ).padStart(2, "0")}`;
-                                const balloonClass = getBalloonClass(entry, "bg-gradient-to-r from-indigo-500 to-blue-500 shadow-lg");
-                                return (
+                        {filteredEvents[slotKey] &&
+                          filteredEvents[slotKey].map((entry) => {
+                            if (!entry.is_recurring && entry.start_time && entry.end_time) {
+                              const dtStart = new Date(entry.start_time);
+                              const dtEnd = new Date(entry.end_time);
+                              const startStr = `${String(dtStart.getHours()).padStart(2, "0")}:${String(dtStart.getMinutes()).padStart(2, "0")}`;
+                              const endStr = `${String(dtEnd.getHours()).padStart(2, "0")}:${String(dtEnd.getMinutes()).padStart(2, "0")}`;
+                              const durationMinutes = getEventDurationInMinutes(startStr, endStr);
+                              const isShortEvent = durationMinutes <= 70; // menos ou igual a 1 hora
+                              const balloonClass = getBalloonClass(entry, "bg-gradient-to-r from-indigo-500 to-blue-500 shadow-lg");
+                              return (
                                   <div
                                     key={entry.id}
-                                    onClick={() => handleEventClick(slotKey, entry)}
-                                    className={`absolute w-11/12 ml-1 ${balloonClass} p-2 rounded-md text-xs cursor-pointer transition-all duration-200`}
+                                    onClick={() => handleViewEventDetails(entry, startStr, endStr)}
+                                    className={`absolute w-11/12 ml-1 ${balloonClass} p-2 rounded-md cursor-pointer transition-all duration-200`}
                                     style={{
                                       top: `${calculateEventTopPosition(startStr)}px`,
                                       height: `${calculateEventHeight(startStr, endStr)}px`,
                                       zIndex: 1,
                                     }}
                                   >
-                                    {renderEventDetails(entry, startStr, endStr)}
-                                  </div>
-                                );
-                              }
-                              if (entry.is_recurring && entry.recurrence_pattern) {
-                                const [dayCode, timeRange] = entry.recurrence_pattern.split("@");
-                                const [startStr, endStr] = timeRange.split("-");
-                                const balloonClass = getBalloonClass(entry, "bg-gradient-to-r from-green-500 to-teal-500 shadow-lg");
-                                return (
+
+                                  {/* Ícones editar/excluir */}
+                                  <Pencil
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleEventClick(slotKey, entry);
+                                    }}
+                                    className="absolute top-1 right-5 w-4 h-4 text-white hover:text-yellow-200 transition z-20"
+                                  />
+
+                                  <Trash
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteEvent(entry.id);
+                                    }}
+                                    className="absolute top-1 right-1 w-4 h-4 text-white hover:text-red-200 transition z-20"
+                                  />
+
+                                  {/* Detalhes resumidos */}
+                                  {renderEventDetails(entry, isShortEvent)}
+                                </div>
+
+                              );
+                            }
+                            if (entry.is_recurring && entry.recurrence_pattern) {
+                              const [dayCode, timeRange] = entry.recurrence_pattern.split("@");
+                              const [startStr, endStr] = timeRange.split("-");
+                              const durationMinutes = getEventDurationInMinutes(startStr, endStr);
+                              const isShortEvent = durationMinutes <= 70; // menos ou igual a 1 hora
+                              const balloonClass = getBalloonClass(entry, "bg-gradient-to-r from-green-500 to-teal-500 shadow-lg");
+                              return (
                                   <div
                                     key={entry.id}
-                                    onClick={() => handleEventClick(slotKey, entry)}
-                                    className={`absolute w-11/12 ml-1 ${balloonClass} p-2 rounded-md text-xs cursor-pointer transition-all duration-200`}
+                                    onClick={() => handleViewEventDetails(entry, startStr, endStr)}
+                                    className={`absolute w-11/12 ml-1 ${balloonClass} p-2 rounded-md cursor-pointer transition-all duration-200`}
                                     style={{
                                       top: `${calculateEventTopPosition(startStr)}px`,
                                       height: `${calculateEventHeight(startStr, endStr)}px`,
                                       zIndex: 1,
                                     }}
                                   >
-                                    {renderEventDetails(entry, startStr, endStr)}
+
+                                    {/* Ícones editar/excluir */}
+                                    <Pencil
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleEventClick(slotKey, entry);
+                                      }}
+                                      className="absolute top-1 right-5 w-4 h-4 text-white hover:text-yellow-200 transition z-20"
+                                    />
+
+                                    <Trash
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDeleteEvent(entry.id);
+                                      }}
+                                      className="absolute top-1 right-1 w-4 h-4 text-white hover:text-red-200 transition z-20"
+                                    />
+
+                                    {/* Detalhes resumidos */}
+                                    {renderEventDetails(entry, isShortEvent)}
                                   </div>
-                                );
-                              }
-                              return null;
-                            })}
+
+
+                              );
+                            }
+                            return null;
+                          })}
                       </div>
                     );
                   })}
