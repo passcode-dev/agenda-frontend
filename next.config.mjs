@@ -4,7 +4,7 @@ const nextConfig = {
         return [
             {
                 source: '/api/:path*', // Rota no frontend
-                destination: 'http://localhost:8080/api/:path*', // URL do backend
+                destination: `${process.env.NEXT_PUBLIC_API_URL}/api:path*`, // URL do backend
             },
         ];
     },
