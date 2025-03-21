@@ -523,6 +523,7 @@ export default function ModalAgendamento({
                       setEventDetails({ ...eventDetails, selectedItems: [] });
                     }}
                     className="form-radio h-4 w-4 text-blue-600"
+                    disabled={!!eventDetails.id}
                   />
                   <span className="ml-2 text-gray-700">Aluno</span>
                 </label>
@@ -537,6 +538,7 @@ export default function ModalAgendamento({
                       setEventDetails({ ...eventDetails, selectedItems: [] });
                     }}
                     className="form-radio h-4 w-4 text-blue-600"
+                    disabled={!!eventDetails.id}
                   />
                   <span className="ml-2 text-gray-700">Turma</span>
                 </label>
@@ -544,7 +546,7 @@ export default function ModalAgendamento({
             </div>
 
             {/* Aluno/Turma */}
-            <div>
+            <div className={`${eventDetails.id ? 'pointer-events-none opacity-50' : ''}`}>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {selectedType === "aluno" ? "Aluno" : "Turma"}
               </label>
@@ -554,12 +556,16 @@ export default function ModalAgendamento({
                   placeholder={`Digite o nome do ${selectedType === "aluno" ? "Aluno" : "Turma"}`}
                   value={searchText}
                   onChange={(e) => {
-                    setSearchText(e.target.value);
-                    handleSearchName(e.target.value);
+                    if (!eventDetails.id) {
+                      setSearchText(e.target.value);
+                      handleSearchName(e.target.value);
+                    }
                   }}
                   className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 h-12"
+                  disabled={!!eventDetails.id}
                 />
-                {searchResults.length > 0 && (
+                {/* Só exibe as sugestões se não estiver desabilitado */}
+                {searchResults.length > 0 && !eventDetails.id && (
                   <ul className="absolute left-0 right-0 bg-white border border-gray-300 mt-1 max-h-48 overflow-y-auto z-10">
                     {searchResults.map((item) => (
                       <li
@@ -578,14 +584,21 @@ export default function ModalAgendamento({
                   {(eventDetails.selectedItems ?? []).map((item) => (
                     <div key={item.id} className="bg-gray-200 px-2 py-1 rounded flex items-center">
                       <span className="mr-2 text-sm">{item.label}</span>
-                      <button onClick={() => removeItem(item.id)} className="text-red-600 text-sm font-bold">
-                        X
-                      </button>
+                      {/* Remove o botão se estiver desabilitado */}
+                      {!eventDetails.id && (
+                        <button
+                          onClick={() => removeItem(item.id)}
+                          className="text-red-600 text-sm font-bold"
+                        >
+                          X
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>
               )}
             </div>
+
 
             {/* Professor */}
             <div>
