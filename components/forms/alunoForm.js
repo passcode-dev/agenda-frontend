@@ -116,8 +116,6 @@ const CustomAlert=styled.div`
 `;
 
 const CustomInputWithMask = styled(InputWithMask)`
-  margin-bottom: 16px;
-
   label {
     font-size: 1rem;
     font-weight: 600;
