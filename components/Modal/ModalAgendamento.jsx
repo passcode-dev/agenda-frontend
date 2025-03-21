@@ -491,9 +491,10 @@ export default function ModalAgendamento({
         onClick={onClose}
       >
         <div
-          className="bg-white p-8 rounded-lg w-full sm:w-11/12 md:w-3/4 lg:w-1/2 max-w-4xl shadow-lg relative"
+          className="bg-white p-8 rounded-lg w-full sm:w-11/12 md:w-3/4 lg:w-1/2 max-w-4xl shadow-lg relative max-h-[90vh] overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
         >
+          
           {/* Botão de fechar */}
           <button
             className="absolute top-4 right-4 p-2 rounded-full text-gray-500 hover:text-gray-700 transition"
@@ -556,7 +557,7 @@ export default function ModalAgendamento({
                     setSearchText(e.target.value);
                     handleSearchName(e.target.value);
                   }}
-                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 h-12"
                 />
                 {searchResults.length > 0 && (
                   <ul className="absolute left-0 right-0 bg-white border border-gray-300 mt-1 max-h-48 overflow-y-auto z-10">
@@ -598,7 +599,7 @@ export default function ModalAgendamento({
                     setTeacherSearchText(e.target.value);
                     handleSearchTeacher(e.target.value);
                   }}
-                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 h-12"
                 />
                 {teacherSearchResults.length > 0 && (
                   <ul className="absolute left-0 right-0 bg-white border border-gray-300 mt-1 max-h-48 overflow-y-auto z-10">
@@ -638,7 +639,7 @@ export default function ModalAgendamento({
                     setCoursesearchText(e.target.value);
                     handleSearchCourse(e.target.value);
                   }}
-                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 h-12"
                 />
                 {coursesSearchResults.length > 0 && (
                   <ul className="absolute left-0 right-0 bg-white border border-gray-300 mt-1 max-h-48 overflow-y-auto z-10">
@@ -678,7 +679,7 @@ export default function ModalAgendamento({
                     setSubjectsearchText(e.target.value);
                     handleSearchSubject(e.target.value);
                   }}
-                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 h-12"
                 />
                 {subjectsSearchResults.length > 0 && (
                   <ul className="absolute left-0 right-0 bg-white border border-gray-300 mt-1 max-h-48 overflow-y-auto z-10">
@@ -715,7 +716,7 @@ export default function ModalAgendamento({
                 type="date"
                 value={eventDetails.date || ""}
                 onChange={(e) => setEventDetails({ ...eventDetails, date: e.target.value })}
-                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 h-12"
               />
             </div>
             <div>
@@ -724,8 +725,7 @@ export default function ModalAgendamento({
                 placeholder="Digite suas observações..."
                 value={eventDetails.notes || ""}
                 onChange={(e) => setEventDetails({ ...eventDetails, notes: e.target.value })}
-                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                rows={3}
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 h-24"
               />
             </div>
           </div>
@@ -738,7 +738,7 @@ export default function ModalAgendamento({
                 type="time"
                 value={eventDetails.inicio}
                 onChange={(e) => setEventDetails({ ...eventDetails, inicio: e.target.value })}
-                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 h-12"
               />
             </div>
             <div>
@@ -747,7 +747,7 @@ export default function ModalAgendamento({
                 type="time"
                 value={eventDetails.fim}
                 onChange={(e) => setEventDetails({ ...eventDetails, fim: e.target.value })}
-                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 h-12"
               />
             </div>
           </div>
