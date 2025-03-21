@@ -449,14 +449,14 @@ export default function Agenda() {
                                     }}
                                   >
 
-                                  {/* Ícones editar/excluir 
+                                  {/* Ícones editar/excluir */}
                                   <Pencil
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       handleEventClick(slotKey, entry);
                                     }}
                                     className="absolute top-1 right-5 w-4 h-4 text-white hover:text-yellow-200 transition z-20"
-                                  />*/}
+                                  />
 
                                   <Trash
                                     onClick={(e) => {
