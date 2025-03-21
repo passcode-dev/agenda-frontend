@@ -35,7 +35,7 @@ const AsideBar = styled(({ $isOpen, ...props }) => <aside {...props} />)`
   position: sticky;
   top: 0;
   left: 0;
-  height: 100vh;
+  height: fit-content;
   background-color: #ffffff;
   transition: width 0.3s ease, opacity 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
