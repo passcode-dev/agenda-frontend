@@ -36,19 +36,16 @@ export default function ModalAgendamento({
 
   // Efeito para detectar automaticamente se é aluno ou turma (ao editar)
   useEffect(() => {
-      if (eventDetails?.id) {
-        
-         // Se existir "class_id" (não zero), define como turma; caso contrário, aluno.
-         if (eventDetails.class_id && eventDetails.class_id !== 0) {
-           setSelectedType("turma");
-         } if (eventDetails.student_id && eventDetails.student_id !== 0) {
-         
-           setSelectedType("aluno");
-         }
-       }
-
-    }, [eventDetails?.id]);
-    
+    if (eventDetails?.id) {
+      // Se existir "class_id" (não zero), define como turma; caso contrário, aluno.
+      if (eventDetails.class_id && eventDetails.class_id !== 0) {
+        setSelectedType("turma");
+      }
+      if (eventDetails.student_id && eventDetails.student_id !== 0) {
+        setSelectedType("aluno");
+      }
+    }
+  }, [eventDetails?.id]);
 
   // Atualiza o classroom_id com base no selectedClassroom
   useEffect(() => {
@@ -494,7 +491,7 @@ export default function ModalAgendamento({
         onClick={onClose}
       >
         <div
-          className="bg-white p-8 rounded-lg w-3/4 max-w-4xl shadow-lg relative"
+          className="bg-white p-8 rounded-lg w-full sm:w-11/12 md:w-3/4 lg:w-1/2 max-w-4xl shadow-lg relative"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Botão de fechar */}
@@ -508,8 +505,8 @@ export default function ModalAgendamento({
             {eventDetails.id ? "Editar Agendamento" : "Novo Agendamento"}
           </h2>
 
-          {/* Organização dos inputs em duas colunas */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* Organização dos inputs em duas colunas (stack em telas menores) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Checkbox (Radio) de Tipo de Usuário */}
             <div className="col-span-2">
               <p className="text-sm font-medium text-gray-700 mb-1">Tipo de Usuário:</p>
@@ -711,7 +708,7 @@ export default function ModalAgendamento({
           </div>
 
           {/* Linha adicional para Data e Observações */}
-          <div className="grid grid-cols-2 gap-4 mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Data do Agendamento</label>
               <input
@@ -734,7 +731,7 @@ export default function ModalAgendamento({
           </div>
 
           {/* Linha para Horários */}
-          <div className="grid grid-cols-2 gap-4 mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Horário de Início</label>
               <input
@@ -756,7 +753,7 @@ export default function ModalAgendamento({
           </div>
 
           {/* Linha para Checkboxes de Aula Recorrente e Reposição */}
-          <div className="grid grid-cols-2 gap-4 mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
             <div className="flex items-center">
               <input
                 type="checkbox"
