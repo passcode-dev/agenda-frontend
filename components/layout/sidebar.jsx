@@ -44,6 +44,20 @@ const AsideBar = styled(({ $isOpen, ...props }) => <aside {...props} />)`
   display: flex;
   flex-direction: column;
 
+
+  @media (max-width:1000px) {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    position: none;
+    color: ${({ $isActive }) => ($isActive ? "#2563eb" : "#4b5563")};
+    background-color: ${({ $isActive }) => ($isActive ? "#e0f2fe" : "transparent")};
+  }
+
   ${({ $isOpen }) =>
     $isOpen
       ? `width: 330px; opacity: 1;`
@@ -146,14 +160,14 @@ export function Sidebar() {
       }
     };
 
-    if (isMobile && isOpen) {
+    if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isMobile, isOpen]);
+  }, [isOpen]);
 
   const handleMouseEnter = () => setIsOpen(true);
   const handleMouseLeave = () => !isMobile && setIsOpen(false);
@@ -163,7 +177,7 @@ export function Sidebar() {
       {isMobile && !isOpen && (
         <Menu
           onClick={() => setIsOpen(true)}
-          className="cursor-pointer text-gray-600 absolute top-4 left-4"
+          className="cursor-pointer text-gray-600 fixed top-4 left-4 z-30"
           size={24}
           aria-label="Open Sidebar"
         />
