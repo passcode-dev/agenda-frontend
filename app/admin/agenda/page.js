@@ -473,6 +473,7 @@ export default function Agenda() {
                               );
                             }
                             if (entry.is_recurring && entry.recurrence_pattern) {
+                              console.log(entry);
                               const [dayCode, timeRange] = entry.recurrence_pattern.split("@");
                               const [startStr, endStr] = timeRange.split("-");
                               const durationMinutes = getEventDurationInMinutes(startStr, endStr);
@@ -491,13 +492,14 @@ export default function Agenda() {
                                   >
 
                                     {/* Ícones editar/excluir */}
+                                    {/*  
                                     <Pencil
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         handleEventClick(slotKey, entry);
                                       }}
                                       className="absolute top-1 right-5 w-4 h-4 text-white hover:text-yellow-200 transition z-20"
-                                    />
+                                    />*/}
 
                                     <Trash
                                       onClick={(e) => {
