@@ -146,21 +146,42 @@ export default function Agenda() {
               const slotKey = `${dayKey}T${String(hour).padStart(2, "0")}:00`;
               if (!acc[slotKey]) acc[slotKey] = [];
               acc[slotKey].push(entry);
-            } else if (entry.is_recurring && entry.recurrence_pattern) {
+            } else if (entry.is_recurring && entry.recurrence_pattern) { 
+              console.log("entryReduce =", JSON.stringify(entry, null, 2));
+              console.log("entrei 2");
+            
               const [dayCode, timeRange] = entry.recurrence_pattern.split("@");
-              const startTime = timeRange.split("-")[0];
+              console.log("dayCode:", dayCode, "timeRange:", timeRange);
+            
+              // Extraímos o horário de início do pattern
+              const startTimeRaw = timeRange.split("-")[0];
+              // Aqui, em vez de usar os minutos do startTimeRaw (por exemplo, "18:30"),
+              // pegamos apenas a hora e forçamos ":00"
+              const hourPart = startTimeRaw.split(":")[0];
+              console.log("hourPart:", hourPart);
+            
               const dayIndexMap = { MON: 1, TUE: 2, WED: 3, THU: 4, FRI: 5, SAT: 6, SUN: 0 };
               const dayIndex = dayIndexMap[dayCode] ?? 0;
+              console.log("dayIndex:", dayIndex);
+            
               const recurrenceDate = new Date(startOfWeek);
               recurrenceDate.setDate(startOfWeek.getDate() + ((dayIndex - startOfWeek.getDay() + 7) % 7));
+              console.log("recurrenceDate:", recurrenceDate.toISOString());
+            
               const dayKey = recurrenceDate.toISOString().split("T")[0];
+              console.log("dayKey:", dayKey);
+            
               if (entry.start_time) {
                 const recurringStartDate = new Date(entry.start_time).toISOString().split("T")[0];
+                console.log("recurringStartDate:", recurringStartDate);
                 if (dayKey < recurringStartDate) {
+                  console.log("Evento ignorado: dayKey (" + dayKey + ") é anterior a recurringStartDate (" + recurringStartDate + ")");
                   return acc;
                 }
               }
-              const slotKey = `${dayKey}T${startTime}:00`.slice(0, 16);
+              // Monta o slotKey usando a hora cheia
+              const slotKey = `${dayKey}T${String(hourPart).padStart(2, "0")}:00`;
+              console.log("slotKey ajustado:", slotKey);
               if (!acc[slotKey]) acc[slotKey] = [];
               acc[slotKey].push(entry);
             }
