@@ -99,7 +99,7 @@ export default function Agenda() {
   // Atualiza o classroom_id em eventDetails com base no selectedClassroom
   useEffect(() => {
     if (selectedClassroom && selectedClassroom.id) {
-      setEventDetails((prev) => ({ ...prev, classroom_id: selectedClassroom.id }));
+      setEventDetails((prev) => ({ ...prev, classroom_id: selectedClassroom?.id }));
     }
   }, [selectedClassroom, setEventDetails]);
 
@@ -122,7 +122,7 @@ export default function Agenda() {
         const jsonData = await agendaService.getDiaryTeacher(
           startOfWeek.toISOString(),
           endOfWeek.toISOString(),
-          selectedClassroom.id,
+          selectedClassroom?.id,
           
         );
         if (jsonData.status === "success") {
@@ -243,7 +243,7 @@ export default function Agenda() {
       {/* Select de Salas */}
       <div className="absolute top-4 right-4">
         <select
-          value={selectedClassroom ? selectedClassroom.id : ""}
+          value={selectedClassroom ? selectedClassroom?.id : ""}
           onChange={(e) => {
             const selected = classrooms.find((c) => c.id === parseInt(e.target.value));
             setSelectedClassroom(selected);
