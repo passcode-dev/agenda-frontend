@@ -66,7 +66,7 @@ const CustomInputWithMask = styled(InputWithMask)`
   `;
 
 
-export default function ProfessorForm({ professor, setProfessorData, error }) {
+export default function EditProfessorForm({ professor, setProfessorData, error }) {
 
 
   const handleChange = (nome, value) => {
@@ -128,17 +128,6 @@ export default function ProfessorForm({ professor, setProfessorData, error }) {
         error={error}
         isRequired={false}
       />
-
-      <CustomInputWithMask
-        label="Senha"
-        name="password"
-        defaultValue={professor.password}
-        onChange={handleChange}
-        error={error}
-        isRequired={false}
-      />
-
-
     </StyledForm>
   );
 
