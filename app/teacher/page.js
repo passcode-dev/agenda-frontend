@@ -75,6 +75,42 @@ export default function Agenda() {
   const [classrooms, setClassrooms] = useState([]);
   const [selectedClassroom, setSelectedClassroom] = useState(null);
   const [refreshDiary, setRefreshDiary] = useState(false);
+  const [currentTimePosition, setCurrentTimePosition] = useState(0);
+  
+  const getCurrentTimePosition = () => {
+    const now = new Date();
+    
+    // Hora local em minutos
+    const localMinutes = now.getHours() * 60 + now.getMinutes();
+  
+    // Verifique o horário local para garantir que não há erro
+    console.log(`Hora local: ${now.toString()}`);  // Exibe o horário local completo
+  
+    // Calculando a posição no calendário com base no horário local
+    const position = (localMinutes / 1440) * 24 * 64 + 64; // 1440 minutos por dia e 64px por "slot"
+    
+    return position;
+  };
+  
+  
+  useEffect(() => {
+      const updateCurrentTimePosition = () => {
+        const position = getCurrentTimePosition();
+        console.log("Atualizando posição:", position);
+        setCurrentTimePosition(position);
+      };
+  
+      console.log("Local time:", new Date().toLocaleTimeString());
+      console.log("UTC time:", new Date().toUTCString());
+  
+      // Chama na primeira renderização
+      updateCurrentTimePosition(); 
+  
+      // Atualiza a cada minuto
+      const interval = setInterval(updateCurrentTimePosition, 60000); 
+  
+      return () => clearInterval(interval);
+    }, []);
 
   // Busca das salas via AgendaService
   useEffect(() => {
@@ -301,6 +337,7 @@ export default function Agenda() {
           <div className="grid grid-cols-7 border-t border-r flex-grow relative">
             {renderWeek().map((currentDate, dayIndex) => {
               const dayKey = currentDate.toISOString().split("T")[0];
+              const isToday = currentDate.toDateString() === new Date().toDateString();
               return (
                 <div key={dayIndex} className="border-l border-gray-300 relative">
                   <div
@@ -312,6 +349,13 @@ export default function Agenda() {
                   >
                     {"Dom Seg Ter Qua Qui Sex Sáb".split(" ")[currentDate.getDay()]} <br /> {currentDate.getDate()}
                   </div>
+                  {/* LINHA VERMELHA DO HORÁRIO ATUAL */}
+                  {isToday && (
+                    <div
+                    className="absolute left-0 w-full h-0.5 bg-red-500 z-20"
+                    style={{ top: `${currentTimePosition}px` }}
+                    />
+                  )}
                   {Array.from({ length: 24 }, (_, hourIndex) => {
                     const slotKey = `${dayKey}T${String(hourIndex).padStart(2, "0")}:00`;
                     return (

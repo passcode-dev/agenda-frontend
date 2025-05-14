@@ -4,6 +4,8 @@ import { maskCpf } from "@/lib/mask";
 import InputWithMask from "../ui/inputWithMask";
 import DatePickerField from "../ui/datePickerField";
 import styled from "styled-components";
+import { useEffect } from "react";
+import { useState } from "react";
 
 const StyledForm = styled.form`
 display: flex;
@@ -68,10 +70,19 @@ const CustomInputWithMask = styled(InputWithMask)`
 
 export default function EditProfessorForm({ professor, setProfessorData, error }) {
 
+  const [isfirstacess, setIsFirstAccess] = useState(false);
 
   const handleChange = (nome, value) => {
     setProfessorData({ ...professor, [nome]: value })
   };
+
+  useEffect(() => {
+    if (professor?.password === undefined || professor?.password == null || professor?.password == '') {
+      setIsFirstAccess(true);
+    } else {
+      setIsFirstAccess(false);
+    }
+  },[]);
 
   return (
     <StyledForm className="space-y-4">
@@ -128,6 +139,17 @@ export default function EditProfessorForm({ professor, setProfessorData, error }
         error={error}
         isRequired={false}
       />
+
+      { isfirstacess && 
+
+      <CustomInputWithMask
+        label="Senha"
+        name="password"
+        defaultValue={professor.password}
+        onChange={handleChange}
+        error={error}
+        isRequired={false}
+      />}
     </StyledForm>
   );
 

@@ -45,6 +45,10 @@ const renderEventDetails = (entry, isShortEvent) => {
 
 
 
+
+
+
+
 const getEventDurationInMinutes = (startStr, endStr) => {
   const [startHour, startMin] = startStr.split(':').map(Number);
   const [endHour, endMin] = endStr.split(':').map(Number);
@@ -87,7 +91,42 @@ export default function Agenda() {
   const [classrooms, setClassrooms] = useState([]);
   const [selectedClassroom, setSelectedClassroom] = useState(null);
   const [refreshDiary, setRefreshDiary] = useState(false);
+  const [currentTimePosition, setCurrentTimePosition] = useState(0);
 
+const getCurrentTimePosition = () => {
+  const now = new Date();
+  
+  // Hora local em minutos
+  const localMinutes = now.getHours() * 60 + now.getMinutes();
+
+  // Verifique o horário local para garantir que não há erro
+  console.log(`Hora local: ${now.toString()}`);  // Exibe o horário local completo
+
+  // Calculando a posição no calendário com base no horário local
+  const position = (localMinutes / 1440) * 24 * 64 + 64; // 1440 minutos por dia e 64px por "slot"
+  
+  return position;
+};
+
+
+useEffect(() => {
+    const updateCurrentTimePosition = () => {
+      const position = getCurrentTimePosition();
+      console.log("Atualizando posição:", position);
+      setCurrentTimePosition(position);
+    };
+
+    console.log("Local time:", new Date().toLocaleTimeString());
+    console.log("UTC time:", new Date().toUTCString());
+
+    // Chama na primeira renderização
+    updateCurrentTimePosition(); 
+
+    // Atualiza a cada minuto
+    const interval = setInterval(updateCurrentTimePosition, 60000); 
+
+    return () => clearInterval(interval);
+  }, []);
   // Busca das salas via AgendaService
   useEffect(() => {
     const fetchClassrooms = async () => {
@@ -345,6 +384,8 @@ export default function Agenda() {
       confirmButtonText: 'Fechar'
     });
   };
+
+  
   
 
   return (
@@ -411,43 +452,53 @@ export default function Agenda() {
               <ChevronRight />
             </button>
           </div>
-          <div className="grid grid-cols-7 border-t border-r flex-grow relative">
-            {renderWeek().map((currentDate, dayIndex) => {
-              const dayKey = currentDate.toISOString().split("T")[0];
+         <div className="grid grid-cols-7 border-t border-r flex-grow relative">
+      {renderWeek().map((currentDate, dayIndex) => {
+        const dayKey = currentDate.toISOString().split("T")[0];
+        const isToday = currentDate.toDateString() === new Date().toDateString();
+
+        return (
+          <div key={dayIndex} className="border-l border-gray-300 relative">
+            <div
+              className={`p-2 text-center font-semibold ${
+                isToday ? "bg-blue-500 text-white" : "bg-gray-100"
+              } transition-colors duration-300 sticky top-0 z-10 border-b border-gray-300`}
+            >
+              {"Dom Seg Ter Qua Qui Sex Sáb".split(" ")[currentDate.getDay()]} <br /> {currentDate.getDate()}
+            </div>
+
+            {/* LINHA VERMELHA DO HORÁRIO ATUAL */}
+            {isToday && (
+              <div
+                className="absolute left-0 w-full h-0.5 bg-red-500 z-20"
+                style={{ top: `${currentTimePosition}px` }}
+              />
+            )}
+
+            {Array.from({ length: 24 }, (_, hourIndex) => {
+              const slotKey = `${dayKey}T${String(hourIndex).padStart(2, "0")}:00`;
+
               return (
-                <div key={dayIndex} className="border-l border-gray-300 relative">
-                  <div
-                    className={`p-2 text-center font-semibold ${
-                      currentDate.toDateString() === new Date().toDateString()
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-100"
-                    } transition-colors duration-300 sticky top-0 z-10 border-b border-gray-300`}
-                  >
-                    {"Dom Seg Ter Qua Qui Sex Sáb".split(" ")[currentDate.getDay()]} <br /> {currentDate.getDate()}
-                  </div>
-                  {Array.from({ length: 24 }, (_, hourIndex) => {
-                    const slotKey = `${dayKey}T${String(hourIndex).padStart(2, "0")}:00`;
-                    return (
-                      <div key={hourIndex} className="transition-all duration-300">
-                        <button
-                          onClick={() => {
-                            setSelectedSlot(slotKey);
-                            setEventDetails({
-                              turmaAluno: "",
-                              curso: "",
-                              professor: "",
-                              inicio: `${String(hourIndex).padStart(2, "0")}:00`,
-                              fim: "",
-                              reposicao: false,
-                              recorrente: false,
-                              days: [],
-                              notes: "",
-                              date: dayKey,
-                            });
-                            setIsModalOpen(true);
-                          }}
-                          className="h-16 w-full border-t border-gray-300 flex justify-center items-center transition relative hover:bg-gray-200"
-                        ></button>
+                <div key={hourIndex} className="transition-all duration-300">
+                  <button
+                    onClick={() => {
+                      setSelectedSlot(slotKey);
+                      setEventDetails({
+                        turmaAluno: "",
+                        curso: "",
+                        professor: "",
+                        inicio: `${String(hourIndex).padStart(2, "0")}:00`,
+                        fim: "",
+                        reposicao: false,
+                        recorrente: false,
+                        days: [],
+                        notes: "",
+                        date: dayKey,
+                      });
+                      setIsModalOpen(true);
+                    }}
+                    className="h-16 w-full border-t border-gray-300 flex justify-center items-center transition relative hover:bg-gray-200"
+                  ></button>
                         {filteredEvents[slotKey] &&
                           filteredEvents[slotKey].map((entry) => {
                             if (!entry.is_recurring && entry.start_time && entry.end_time) {
