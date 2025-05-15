@@ -1,6 +1,6 @@
 "use client";
 
-import { Sidebar } from "@/components/layout/sidebar";
+import { Sidebar}  from "@/components/layout/sidebar";
 import { Suspense } from "react";
 
 export default function AdminLayout({ children }) {
