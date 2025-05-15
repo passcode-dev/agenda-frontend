@@ -8,7 +8,7 @@ import { Items } from "./nav-items";
 import { LogOut, Menu, X } from "lucide-react";
 import { UserContext } from "@/app/context/userContext";
 import styled from "styled-components";
-import { handleLogout } from "@/lib/functions";
+import AuthService from "@/lib/service/authService";
 
 // LinkStyled agora usa $isActive
 const LinkStyled = styled(Link)`
@@ -171,6 +171,15 @@ export function SidebarTeacher() {
 
   const handleMouseEnter = () => setIsOpen(true);
   const handleMouseLeave = () => !isMobile && setIsOpen(false);
+   const handleLogout = async () => {
+      const success = await AuthService.logout();
+       if (success) {
+        
+        window.location.href = "/";
+      } else {
+        console.error("Falha ao fazer logout");
+      }
+    };
 
   return (
     <>
