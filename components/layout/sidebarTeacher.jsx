@@ -8,8 +8,7 @@ import { Items } from "./nav-items";
 import { LogOut, Menu, X } from "lucide-react";
 import { UserContext } from "@/app/context/userContext";
 import styled from "styled-components";
-import AuthService from "@/lib/service/authService";
-
+import { handleLogout } from "@/lib/functions";
 
 // LinkStyled agora usa $isActive
 const LinkStyled = styled(Link)`
@@ -133,15 +132,13 @@ const LogOutIcon = styled(LogOut)`
   height: 24px !important;
 `;
 
-export  function Sidebar() {
+export function SidebarTeacher() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const pathname = usePathname();
   const [NavItems, setNavItems] = useState(Items);
   const { user } = useContext(UserContext);
   const sidebarRef = useRef(null);
-
-  
 
   useEffect(() => {
     const handleResize = () => {
@@ -174,16 +171,6 @@ export  function Sidebar() {
 
   const handleMouseEnter = () => setIsOpen(true);
   const handleMouseLeave = () => !isMobile && setIsOpen(false);
-  
-  const handleLogout = async () => {
-    const success = await AuthService.logout();
-     if (success) {
-      
-      window.location.href = "/";
-    } else {
-      console.error("Falha ao fazer logout");
-    }
-  };
 
   return (
     <>
@@ -215,39 +202,6 @@ export  function Sidebar() {
                 />
               </div>
             )}
-
-            <UserInfo $isOpen={isOpen}>
-              <Avatar>
-                {user?.username?.[0]?.toUpperCase() || "U"}
-              </Avatar>
-              <UserSection $isOpen={isOpen}>
-                <p className="font-semibold text-lg text-gray-800 capitalize">{user?.username}</p>
-                <p className="font-semibold text-sm text-gray-500">{user?.email}</p>
-              </UserSection>
-            </UserInfo>
-
-            <Separator className="my-2" />
-
-            <nav className="flex flex-col px-2">
-              {NavItems.map((item, index) => {
-                const isActive = pathname === item.href;
-                return (
-                  <LinkStyled
-                    key={index}
-                    href={item.href}
-                    $isActive={isActive}
-                    aria-current={isActive ? "page" : undefined}
-                  >
-                    <span>
-                      <item.icon size="24px" />
-                    </span>
-                    <LabelSection $isOpen={isOpen}>
-                      {item.title}
-                    </LabelSection>
-                  </LinkStyled>
-                );
-              })}
-            </nav>
 
             <div className="mt-auto border-t px-2 py-2">
               <LogoutButton $isOpen={isOpen} variant="link">

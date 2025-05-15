@@ -6,7 +6,7 @@ import Table from "@/components/tables/Tables";
 import { ProLayout, PageContainer, ProCard } from "@ant-design/pro-components";
 import { Layout, Row, Col, Statistic } from "antd";
 import { UserRound } from "lucide-react";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -56,7 +56,7 @@ export default function Admin() {
   const [makeupClasses, setMakeupClasses] = useState([]);
   const [classesByCourse, setClassesByCourse] = useState([]);
   const searchParams = useSearchParams();
-
+  const [sortedData, setSortedData] = useState([]);
   // Estados para o filtro de datas
   const [filterMode, setFilterMode] = useState("geral"); // "geral" ou "data"
   const [startDate, setStartDate] = useState("");
@@ -69,6 +69,10 @@ export default function Admin() {
       const prof = await professorService.GetAulasPendentes();
       setTeacher(prof.data);
 
+      
+
+
+      console.log("Dados de professores:", prof.data);
       const dashService = new DashService();
       // Se o usuário escolheu o filtro "Por Período" e as datas foram preenchidas, monta a query
       const query =
@@ -107,6 +111,15 @@ export default function Admin() {
     fetchDashboardData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
+
+  useEffect(() => {
+    setSortedData([...(teacher || [])]
+      .map(t => ({
+        ...t,
+        completed_classes: Number(t.completed_classes),
+        }))
+        .sort((a, b) => a.completed_classes - b.completed_classes));
+  },[teacher]);
 
   return (
     <PageContainer>
@@ -153,6 +166,7 @@ export default function Admin() {
           </>
         )}
       </div>*/}
+      
 
       <div className="flex flex-col gap-6 p-4">
         <Row gutter={[16, 24]}>
@@ -187,12 +201,11 @@ export default function Admin() {
 
         {/* Gráfico de Barras */}
         <StyledProCard title="Aulas Mensais Realizadas">
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={300} >
             <BarChart
-              data={teacher?.sort(
-                (a, b) => a.completed_classes - b.completed_classes
-              )}
+              data={sortedData}
             >
+              
               <XAxis dataKey="teacher_name" stroke="#4CAF50" />
               <YAxis />
               <Tooltip />

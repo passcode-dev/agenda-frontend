@@ -1,13 +1,14 @@
 "use client";
 
-import { Sidebar}  from "@/components/layout/sidebar";
+import { Sidebar } from "@/components/layout/sidebar";
+import { SidebarTeacher } from "@/components/layout/sidebarTeacher";
 import { Suspense } from "react";
 
-export default function AdminLayout({ children }) {
+export default function TeacherLayout({ children }) {
   return (
     <Suspense>
       <div className="flex min-h-screen">
-        <Sidebar />
+        <SidebarTeacher />
         <main className="w-full">{children}</main>
       </div>
     </Suspense>

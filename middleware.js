@@ -1,25 +1,32 @@
 import { NextResponse } from 'next/server';
 
 export function middleware(request) {
-    const cookies = request.headers.get('cookie');
-    const isAuthorized = cookies && cookies.includes('Authorization=');
+    const cookieHeader = request.headers.get('cookie') || '';
+    const cookies = Object.fromEntries(cookieHeader.split('; ').map(cookie => {
+        const [key, value] = cookie.split('=');
+        return [key, value];
+    }));
+
+    const isAuthorized = Boolean(cookies.Authorization);
+    const role = cookies.role;
 
     console.log("Cookies recebidos no middleware:", cookies);
 
-    // Se o usuário tem o cookie de autorização e está na rota raiz, redireciona para /admin
     if (isAuthorized && request.nextUrl.pathname === '/') {
         return NextResponse.redirect(new URL('/admin', request.url));
     }
 
-    // Se não tem o cookie de autorização e está nas rotas /admin, redireciona para a página inicial
     if (!isAuthorized && request.nextUrl.pathname.startsWith('/admin')) {
         return NextResponse.redirect(new URL('/', request.url));
     }
 
-    // Continua a requisição normalmente para todas as outras rotas
+    if (role === 'teacher' && request.nextUrl.pathname.startsWith('/admin')) {
+        return NextResponse.redirect(new URL('/teacher', request.url));
+    }
+
     return NextResponse.next();
 }
 
 export const config = {
-    matcher: ['/admin/:path*', '/'], // Adicionamos a rota raiz para redirecionar caso tenha o cookie Authorization
+    matcher: ['/admin/:path*', '/'],
 };

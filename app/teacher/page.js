@@ -3,7 +3,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import ModalAgendamento from "@/components/Modal/ModalAgendamento";
 import AgendaService from "@/lib/service/agendaService";
 import { Trash,Pencil  } from "lucide-react";
 import Swal from 'sweetalert2';
@@ -41,21 +40,11 @@ const renderEventDetails = (entry, isShortEvent) => {
   );
 };
 
-
-
-
-
-
-
-
-
 const getEventDurationInMinutes = (startStr, endStr) => {
   const [startHour, startMin] = startStr.split(':').map(Number);
   const [endHour, endMin] = endStr.split(':').map(Number);
   return (endHour * 60 + endMin) - (startHour * 60 + startMin); // ✅ Correto: 60 minutos por hora
 };
-
-
 
 // Função para definir a classe do balão
 const getBalloonClass = (entry, defaultClass) => {
@@ -64,10 +53,6 @@ const getBalloonClass = (entry, defaultClass) => {
   }
   return defaultClass;
 };
-
-// Função no componente
-
-
 
 export default function Agenda() {
   const { toast } = useToast();
@@ -87,46 +72,46 @@ export default function Agenda() {
   });
   // "events" será um objeto com chave slotKey e valor um array de diary entries
   const [events, setEvents] = useState({});
-  const [selectedType, setSelectedType] = useState("aluno");
   const [classrooms, setClassrooms] = useState([]);
   const [selectedClassroom, setSelectedClassroom] = useState(null);
   const [refreshDiary, setRefreshDiary] = useState(false);
   const [currentTimePosition, setCurrentTimePosition] = useState(0);
-
-const getCurrentTimePosition = () => {
-  const now = new Date();
   
-  // Hora local em minutos
-  const localMinutes = now.getHours() * 60 + now.getMinutes();
-
-  // Verifique o horário local para garantir que não há erro
-  console.log(`Hora local: ${now.toString()}`);  // Exibe o horário local completo
-
-  // Calculando a posição no calendário com base no horário local
-  const position = (localMinutes / 1440) * 24 * 64 + 64; // 1440 minutos por dia e 64px por "slot"
+  const getCurrentTimePosition = () => {
+    const now = new Date();
+    
+    // Hora local em minutos
+    const localMinutes = now.getHours() * 60 + now.getMinutes();
   
-  return position;
-};
+    // Verifique o horário local para garantir que não há erro
+    console.log(`Hora local: ${now.toString()}`);  // Exibe o horário local completo
+  
+    // Calculando a posição no calendário com base no horário local
+    const position = (localMinutes / 1440) * 24 * 64 + 64; // 1440 minutos por dia e 64px por "slot"
+    
+    return position;
+  };
+  
+  
+  useEffect(() => {
+      const updateCurrentTimePosition = () => {
+        const position = getCurrentTimePosition();
+        console.log("Atualizando posição:", position);
+        setCurrentTimePosition(position);
+      };
+  
+      console.log("Local time:", new Date().toLocaleTimeString());
+      console.log("UTC time:", new Date().toUTCString());
+  
+      // Chama na primeira renderização
+      updateCurrentTimePosition(); 
+  
+      // Atualiza a cada minuto
+      const interval = setInterval(updateCurrentTimePosition, 60000); 
+  
+      return () => clearInterval(interval);
+    }, []);
 
-
-useEffect(() => {
-    const updateCurrentTimePosition = () => {
-      const position = getCurrentTimePosition();
-      console.log("Atualizando posição:", position);
-      setCurrentTimePosition(position);
-    };
-
-    console.log("Local time:", new Date().toLocaleTimeString());
-    console.log("UTC time:", new Date().toUTCString());
-
-    // Chama na primeira renderização
-    updateCurrentTimePosition(); 
-
-    // Atualiza a cada minuto
-    const interval = setInterval(updateCurrentTimePosition, 60000); 
-
-    return () => clearInterval(interval);
-  }, []);
   // Busca das salas via AgendaService
   useEffect(() => {
     const fetchClassrooms = async () => {
@@ -150,7 +135,7 @@ useEffect(() => {
   // Atualiza o classroom_id em eventDetails com base no selectedClassroom
   useEffect(() => {
     if (selectedClassroom && selectedClassroom.id) {
-      setEventDetails((prev) => ({ ...prev, classroom_id: selectedClassroom.id }));
+      setEventDetails((prev) => ({ ...prev, classroom_id: selectedClassroom?.id }));
     }
   }, [selectedClassroom, setEventDetails]);
 
@@ -170,10 +155,11 @@ useEffect(() => {
     const fetchDiary = async () => {
       try {
         const agendaService = new AgendaService();
-        const jsonData = await agendaService.getDiary(
+        const jsonData = await agendaService.getDiaryTeacher(
           startOfWeek.toISOString(),
           endOfWeek.toISOString(),
-          selectedClassroom.id
+          selectedClassroom?.id,
+          
         );
         if (jsonData.status === "success") {
           const diaryEntries = jsonData.data;
@@ -264,104 +250,6 @@ useEffect(() => {
     });
   };
 
-  const handleToggleDay = (day) => {
-    let days = eventDetails.days || [];
-    if (days.includes(day)) {
-      days = days.filter((d) => d !== day);
-    } else {
-      days.push(day);
-    }
-    setEventDetails({ ...eventDetails, days });
-  };
-
-  // Ao clicar num evento, transforma o registro para o formato esperado no modal
-  const handleEventClick = (slotKey, entry) => {
-    const dtStart = entry.start_time ? new Date(entry.start_time) : null;
-    const dtEnd = entry.end_time ? new Date(entry.end_time) : null;
-  
-    const isTurma = entry.class && entry.class.id !== 0;
-    setSelectedType(isTurma ? "turma" : "aluno"); // Aqui está a correção
-    
-    const transformed = {
-      id: entry.id,
-      classroom_id: entry.classroom_id,
-      turmaAluno: isTurma 
-        ? (entry.class ? entry.class.name : "") 
-        : (entry.student ? `${entry.student.name} ${entry.student.last_name}` : ""),
-      curso: entry.course ? entry.course.name : "",
-      professor: entry.teacher ? entry.teacher.name : "",
-      inicio: dtStart
-        ? `${String(dtStart.getHours()).padStart(2, "0")}:${String(dtStart.getMinutes()).padStart(2, "0")}`
-        : entry.recurrence_pattern
-        ? entry.recurrence_pattern.split("@")[1].split("-")[0]
-        : "",
-      fim: dtEnd
-        ? `${String(dtEnd.getHours()).padStart(2, "0")}:${String(dtEnd.getMinutes()).padStart(2, "0")}`
-        : entry.recurrence_pattern
-        ? entry.recurrence_pattern.split("@")[1].split("-")[1]
-        : "",
-      reposicao: entry.is_makeup_class,
-      recorrente: entry.is_recurring,
-      days: [],
-      notes: entry.notes || "",
-      selectedItems: isTurma 
-        ? (entry.class ? [{ ...entry.class, label: entry.class.name }] : [])
-        : (entry.student ? [{ ...entry.student, label: `${entry.student.name} ${entry.student.last_name}` }] : []),
-      selectedTeacher: entry.teacher ? { ...entry.teacher, label: entry.teacher.name } : null,
-      selectedCourse: entry.course ? { ...entry.course, label: entry.course.name } : null,
-      selectedSubject: entry.subject ? { ...entry.subject, label: entry.subject.name } : null,
-      date: entry.start_time ? entry.start_time.split("T")[0] : "",
-    };
-    
-    setSelectedSlot(slotKey);
-    setEventDetails(transformed);
-    setIsModalOpen(true);
-  };
-  
-  
-
-  // Callback para forçar refresh do diary após salvar/alterar
-  const onDiaryUpdatedCallback = () => {
-    setRefreshDiary((prev) => !prev);
-  };
-
-  const handleDeleteEvent = async (entryId) => {
-    const confirmation = await Swal.fire({
-      title: 'Confirmar exclusão?',
-      text: 'Deseja realmente excluir este agendamento?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#dc2626',
-      cancelButtonColor: '#6b7280',
-      confirmButtonText: 'Sim, excluir!',
-      cancelButtonText: 'Cancelar'
-    });
-  
-    if (confirmation.isConfirmed) {
-      try {
-        const agendaService = new AgendaService();
-        const result = await agendaService.deleteDiary(entryId);
-  
-        Swal.fire({
-          icon: 'success',
-          title: 'Sucesso',
-          text: result.message || 'Agendamento excluído com sucesso.',
-        });
-  
-        // Força o refresh do diário após exclusão
-        setRefreshDiary(prev => !prev);
-  
-      } catch (error) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Erro',
-          text: error.message || 'Falha ao excluir o agendamento.',
-        });
-      }
-    }
-  }
-
-
   const handleViewEventDetails = (entry, startStr, endStr) => {
     Swal.fire({
       title: 'Detalhes do Agendamento',
@@ -385,18 +273,13 @@ useEffect(() => {
     });
   };
 
-  
-  
-
   return (
     <div className="flex flex-col items-center p-6 bg-white shadow-lg rounded-xl w-full transition-all duration-300 relative">
-      {/* Legenda dos Balões */}
-
 
       {/* Select de Salas */}
       <div className="absolute top-4 right-4">
         <select
-          value={selectedClassroom ? selectedClassroom.id : ""}
+          value={selectedClassroom ? selectedClassroom?.id : ""}
           onChange={(e) => {
             const selected = classrooms.find((c) => c.id === parseInt(e.target.value));
             setSelectedClassroom(selected);
@@ -424,7 +307,6 @@ useEffect(() => {
           <span>Aulas Recorrentes</span>
         </div>
       </div>
-
       {/* Calendário */}
       <div className="flex w-full border-gray-300">
         <div className="flex flex-col mt-32 border-gray-300">
@@ -452,53 +334,51 @@ useEffect(() => {
               <ChevronRight />
             </button>
           </div>
-         <div className="grid grid-cols-7 border-t border-r flex-grow relative">
-      {renderWeek().map((currentDate, dayIndex) => {
-        const dayKey = currentDate.toISOString().split("T")[0];
-        const isToday = currentDate.toDateString() === new Date().toDateString();
-
-        return (
-          <div key={dayIndex} className="border-l border-gray-300 relative">
-            <div
-              className={`p-2 text-center font-semibold ${
-                isToday ? "bg-blue-500 text-white" : "bg-gray-100"
-              } transition-colors duration-300 sticky top-0 z-10 border-b border-gray-300`}
-            >
-              {"Dom Seg Ter Qua Qui Sex Sáb".split(" ")[currentDate.getDay()]} <br /> {currentDate.getDate()}
-            </div>
-
-            {/* LINHA VERMELHA DO HORÁRIO ATUAL */}
-            {isToday && (
-              <div
-                className="absolute left-0 w-full h-0.5 bg-red-500 z-20"
-                style={{ top: `${currentTimePosition}px` }}
-              />
-            )}
-
-            {Array.from({ length: 24 }, (_, hourIndex) => {
-              const slotKey = `${dayKey}T${String(hourIndex).padStart(2, "0")}:00`;
-
+          <div className="grid grid-cols-7 border-t border-r flex-grow relative">
+            {renderWeek().map((currentDate, dayIndex) => {
+              const dayKey = currentDate.toISOString().split("T")[0];
+              const isToday = currentDate.toDateString() === new Date().toDateString();
               return (
-                <div key={hourIndex} className="transition-all duration-300">
-                  <button
-                    onClick={() => {
-                      setSelectedSlot(slotKey);
-                      setEventDetails({
-                        turmaAluno: "",
-                        curso: "",
-                        professor: "",
-                        inicio: `${String(hourIndex).padStart(2, "0")}:00`,
-                        fim: "",
-                        reposicao: false,
-                        recorrente: false,
-                        days: [],
-                        notes: "",
-                        date: dayKey,
-                      });
-                      setIsModalOpen(true);
-                    }}
-                    className="h-16 w-full border-t border-gray-300 flex justify-center items-center transition relative hover:bg-gray-200"
-                  ></button>
+                <div key={dayIndex} className="border-l border-gray-300 relative">
+                  <div
+                    className={`p-2 text-center font-semibold ${
+                      currentDate.toDateString() === new Date().toDateString()
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-100"
+                    } transition-colors duration-300 sticky top-0 z-10 border-b border-gray-300`}
+                  >
+                    {"Dom Seg Ter Qua Qui Sex Sáb".split(" ")[currentDate.getDay()]} <br /> {currentDate.getDate()}
+                  </div>
+                  {/* LINHA VERMELHA DO HORÁRIO ATUAL */}
+                  {isToday && (
+                    <div
+                    className="absolute left-0 w-full h-0.5 bg-red-500 z-20"
+                    style={{ top: `${currentTimePosition}px` }}
+                    />
+                  )}
+                  {Array.from({ length: 24 }, (_, hourIndex) => {
+                    const slotKey = `${dayKey}T${String(hourIndex).padStart(2, "0")}:00`;
+                    return (
+                      <div key={hourIndex} className="transition-all duration-300">
+                        <button
+                          onClick={() => {
+                            setSelectedSlot(slotKey);
+                            setEventDetails({
+                              turmaAluno: "",
+                              curso: "",
+                              professor: "",
+                              inicio: `${String(hourIndex).padStart(2, "0")}:00`,
+                              fim: "",
+                              reposicao: false,
+                              recorrente: false,
+                              days: [],
+                              notes: "",
+                              date: dayKey,
+                            });
+                            setIsModalOpen(true);
+                          }}
+                          className="h-16 w-full border-t border-gray-300 flex justify-center items-center transition relative hover:bg-gray-200"
+                        ></button>
                         {filteredEvents[slotKey] &&
                           filteredEvents[slotKey].map((entry) => {
                             if (!entry.is_recurring && entry.start_time && entry.end_time) {
@@ -520,25 +400,6 @@ useEffect(() => {
                                       zIndex: 1,
                                     }}
                                   >
-
-                                  {/* Ícones editar/excluir */}
-                                  <Pencil
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleEventClick(slotKey, entry);
-                                    }}
-                                    className="absolute top-1 right-5 w-4 h-4 text-white hover:text-yellow-200 transition z-20"
-                                  />
-
-                                  <Trash
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleDeleteEvent(entry.id);
-                                    }}
-                                    className="absolute top-1 right-1 w-4 h-4 text-white hover:text-red-200 transition z-20"
-                                  />
-
-                                  {/* Detalhes resumidos */}
                                   {renderEventDetails(entry, isShortEvent)}
                                 </div>
 
@@ -562,29 +423,9 @@ useEffect(() => {
                                       zIndex: 1,
                                     }}
                                   >
-
-                                    {/* Ícones editar/excluir */}
-                                    {/*  
-                                    <Pencil
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleEventClick(slotKey, entry);
-                                      }}
-                                      className="absolute top-1 right-5 w-4 h-4 text-white hover:text-yellow-200 transition z-20"
-                                    />*/}
-
-                                    <Trash
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleDeleteEvent(entry.id);
-                                      }}
-                                      className="absolute top-1 right-1 w-4 h-4 text-white hover:text-red-200 transition z-20"
-                                    />
-
                                     {/* Detalhes resumidos */}
                                     {renderEventDetails(entry, isShortEvent)}
                                   </div>
-
 
                               );
                             }
@@ -600,18 +441,6 @@ useEffect(() => {
         </div>
       </div>
 
-      {/* Modal de Agendamento */}
-      <ModalAgendamento
-        isModalOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        selectedType={selectedType}
-        setSelectedType={setSelectedType}
-        eventDetails={eventDetails}
-        setEventDetails={setEventDetails}
-        handleToggleDay={handleToggleDay}
-        selectedClassroom={selectedClassroom}
-        onDiaryUpdated={() => setRefreshDiary((prev) => !prev)}
-      />
     </div>
   );
 }

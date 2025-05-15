@@ -14,6 +14,7 @@ import { AlertDialogUI } from "@/components/alert";
 import styled from "styled-components";
 import ProfessorForm from "@/components/forms/professorForm";
 import FormatDate from "@/app/utils/FormatDate";
+import EditProfessorForm from "@/components/forms/EditprofessorForm";
 
 const Backdrop = styled.div`
   position: fixed;
@@ -281,13 +282,13 @@ export default function Professores() {
         <>
           <Backdrop onClick={() => setEditProfessor(false)} />
           <GenericModalContent>
-            <ProfessorForm
+            <EditProfessorForm
               professor={editProfessor}
               setProfessorData={setEditProfessor}
             />
             <ButtonGroup>
               <StyledButtonPrimary onClick={() => fetchEditarProfessor(editProfessor)}>
-                Salvar{" "}
+                Salvar
               </StyledButtonPrimary>
               <StyledButtonSecondary onClick={() => setEditProfessor(null)}>Cancelar</StyledButtonSecondary>
             </ButtonGroup>
