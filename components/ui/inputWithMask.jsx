@@ -1,7 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const InputWithMask = ({ label, value, defaultValue, name, onChange, type = "text", mask, error, className="", isRequired}) => {
+const InputWithMask = ({ label, value, defaultValue, name, onChange, type = "text", mask, error, className="", isRequired,placeholder}) => {
   const handleInputChange = (e) => {
     const { value } = e.target;
 
@@ -20,6 +20,7 @@ const InputWithMask = ({ label, value, defaultValue, name, onChange, type = "tex
         id={name}
         name={name}
         value={value}
+        placeholder={placeholder}
         defaultValue={defaultValue}
         onChange={handleInputChange}
         style={{
