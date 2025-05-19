@@ -7,6 +7,7 @@ import AgendaService from "@/lib/service/agendaService";
 import { Trash,Pencil  } from "lucide-react";
 import Swal from 'sweetalert2';
 
+
 // Função auxiliar para renderizar os detalhes do evento
 const renderEventDetails = (entry, isShortEvent) => {
   const participantLabel = entry.class && entry.class.id !== 0 ? "Turma" : "Aluno";
@@ -152,6 +153,7 @@ export default function Agenda() {
   // Busca os registros de diário conforme a semana e a sala selecionada
   useEffect(() => {
     const { startOfWeek, endOfWeek } = getWeekRange();
+
     const fetchDiary = async () => {
       try {
         const agendaService = new AgendaService();

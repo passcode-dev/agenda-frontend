@@ -70,19 +70,12 @@ const CustomInputWithMask = styled(InputWithMask)`
 
 export default function EditProfessorForm({ professor, setProfessorData, error }) {
 
-  const [isfirstacess, setIsFirstAccess] = useState(false);
 
   const handleChange = (nome, value) => {
     setProfessorData({ ...professor, [nome]: value })
   };
 
-  useEffect(() => {
-    if (professor?.password === undefined || professor?.password == null || professor?.password == '') {
-      setIsFirstAccess(true);
-    } else {
-      setIsFirstAccess(false);
-    }
-  },[]);
+ 
 
   return (
     <StyledForm className="space-y-4">
@@ -140,16 +133,16 @@ export default function EditProfessorForm({ professor, setProfessorData, error }
         isRequired={false}
       />
 
-      { isfirstacess && 
-
+     
       <CustomInputWithMask
         label="Senha"
         name="password"
-        defaultValue={professor.password}
+        placeholder={"Deixe em branco para não alterar a senha"}
+        defaultValue={""}
         onChange={handleChange}
         error={error}
         isRequired={false}
-      />}
+      />
     </StyledForm>
   );
 
