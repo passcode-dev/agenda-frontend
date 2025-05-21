@@ -276,8 +276,8 @@ useEffect(() => {
 
   // Ao clicar num evento, transforma o registro para o formato esperado no modal
   const handleEventClick = (slotKey, entry) => {
-    const dtStart = entry.start_time ? new Date(entry.start_time) : null;
-    const dtEnd = entry.end_time ? new Date(entry.end_time) : null;
+    const dtStart = entry.start_time ?parseLocalDateTime(entry.start_time) : null;
+    const dtEnd = entry.end_time ? parseLocalDateTime(entry.end_time) : null;
   
     const isTurma = entry.class && entry.class.id !== 0;
     setSelectedType(isTurma ? "turma" : "aluno"); // Aqui está a correção
@@ -318,7 +318,14 @@ useEffect(() => {
     setIsModalOpen(true);
   };
   
-  
+
+  function parseLocalDateTime(dateTimeStr) {
+    const [datePart, timePart] = dateTimeStr.split('T');
+    const [year, month, day] = datePart.split('-').map(Number);
+    const [hour, minute, second] = timePart.split(':').map(Number);
+    return new Date(year, month - 1, day, hour, minute, second || 0);
+  }
+
 
   // Callback para forçar refresh do diary após salvar/alterar
   const onDiaryUpdatedCallback = () => {
@@ -502,10 +509,11 @@ useEffect(() => {
                         {filteredEvents[slotKey] &&
                           filteredEvents[slotKey].map((entry) => {
                             if (!entry.is_recurring && entry.start_time && entry.end_time) {
-                              const dtStart = new Date(entry.start_time);
-                              const dtEnd = new Date(entry.end_time);
+                              const dtStart = parseLocalDateTime(entry.start_time);
+                              const dtEnd = parseLocalDateTime(entry.end_time);
                               const startStr = `${String(dtStart.getHours()).padStart(2, "0")}:${String(dtStart.getMinutes()).padStart(2, "0")}`;
                               const endStr = `${String(dtEnd.getHours()).padStart(2, "0")}:${String(dtEnd.getMinutes()).padStart(2, "0")}`;
+                              console.log("startStr:", startStr, "endStr:", endStr);
                               const durationMinutes = getEventDurationInMinutes(startStr, endStr);
                               const isShortEvent = durationMinutes <= 70; // menos ou igual a 1 hora
                               const balloonClass = getBalloonClass(entry, "bg-gradient-to-r from-indigo-500 to-blue-500 shadow-lg");

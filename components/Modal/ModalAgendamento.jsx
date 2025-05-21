@@ -289,6 +289,14 @@ export default function ModalAgendamento({
 
   // ---------- VALIDAÇÃO E TRATAMENTO DE CONFLITO ----------
 
+
+    function parseLocalDateTime(dateTimeStr) {
+    const [datePart, timePart] = dateTimeStr.split('T');
+    const [year, month, day] = datePart.split('-').map(Number);
+    const [hour, minute, second] = timePart.split(':').map(Number);
+    return new Date(year, month - 1, day, hour, minute, second || 0);
+  }
+
   // Submodal de conflito
   function ConflictModal() {
     if (!conflictData) return null;
@@ -317,8 +325,8 @@ export default function ModalAgendamento({
     // Formata horário
     let horarioStr = "";
     if (start_time && end_time) {
-      const dtStart = new Date(start_time);
-      const dtEnd = new Date(end_time);
+      const dtStart = parseLocalDateTime(start_time);
+      const dtEnd = parseLocalDateTime(end_time);
       const startHH = String(dtStart.getHours()).padStart(2, "0");
       const startMM = String(dtStart.getMinutes()).padStart(2, "0");
       const endHH = String(dtEnd.getHours()).padStart(2, "0");
