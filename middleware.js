@@ -10,7 +10,6 @@ export function middleware(request) {
     const isAuthorized = Boolean(cookies.Authorization);
     const role = cookies.role;
 
-    console.log("Cookies recebidos no middleware:", cookies);
 
     if (isAuthorized && request.nextUrl.pathname === '/') {
         return NextResponse.redirect(new URL('/admin', request.url));
