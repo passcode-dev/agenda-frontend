@@ -27,13 +27,13 @@ const Backdrop = styled.div`
 `;
 
 const GenericModalContent = styled.div`
-  position: fixed;
+  position: absolute;
   top: 50px;
   left: 0;
   right: 0;
   margin: auto;
   max-width: 1000px;
-  max-height: 90vh;
+  height: fit-content;
   display: flex;
   flex-direction: column;
   background: white;
@@ -57,6 +57,7 @@ const GenericModalContent = styled.div`
     }
   }
 `;
+
 
 const ButtonGroup = styled.div`
   display: flex;
