@@ -38,7 +38,6 @@ const Backdrop = styled.div`
   backdrop-filter: blur(5px);
   z-index: 99;
 `;
-
 const GenericModalContent = styled.div`
   position: absolute;
   top: 50px;
@@ -70,6 +69,7 @@ const GenericModalContent = styled.div`
     }
   }
 `;
+
 
 const ContainerLogs = styled.div`
   width: 100%;
