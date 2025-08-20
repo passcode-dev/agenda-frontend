@@ -254,7 +254,7 @@ export default function Usuarios() {
         }
       };
       const verificaInputs = async (usuario) => {
-        if (!usuario.name || !usuario.email || !usuario.password) {
+        if (!usuario.username || !usuario.email || !usuario.password) {
           setError(true);
         } else {
           setError(false);
